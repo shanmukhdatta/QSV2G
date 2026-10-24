@@ -1,0 +1,16 @@
+# Do not commit generated files, credentials, or temporary materials
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store
+.pytest_cache/
+/kaggle/working/
+# Raw experimental archives in results/archives/ are intentionally versioned.

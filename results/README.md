@@ -1,0 +1,11 @@
+# Results — navigate by experiment
+
+| Directory | Experiment and files |
+|---|---|
+| [`final_validation/`](final_validation/) | 38 validation cases, 720 ideal QSS trials, equation mapping, assumptions, execution trace, summary JSON |
+| [`full_protocol_openssl/`](full_protocol_openssl/) | Full protocol results reporting the OpenSSL ML-KEM/ML-DSA backend |
+| [`full_protocol_pqcrypto/`](full_protocol_pqcrypto/) | Separate full protocol results reporting native `pqcrypto` backend |
+| [`quantum_validation/`](quantum_validation/) | Independent qutrit quantum correctness and X-error observations |
+| [`archives/`](archives/) | Original untouched source ZIP files for all available result variants |
+
+Original plots are also extracted into [`../figures/experimental/`](../figures/experimental/). **Do not aggregate cross-environment timing measurements.** All results are from software simulation and should be attributed to their source manifests.

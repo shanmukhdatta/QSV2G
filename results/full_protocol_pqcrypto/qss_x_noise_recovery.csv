@@ -1,0 +1,22 @@
+pair,x_error_rate,shots,successes,recovery_success_rate,model
+AB,0.0,400,400,1.0,single-share qutrit X error before computational measurement
+AB,0.01,400,397,0.9925,single-share qutrit X error before computational measurement
+AB,0.03,400,387,0.9675,single-share qutrit X error before computational measurement
+AB,0.05,400,382,0.955,single-share qutrit X error before computational measurement
+AB,0.1,400,358,0.895,single-share qutrit X error before computational measurement
+AB,0.2,400,317,0.7925,single-share qutrit X error before computational measurement
+AB,0.3,400,297,0.7425,single-share qutrit X error before computational measurement
+AC,0.0,400,400,1.0,single-share qutrit X error before computational measurement
+AC,0.01,400,396,0.99,single-share qutrit X error before computational measurement
+AC,0.03,400,388,0.97,single-share qutrit X error before computational measurement
+AC,0.05,400,372,0.93,single-share qutrit X error before computational measurement
+AC,0.1,400,355,0.8875,single-share qutrit X error before computational measurement
+AC,0.2,400,326,0.815,single-share qutrit X error before computational measurement
+AC,0.3,400,286,0.715,single-share qutrit X error before computational measurement
+BC,0.0,400,400,1.0,single-share qutrit X error before computational measurement
+BC,0.01,400,394,0.985,single-share qutrit X error before computational measurement
+BC,0.03,400,385,0.9625,single-share qutrit X error before computational measurement
+BC,0.05,400,385,0.9625,single-share qutrit X error before computational measurement
+BC,0.1,400,354,0.885,single-share qutrit X error before computational measurement
+BC,0.2,400,317,0.7925,single-share qutrit X error before computational measurement
+BC,0.3,400,290,0.725,single-share qutrit X error before computational measurement

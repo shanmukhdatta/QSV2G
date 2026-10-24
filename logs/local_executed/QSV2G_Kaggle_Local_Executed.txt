@@ -1,0 +1,142 @@
+Original notebook: QSV2G_Kaggle_Local_Executed.ipynb
+Source: captured output cells in local executed notebook; not a Kaggle runtime log.
+
+--- notebook cell 2, execution_count=1 ---
+Local runtime: using available libraries; optional Qiskit/PennyLane checks skip if unavailable.
+Python 3.13.5 | NumPy 2.3.5 | Results /mnt/data/qsv2g_notebook_results
+
+--- notebook cell 6, execution_count=3 ---
+PQC backend: OpenSSL 3.5+ ML-KEM-768 + ML-DSA-65 (subprocess)
+ML-KEM ciphertext bytes: 1088 ML-DSA signature bytes: 3309
+Qutrit norms, stabilizers and single-share density tests: PASS
+
+--- notebook cell 8, execution_count=4 ---
+Qiskit unavailable: optional Bell and embedded qutrit check SKIPPED
+PennyLane unavailable: optional Bell and embedded qutrit check SKIPPED
+
+--- notebook cell 10, execution_count=5 ---
+Three-qutrit ideal reconstruction — all 3 pairs and secret values: PASS
+   secret pair  shots  recovered  success_rate
+0       0   AB    300        300           1.0
+1       0   AC    300        300           1.0
+2       0   BC    300        300           1.0
+3       1   AB    300        300           1.0
+4       1   AC    300        300           1.0
+5       1   BC    300        300           1.0
+6       2   AB    300        300           1.0
+7       2   AC    300        300           1.0
+8       2   BC    300        300           1.0
+
+--- notebook cell 12, execution_count=6 ---
+PAIR AB -- TERMINATED | 175.8 ms
+PAIR AC -- TERMINATED | 165.3 ms
+PAIR BC -- TERMINATED | 162.1 ms
+  pair  passed  elapsed_ms  energy_mWh  signature_bytes
+0   AB    True  175.839648   10000.002             6618
+1   AC    True  165.255732   10000.002             6618
+2   BC    True  162.081876   10000.002             6618
+Protocol stages from most recent full run:
+                         phase     status  ...  ticks      op
+0                 registration       PASS  ...    NaN     NaN
+1  cross_domain_authentication       PASS  ...    NaN     NaN
+2        session_establishment       PASS  ...    NaN     NaN
+3            context_agreement       PASS  ...    NaN     NaN
+4         authority_validation       PASS  ...    NaN     NaN
+5                qss_threshold       PASS  ...    NaN     NaN
+6          authorization_token       PASS  ...    NaN     NaN
+7        ev_token_verification       PASS  ...    NaN     NaN
+8             energy_execution       PASS  ...    6.0  CHARGE
+9                  termination  COMPLETED  ...    NaN     NaN
+
+[10 rows x 18 columns]
+
+--- notebook cell 14, execution_count=7 ---
+                                                 test  ...                                        explanation
+0                                       EV tag tamper  ...                                  EV proof rejected
+1                                       CS tag tamper  ...                                  CS proof rejected
+2                           context ciphertext tamper  ...                        AEAD authentication failure
+3                                   EV consent tamper  ...                           UC-A rejected EV consent
+4                                   revoked pseudonym  ...                                         EV revoked
+5                            only one policy approval  ...                  fewer than two distinct approvals
+6                         missing authority signature  ...                        invalid authority signature
+7      signature swapped inside authentic CS response  ...                         EV token signature invalid
+8                           protected response tamper  ...                        AEAD authentication failure
+9                        corrupted qutrit measurement  ...              QSS reconstructed commitment mismatch
+10                              expired authorization  ...                                    context expired
+11         UC-A offline (required for authentication)  ...     UC-A and UC-B required for online registration
+12  UC-B offline (required for authentication and ...  ...     UC-A and UC-B required for online registration
+13                     UC-C offline with AB approving  ...                                          completed
+14                            repeat energy execution  ...      terminal transaction rejects second execution
+15                               replayed AEAD packet  ...                      nonce seen set rejects replay
+16                      UC-A offline after enrollment  ...  online authentication requires both original a...
+17                      UC-B offline after enrollment  ...  online authentication requires both original a...
+18                      reusing consumed QSS resource  ...              UNUSED->RESERVED->CONSUMED, no replay
+
+[19 rows x 5 columns]
+Attack/failure scenarios passed: 19
+
+--- notebook cell 16, execution_count=8 ---
+   pair  ...                                              model
+0    AB  ...  single-share qutrit X error before computation...
+1    AB  ...  single-share qutrit X error before computation...
+2    AB  ...  single-share qutrit X error before computation...
+3    AB  ...  single-share qutrit X error before computation...
+4    AB  ...  single-share qutrit X error before computation...
+5    AB  ...  single-share qutrit X error before computation...
+6    AB  ...  single-share qutrit X error before computation...
+7    AC  ...  single-share qutrit X error before computation...
+8    AC  ...  single-share qutrit X error before computation...
+9    AC  ...  single-share qutrit X error before computation...
+10   AC  ...  single-share qutrit X error before computation...
+11   AC  ...  single-share qutrit X error before computation...
+12   AC  ...  single-share qutrit X error before computation...
+13   AC  ...  single-share qutrit X error before computation...
+14   BC  ...  single-share qutrit X error before computation...
+15   BC  ...  single-share qutrit X error before computation...
+16   BC  ...  single-share qutrit X error before computation...
+17   BC  ...  single-share qutrit X error before computation...
+18   BC  ...  single-share qutrit X error before computation...
+19   BC  ...  single-share qutrit X error before computation...
+20   BC  ...  single-share qutrit X error before computation...
+
+[21 rows x 6 columns]
+<Figure size 700x400 with 1 Axes>
+
+--- notebook cell 18, execution_count=9 ---
+End-to-end timing distribution (ms):
+               count        mean       std  ...         50%         75%         max
+total_wall_ms    8.0  164.955423  7.637684  ...  163.293923  170.203837  177.667606
+
+[1 rows x 8 columns]
+                         phase       mean       std     min     max
+0         authority_validation   0.088625  0.048267   0.057   0.202
+1          authorization_token  36.132875  3.683358  31.454  43.462
+2            context_agreement   0.247750  0.058029   0.193   0.357
+3  cross_domain_authentication   0.166625  0.049263   0.126   0.237
+4             energy_execution   0.153375  0.031924   0.129   0.228
+5        ev_token_verification  15.378375  1.621305  13.640  18.196
+6                qss_threshold  11.542000  0.961724  10.240  13.203
+7                 registration  18.088500  2.570562  15.916  23.205
+8        session_establishment  30.874500  3.023546  27.379  36.188
+9                  termination   0.050750  0.002866   0.048   0.056
+<Figure size 900x480 with 1 Axes>
+
+--- notebook cell 20, execution_count=10 ---
+                  message  wire_bytes
+0  authorization_response        9746
+1             context_ack         239
+2           context_offer         382
+3         execution_start         265
+4             termination         264
+                                   component  ...                          unit
+0                       EV Bell registration  ...   qubit one-way transmissions
+1                       CS Bell registration  ...   qubit one-way transmissions
+2          three-dealer QSS resources, L=162  ...  qutrit one-way transmissions
+3  QSS qutrit subsystems stored collectively  ...             qutrit subsystems
+
+[4 rows x 3 columns]
+
+--- notebook cell 22, execution_count=11 ---
+RESULTS ZIP: /mnt/data/qsv2g_results.zip bytes: 176707
+CSV files: ['qsv2g_end_to_end_timing.csv', 'qss_ideal_reconstruction.csv', 'qsv2g_classical_aead_packet_sizes.csv', 'qsv2g_failure_tests.csv', 'qsv2g_phase_summary.csv', 'qss_x_noise_recovery.csv', 'qsv2g_quantum_resource_accounting.csv', 'qsv2g_all_pairs.csv', 'qsv2g_phase_timing.csv']
+RESULT: FULL DEMONSTRATION AND TESTS COMPLETED

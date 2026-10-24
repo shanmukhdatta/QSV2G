@@ -1,0 +1,39 @@
+suite,case,expected,observed,pass,interpretation,type
+A,Ideal AB/AC/BC qutrit recovery,ACCEPTED,ACCEPTED,True,720 / 720 exact ideal recoveries,functional
+A,"Quantum value substitution dealer A pair ('A', 'B')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,"Quantum value substitution dealer B pair ('A', 'B')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,"Quantum value substitution dealer C pair ('A', 'B')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,"Quantum value substitution dealer A pair ('A', 'C')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,"Quantum value substitution dealer B pair ('A', 'C')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,"Quantum value substitution dealer C pair ('A', 'C')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,"Quantum value substitution dealer A pair ('B', 'C')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,"Quantum value substitution dealer B pair ('B', 'C')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,"Quantum value substitution dealer C pair ('B', 'C')",REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,Commitment substitution,REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+A,Malicious dealer replaces valid state and its own commitment,ACCEPTED,ACCEPTED,True,Expected: a self-consistent but dealer-chosen secret is not rejected; does not prove a malicious-secure VQSS property.,known_limitation
+A,"Stabilizers cannot distinguish encoded 0, 1 and 2",NOT_DETECTED,NOT_DETECTED,True,All three valid codewords have the same indicated stabilizer eigenvalues; extra verification is required.,known_limitation
+B,"Full protocol CHARGE / ('A', 'B')",ACCEPTED,ACCEPTED,True,All stages executed through final energy-record processing.,functional
+B,"Full protocol CHARGE / ('A', 'C')",ACCEPTED,ACCEPTED,True,All stages executed through final energy-record processing.,functional
+B,"Full protocol CHARGE / ('B', 'C')",ACCEPTED,ACCEPTED,True,All stages executed through final energy-record processing.,functional
+B,"Full protocol DISCHARGE / ('A', 'B')",ACCEPTED,ACCEPTED,True,All stages executed through final energy-record processing.,functional
+B,"Full protocol DISCHARGE / ('A', 'C')",ACCEPTED,ACCEPTED,True,All stages executed through final energy-record processing.,functional
+B,"Full protocol DISCHARGE / ('B', 'C')",ACCEPTED,ACCEPTED,True,All stages executed through final energy-record processing.,functional
+B,Honest token issuance before QSS,REJECTED,REJECTED,True,QSS reconstruction missing,functional
+B,Only one approving authority,REJECTED,REJECTED,True,fewer than two distinct approvals,functional
+B,Single compromised signer impersonates second authority,REJECTED,REJECTED,True,EV token signature invalid,functional
+B,Two colluding signers bypass QSS attestation without reconstruction,ACCEPTED,ACCEPTED,True,Expected trust-limit demonstration: signature-only EV verification does not prove quantum reconstruction.,known_limitation
+C,Equation mapping symbols present,MAPPED,MAPPED,True,22 source equation/function connections checked; equivalence remains a manual review task.,functional
+C,End-to-end trace reaches termination,ACCEPTED,ACCEPTED,True,Actual state transitions exported to CSV.,functional
+D,Competing QSS reservation,REJECTED,REJECTED,True,QSS resource already reserved or consumed,functional
+D,Unresolved reserved resource cannot be reassigned,REJECTED,REJECTED,True,In-memory RESERVED state has no recovery protocol; safe but can reduce availability.,functional
+D,Failed reconstruction burns resource,REJECTED,REJECTED,True,QSS reconstructed commitment mismatch,functional
+D,Consumed resource cannot be reassigned,REJECTED,REJECTED,True,QSS resource already reserved or consumed,functional
+D,Authenticated packet replay,REJECTED,REJECTED,True,duplicate or malformed AEAD nonce,functional
+D,Associated-data substitution,REJECTED,REJECTED,True,AEAD authentication failure,functional
+D,Reinstantiating traffic with the same key repeats the nonce,REPEATED,REPEATED,True,Expected configuration hazard: session traffic keys must never be restored with reset nonce state.,known_limitation
+D,Expired transaction rejected,REJECTED,REJECTED,True,context expired,functional
+D,Second energy execution rejected,REJECTED,REJECTED,True,EV did not accept token,functional
+D,UC-A unavailable (full workflow),REJECTED,REJECTED,True,"QSS has 2-of-3 reconstructability, but the full system relies on online UC-A and UC-B.",availability_boundary
+D,UC-B unavailable (full workflow),REJECTED,REJECTED,True,"QSS has 2-of-3 reconstructability, but the full system relies on online UC-A and UC-B.",availability_boundary
+D,UC-C unavailable (full workflow),ACCEPTED,ACCEPTED,True,"QSS has 2-of-3 reconstructability, but the full system relies on online UC-A and UC-B.",availability_boundary
+D,Authenticated interrupted termination,INTERRUPTED,INTERRUPTED,True,Terminal receipt protected by the directional traffic key.,functional

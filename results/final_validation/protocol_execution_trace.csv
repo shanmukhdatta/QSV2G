@@ -1,0 +1,11 @@
+phase,status,elapsed_ms,bell_pairs_per_entity,backend,kem_ciphertext_bytes,sid_bytes,context_hash,approved,pair,recovered,consumed,signer_count,signature_bytes,decision,energy_mwh,ticks,op
+registration,PASS,33.843,128.0,,,,,,,,,,,,,,
+cross_domain_authentication,PASS,0.315,,,,,,,,,,,,,,,
+session_establishment,PASS,0.988,,pqcrypto native ML-KEM-768 + ML-DSA-65,1088.0,16.0,,,,,,,,,,,
+context_agreement,PASS,0.273,,,,,1903957252ea782426b37186237c64c5332e4b25b1fc74c94b0907c5223b3c6a,,,,,,,,,,
+authority_validation,PASS,0.118,,,,,,"A,B,C",,,,,,,,,
+qss_threshold,PASS,5.757,,,,,,,BC,True,CONSUMED,,,,,,
+authorization_token,PASS,33.675,,,,,,,,,,2.0,6618.0,,,,
+ev_token_verification,PASS,1.885,,,,,,,,,,,,ACCEPT,,,
+energy_execution,PASS,0.168,,,,,,,,,,,,,10000.002,6.0,DISCHARGE
+termination,COMPLETED,0.078,,,,,,,,,,,,,,,

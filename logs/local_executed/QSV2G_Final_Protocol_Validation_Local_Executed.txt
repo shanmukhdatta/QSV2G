@@ -1,0 +1,61 @@
+Original notebook: QSV2G_Final_Protocol_Validation_Local_Executed.ipynb
+Source: captured output cells in local executed notebook; not a Kaggle runtime log.
+
+--- notebook cell 2, execution_count=1 ---
+Python: 3.13.5 OS: Linux-6.18.55-x86_64-with-glibc2.41
+OpenSSL: OpenSSL 3.5.5 27 Jan 2026 (Library: OpenSSL 3.5.5 27 Jan 2026)
+
+--- notebook cell 6, execution_count=3 ---
+PQC backend: OpenSSL 3.5+ ML-KEM-768 + ML-DSA-65 (subprocess)
+Results folder: qsv2g_final_validation_results
+
+--- notebook cell 8, execution_count=4 ---
+QSS corruption and consistency cases complete
+
+--- notebook cell 10, execution_count=5 ---
+Authorization tests complete; known trust limitation recorded explicitly.
+
+--- notebook cell 12, execution_count=6 ---
+                     latex_equation  ... symbol_exists
+0                    eq:ev_reg_bell  ...          True
+1                     eq:ev_reg_tag  ...          True
+2                    eq:cs_reg_auth  ...          True
+3            eq:qss_qutrit_encoding  ...          True
+4              eq:qss_pair_recovery  ...          True
+5           eq:qsv2g_qss_commitment  ...          True
+6          eq:qss_state_consistency  ...          True
+7                  eq:ev_auth_proof  ...          True
+8                  eq:cs_auth_proof  ...          True
+9               eq:qsv2g_kem_encaps  ...          True
+10             eq:qsv2g_session_key  ...          True
+11                 eq:qsv2g_context  ...          True
+12        eq:qsv2g_ev_authz_consent  ...          True
+13      eq:qsv2g_authority_decision  ...          True
+14      eq:qsv2g_qss_recover_symbol  ...          True
+15    eq:qsv2g_qss_commitment_check  ...          True
+16              eq:qsv2g_auth_token  ...          True
+17     eq:qsv2g_response_encryption  ...          True
+18       eq:qsv2g_ev_context_verify  ...          True
+19       eq:qsv2g_execution_request  ...          True
+20        eq:qsv2g_execution_states  ...          True
+21  eq:qsv2g_termination_protection  ...          True
+
+[22 rows x 5 columns]
+
+--- notebook cell 14, execution_count=7 ---
+Failure and recovery checks complete
+
+--- notebook cell 16, execution_count=8 ---
+TOTAL: 38 tests; expectations matched: 38
+KNOWN LIMITATIONS DOCUMENTED: 4
+ZIP: qsv2g_final_validation_results.zip bytes: 5519
+  suite  tests  matched
+0     A     13       13
+1     B     10       10
+2     C      2        2
+3     D     13       13
+                                                 case                                     interpretation
+11  Malicious dealer replaces valid state and its ...  Expected: a self-consistent but dealer-chosen ...
+12  Stabilizers cannot distinguish encoded 0, 1 and 2  All three valid codewords have the same indica...
+22  Two colluding signers bypass QSS attestation w...  Expected trust-limit demonstration: signature-...
+31  Reinstantiating traffic with the same key repe...  Expected configuration hazard: session traffic...

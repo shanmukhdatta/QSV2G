@@ -1,0 +1,12 @@
+{
+  "quantum_model": "exact three-qutrit pure-state statevector; classical computational-basis measurement",
+  "source": "QSV2G_main8_SectionIV_Revised.tex",
+  "pair_samples": 500,
+  "noise_samples_per_probability_per_pair": 900,
+  "embeddings": "each qutrit encoded into 2 qubits for optional Qiskit/PennyLane validation",
+  "constraints": [
+    "Not a physical qutrit quantum device",
+    "No malicious-secure verifiable QSS implementation",
+    "No network transport/quantum memory noise beyond explicitly specified X error"
+  ]
+}

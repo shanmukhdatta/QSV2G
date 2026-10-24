@@ -1,0 +1,20 @@
+test,expected,observed,pass,explanation
+EV tag tamper,REJECT,REJECT,True,EV proof rejected
+CS tag tamper,REJECT,REJECT,True,CS proof rejected
+context ciphertext tamper,REJECT,REJECT,True,AEAD authentication failure
+EV consent tamper,REJECT,REJECT,True,UC-A rejected EV consent
+revoked pseudonym,REJECT,REJECT,True,EV revoked
+only one policy approval,REJECT,REJECT,True,fewer than two distinct approvals
+missing authority signature,REJECT,REJECT,True,invalid authority signature
+signature swapped inside authentic CS response,REJECT,REJECT,True,EV token signature invalid
+protected response tamper,REJECT,REJECT,True,AEAD authentication failure
+corrupted qutrit measurement,REJECT,REJECT,True,QSS reconstructed commitment mismatch
+expired authorization,REJECT,REJECT,True,context expired
+UC-A offline (required for authentication),REJECT,REJECT,True,UC-A and UC-B required for online registration
+UC-B offline (required for authentication and collection),REJECT,REJECT,True,UC-A and UC-B required for online registration
+UC-C offline with AB approving,ACCEPT,ACCEPT,True,completed
+repeat energy execution,REJECT,REJECT,True,terminal transaction rejects second execution
+replayed AEAD packet,REJECT,REJECT,True,nonce seen set rejects replay
+UC-A offline after enrollment,REJECT,REJECT,True,online authentication requires both original authorities
+UC-B offline after enrollment,REJECT,REJECT,True,online authentication requires both original authorities
+reusing consumed QSS resource,REJECT,REJECT,True,"UNUSED->RESERVED->CONSUMED, no replay"

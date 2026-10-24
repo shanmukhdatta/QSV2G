@@ -1,0 +1,19 @@
+{
+  "protocol": "QSV2G",
+  "purpose": "pre-faculty implementation consistency and limitation identification",
+  "test_count": 38,
+  "expected_outcomes_matched": 38,
+  "known_limitations_demonstrated": 4,
+  "qss_ideal_pair_trials": 720,
+  "qss_ideal_correct": 720,
+  "post_quantum_crypto_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "source_implementation_sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758",
+  "revised_tex_sha256": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2",
+  "environment": {
+    "python": "3.13.15",
+    "openssl": "OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)",
+    "platform": "Linux-6.18.48+-x86_64-with-glibc2.39"
+  },
+  "security_scope": "research simulator; not a security proof; malicious verifiable QSS not established",
+  "results_note": "Expected known limitations count as correctly classified experimental findings, not as verified security guarantees."
+}

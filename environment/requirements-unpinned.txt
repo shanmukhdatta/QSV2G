@@ -1,0 +1,9 @@
+# Convenience install list, NOT the original environment lockfile
+numpy
+pandas
+matplotlib
+cryptography
+pqcrypto
+qiskit
+pennylane
+nbformat

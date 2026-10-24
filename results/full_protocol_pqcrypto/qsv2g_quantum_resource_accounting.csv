@@ -1,0 +1,5 @@
+component,quantum_transmissions,unit
+EV Bell registration,256,qubit one-way transmissions
+CS Bell registration,256,qubit one-way transmissions
+"three-dealer QSS resources, L=162",972,qutrit one-way transmissions
+QSS qutrit subsystems stored collectively,1458,qutrit subsystems
