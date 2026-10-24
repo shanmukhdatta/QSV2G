@@ -18,6 +18,9 @@ Key identifiers:
 - These digests identify the **earlier revised Section IV source**, not automatically the latest manually edited figure-enhanced PDF/Overleaf revision.
 - `protocol/historical/` is retained for history, **not** the normative current implementation specification.
 
-Available logs: notebook-embedded local text output plus structured result CSVs. Original complete Kaggle cell logs, raw download metadata, immutable environment lockfiles, and original source-control run commit IDs were **not present** in the provided artifacts. Do not label these files as available.
+Available execution evidence:
+- A **user-supplied quantum-validation Kaggle console extract** is preserved unchanged at `logs/kaggle/quantum_validation_download.txt` (SHA-256: `a06066f13c7f4bc4a41fbc7388ff31085147920f8b88eedfe52152f6f79602b3`). It reports successful QSS state tests, Qiskit and PennyLane checks, and output archive creation at `/kaggle/working/qsv2g_quantum_results.zip`.
+- Notebook-embedded **local** execution output is separately available under `logs/local_executed/`; structured CSV results remain under `results/`.
+- Original Kaggle URLs, immutable revision identifiers, full run history for the three notebook families, raw download metadata, and complete environment lockfiles were **not supplied**. The console extract supports reported execution details, but cannot by itself authenticate the run's origin or associate it with an immutable Kaggle revision.
 
 This archive is a reproducibility aid. Equation mapping is curated traceability, not mathematical/formal proof.

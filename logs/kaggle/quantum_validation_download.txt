@@ -1,0 +1,42 @@
+12.4s 1 0.01s - Debugger warning: It seems that frozen modules are being used, which may
+12.4s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+12.4s 3 0.00s - to python to disable frozen modules.
+12.4s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+13.4s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+13.4s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+13.4s 7 0.00s - to python to disable frozen modules.
+13.4s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+23.6s 9 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.2/56.2 kB 936.6 kB/s eta 0:00:00
+23.8s 10 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.2/56.2 kB 936.6 kB/s eta 0:00:00
+23.9s 11 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.1/10.1 MB 49.6 MB/s eta 0:00:00
+24.0s 12 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.4/5.4 MB 60.8 MB/s eta 0:00:00
+24.1s 13 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.1/10.1 MB 49.6 MB/s eta 0:00:00
+24.1s 14 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.4/5.4 MB 60.8 MB/s eta 0:00:00
+24.1s 15 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 937.5/937.5 kB 11.7 MB/s eta 0:00:00
+24.2s 16 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.5/51.5 kB 953.8 kB/s eta 0:00:00
+24.3s 17 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 937.5/937.5 kB 11.7 MB/s eta 0:00:00
+24.3s 18 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.5/51.5 kB 953.8 kB/s eta 0:00:00
+24.5s 19 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 25.5/25.5 MB 53.3 MB/s eta 0:00:00
+24.6s 20 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.4/2.4 MB 42.4 MB/s eta 0:00:00
+24.6s 21 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54.9/54.9 kB 1.2 MB/s eta 0:00:00
+24.7s 22 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 25.5/25.5 MB 53.3 MB/s eta 0:00:00
+24.7s 23 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.4/2.4 MB 42.4 MB/s eta 0:00:00
+24.7s 24 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54.9/54.9 kB 1.2 MB/s eta 0:00:00
+24.7s 25 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 167.2/167.2 kB 4.1 MB/s eta 0:00:00
+24.9s 26 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.8/7.8 MB 53.3 MB/s eta 0:00:00
+24.9s 27 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 167.2/167.2 kB 4.1 MB/s eta 0:00:00
+24.9s 28 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.8/7.8 MB 53.3 MB/s eta 0:00:00
+39.3s 29 All three encoded states passed: norm, X/Z stabilizers and per-share maximally mixed tests.
+40.3s 30 Qiskit embedded three-qutrit state, s=1: PASS
+51.5s 31 PennyLane embedded three-qutrit state, s=1: PASS
+53.6s 32 QUANTUM VALIDATION COMPLETED: /kaggle/working/qsv2g_quantum_results.zip
+59.8s 33 /usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+59.8s 34 cells[i][c] = re.sub('\\\\\|', '|', cell)
+60.1s 35 /usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+60.1s 36 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+61.1s 37 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+61.3s 38 [NbConvertApp] Writing 82781 bytes to __notebook__.ipynb
+64.7s 39 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+65.4s 40 [NbConvertApp] Support files will be in __results___files/
+65.4s 41 [NbConvertApp] Making directory __results___files
+65.4s 42 [NbConvertApp] Writing 337046 bytes to __results__.html
