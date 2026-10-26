@@ -1,0 +1,67 @@
+{
+  "stage": "03",
+  "protocol": "QSV2G",
+  "result": "PASS_WITH_MODEL_LIMITATIONS",
+  "channel_models": [
+    "x",
+    "dephasing",
+    "depolarizing",
+    "erasure",
+    "combined"
+  ],
+  "authority_pairs": [
+    "AB",
+    "AC",
+    "BC"
+  ],
+  "secret_symbols": [
+    0,
+    1,
+    2
+  ],
+  "error_probabilities": [
+    0.0,
+    0.01,
+    0.03,
+    0.05,
+    0.1,
+    0.2,
+    0.3
+  ],
+  "seed_root": 20261027,
+  "shots_per_configuration": 1000,
+  "configurations": 315,
+  "total_trials": 315000,
+  "per_model_trial_counts": {
+    "combined": 63000,
+    "dephasing": 63000,
+    "depolarizing": 63000,
+    "erasure": 63000,
+    "x": 63000
+  },
+  "theory_matches_exact_density_results": true,
+  "wilson_intervals_cover_theoretical_count": 307,
+  "wilson_intervals_total": 315,
+  "max_finite_shot_absolute_deviation": 0.029000000000000026,
+  "limitations": [
+    "Classical-trit reconstruction, not coherent reconstruction of arbitrary quantum input",
+    "Local channels only on second selected share; no realistic quantum network",
+    "Flagged erasure terminates selected pair; re-routing not executed",
+    "Diagnostic mismatch versus known s is not malicious-verifiable QSS",
+    "Resource length iid extrapolation is analytical and not observed end-to-end authorization",
+    "Physical decoherence, multi-link loss, key handling, and transaction security are outside this stage"
+  ],
+  "reference_core_sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758",
+  "reference_sectioniv_sha256": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2",
+  "legacy_x_csv_sha256": "b55b31f50c15b8cf3d9dea2336bbaef873947041042163763ca9a77fd053bfaa",
+  "run_environment": {
+    "utc_generated": "2026-10-26T19:08:41.097892+00:00",
+    "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+    "os": "Linux-6.18.55+-x86_64-with-glibc2.39",
+    "numpy": "2.1.3",
+    "pandas": "2.3.3",
+    "matplotlib": "3.10.0",
+    "kaggle_path_detected": true
+  },
+  "source_note": "Reference core and Section IV embedded verbatim and SHA256-verified; model implementations are new Stage 03 code."
+}

@@ -17,3 +17,17 @@
 ## Reproducibility stages added 2026-10-26
 
 See [Stage Evidence Index](STAGE_EVIDENCE_INDEX.md) for Stage 01/02 test-to-notebook-to-result-to-audit links, per-stage ZIP hashes, and Kaggle provenance limitations.
+
+## Stage 03 / 04 result mapping
+
+| Study | Primary raw evidence |
+|---|---|
+| Five QSS noise models and reconstruction | [Stage 03 aggregates](../results/stage03/submitted/extracted/noise_trial_aggregates.csv) |
+| 315,000 single-trit events | [Stage 03 compressed events](../results/stage03/submitted/extracted/noise_trial_events.csv.gz) |
+| Quantum fidelity and code-space tests | [Stage 03 fidelity CSV](../results/stage03/submitted/extracted/quantum_fidelity_codespace.csv) |
+| Software workflow timings | [Stage 04 raw workflows](../results/stage04/submitted/extracted/end_to_end_raw.csv) |
+| QSS scaling | [Stage 04 resource raw CSV](../results/stage04/submitted/extracted/qss_resource_scaling_raw.csv) |
+| B0/B1/B2 post-context authorization microbenchmarks | [Stage 04 raw baselines](../results/stage04/submitted/extracted/authorization_baselines_raw.csv) |
+| Instrumented AEAD packet sizes | [Stage 04 packet sizes](../results/stage04/submitted/extracted/instrumented_aead_packets_raw.csv) |
+
+See [stage-to-evidence traceability](STAGE_EVIDENCE_INDEX.md) for exact ZIP hashes, notebook links, logs and scope.

@@ -1,0 +1,47 @@
+{
+  "study": "QSV2G Stage04 software performance and constructed baseline microbenchmarks",
+  "status": "PASS_WITH_RESEARCH_LIMITATIONS",
+  "full_workflows": 120,
+  "full_runs_by_L": {
+    "9": 30,
+    "27": 30,
+    "81": 30,
+    "162": 30
+  },
+  "resource_runs": 120,
+  "authorization_microbenchmark_runs": 270,
+  "baseline_runs_per_pair_mode": 30,
+  "warmups_per_condition": 5,
+  "pq_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "source_hashes": {
+    "core": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758",
+    "section_iv": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2"
+  },
+  "median_end_to_end_ms_by_L": {
+    "9": 63.0065935,
+    "27": 66.2775505,
+    "81": 75.5486215,
+    "162": 89.77504350000001
+  },
+  "median_authorization_ms_by_mode": {
+    "B0_single_signer": 15.985884500000001,
+    "B1_two_classical_signers": 31.6481165,
+    "B2_QSV2G_QSS_plus_2_signers": 55.428633500000004
+  },
+  "measured_aead_packet_coverage": [
+    "authorization_response",
+    "context_ack",
+    "context_offer",
+    "execution_start",
+    "termination"
+  ],
+  "claims_not_tested": [
+    "real quantum network delay or fidelity",
+    "physical V2G",
+    "cryptographic energy use",
+    "formal VQSS security",
+    "complete classical baseline architecture",
+    "quantum advantage",
+    "Kaggle immutable run provenance without run URL"
+  ]
+}

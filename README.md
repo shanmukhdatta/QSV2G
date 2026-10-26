@@ -50,3 +50,10 @@ Do not interpret these tests as cryptographic security guarantees. See `docs/LIM
 - **Stage 01 baseline reproducibility:** [notebook](notebooks/stage01/) · [raw submitted results](results/stage01/) · [audit](docs/stages/STAGE01_AUDIT.md). Uploaded outcomes: 38/38 expected; ideal QSS 720/720.
 - **Stage 02 security analysis:** [corrected notebook](notebooks/stage02/) · [raw submitted results](results/stage02/) · [audit](docs/stages/STAGE02_AUDIT.md). Uploaded outcomes: 80/80 expected with 7 *demonstrated limitations*.
 - [Stage-to-evidence index](docs/STAGE_EVIDENCE_INDEX.md) records the exact source versions and evidence provenance. Original Kaggle console logs and revision URLs for these two stages were not supplied; local preflight logs are labelled explicitly.
+
+## Stage 03 and Stage 04 evaluations
+- [Stage 03 notebook](notebooks/stage03/) · [submitted ZIP and extracted results](results/stage03/) · [original figures](figures/experimental/stage03/) · [notebook log](logs/stage03/) · [audit](docs/stages/STAGE03_AUDIT.md). 315 modeled configurations and 315,000 trials.
+- [Stage 04 notebook](notebooks/stage04/) · [submitted ZIP and extracted results](results/stage04/) · [original figures](figures/experimental/stage04/) · [notebook log](logs/stage04/) · [audit](docs/stages/STAGE04_AUDIT.md). 120 workflows, 120 scaling runs and 270 authorization microbenchmarks.
+- [Four-stage evidence index](docs/STAGE_EVIDENCE_INDEX.md) · [Read-only verifier](scripts/verify_stage03_stage04.py).
+
+The result archives are preserved unchanged. Notebook-generated logs are not complete Kaggle job histories; immutable Kaggle run URLs and executed cloud notebook revisions were not supplied. Local preflights are distinct.

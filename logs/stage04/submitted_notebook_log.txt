@@ -1,0 +1,39 @@
+QSV2G Stage04 output path: /kaggle/working/qsv2g_stage04 Kaggle detected: True
+Benchmark repetitions: 30 warm-ups: 5 seed: 20261027
+Neither pqcrypto nor OpenSSL 3.5+ PQC found. Installing pqcrypto from pip.
+Cryptographic backend preflight completed.
+Verified core SHA-256: 2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758
+Verified protocol section SHA-256: 4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2
+Genuine cryptography provider: pqcrypto native ML-KEM-768 + ML-DSA-65
+Reference full-transaction smoke test: PASS; measured AEAD packets: {'context_offer': 382, 'context_ack': 239, 'authorization_response': 9746, 'execution_start': 265, 'termination': 264}
+Full workflow complete: L= 9 measured= 30
+Full workflow complete: L= 27 measured= 30
+Full workflow complete: L= 81 measured= 30
+Full workflow complete: L= 162 measured= 30
+End-to-end measured transactions: 120 phase observations: 1200
+Resource scaling complete: L= 9
+Resource scaling complete: L= 27
+Resource scaling complete: L= 81
+Resource scaling complete: L= 162
+Authorization microbenchmarks complete: AB
+Authorization microbenchmarks complete: AC
+Authorization microbenchmarks complete: BC
+Measured authorization microbenchmarks: 270 with balanced pairs and modes.
+Selected AEAD packet totals; NOT total protocol traffic:
+L_trits
+9      10902.0
+27     10902.0
+81     10902.0
+162    10902.0
+End-to-end latency (ms) by L:
+ L_trits    median       p95      mean  std_sample
+       9 63.006594 68.106923 63.896375    2.168303
+      27 66.277551 71.161901 67.360154    3.677459
+      81 75.548621 78.054445 75.893716    1.146499
+     162 89.775044 93.585815 90.161189    1.731282
+Authorization comparison (medians in ms, see raw per pair):
+mode
+B0_single_signer               15.986
+B1_two_classical_signers       31.648
+B2_QSV2G_QSS_plus_2_signers    55.429
+Generated figures: ['figure_end_to_end_scaling.png', 'figure_qss_scaling.png', 'figure_authorization_baselines.png', 'figure_instrumented_aead_packets.png', 'figure_analytical_quantum_resources.png']

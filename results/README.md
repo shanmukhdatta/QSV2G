@@ -13,3 +13,8 @@ Original plots are also extracted into [`../figures/experimental/`](../figures/e
 
 - [Stage 01: original submitted ZIP and extracted files](stage01/README.md)
 - [Stage 02: original submitted ZIP and extracted files](stage02/README.md)
+
+- [Stage 03 simulated quantum-noise evaluation](stage03/) — unchanged original user-submitted ZIP, 315,000 compressed trial records, fidelity and aggregate CSVs, plots and manifest.
+- [Stage 04 software performance evaluation](stage04/) — unchanged original user-submitted ZIP, raw workflow/QSS scaling/microbenchmark CSVs, object sizes and manifest.
+
+Run `python scripts/verify_stage03_stage04.py` from the repository root for byte-integrity and recorded counts. Local preflight artifacts are separate.

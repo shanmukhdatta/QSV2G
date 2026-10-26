@@ -1,0 +1,9 @@
+{
+  "previous_reported_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "current_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "previous_n": 8,
+  "current_n_at_L162": 30,
+  "previous_median_ms": 62.07773199999167,
+  "current_median_ms_L162": 89.77504350000001,
+  "note": "Descriptive only. Not pooled, not a regression claim; hosts/package versions differ."
+}

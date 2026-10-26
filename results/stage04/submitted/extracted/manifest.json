@@ -1,0 +1,144 @@
+{
+  "stage": "04",
+  "files": [
+    {
+      "path": "QSV2G_SectionIV_reference.tex",
+      "bytes": 121736,
+      "sha256": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2"
+    },
+    {
+      "path": "README_RESULTS.md",
+      "bytes": 1439,
+      "sha256": "1ab3a9260570b26feb8386625f677fd092daa49921c17387a63e3bb1fa0c5f57"
+    },
+    {
+      "path": "authorization_baselines_raw.csv",
+      "bytes": 41067,
+      "sha256": "1f82885714ce383adb7946af2b55567dc048afaa3ff7a21fbbf7f5ac5650d398"
+    },
+    {
+      "path": "authorization_baselines_statistics.csv",
+      "bytes": 1237,
+      "sha256": "dc21177f945b68a3d5e22db8f3e41a49cb8e2e8318a489573fc7f4e9146ce638"
+    },
+    {
+      "path": "end_to_end_raw.csv",
+      "bytes": 9073,
+      "sha256": "7a4b2b1103d57aed1ebf7192dd3e79a96a84a9e2779a0c980d4c00089b7cfae6"
+    },
+    {
+      "path": "end_to_end_statistics.csv",
+      "bytes": 479,
+      "sha256": "c3f30d11e27de4b336f4b717693d702e5b7bf344b74700d69508eabad363b9a3"
+    },
+    {
+      "path": "environment.json",
+      "bytes": 529,
+      "sha256": "5454b4269be8c9e896b2ca1ed4c1373e572e19760251f11311adf935d1b893d0"
+    },
+    {
+      "path": "figure_analytical_quantum_resources.png",
+      "bytes": 92533,
+      "sha256": "7b8cb8e576b47cf3b297100e893f63fbc61f87618e8fc7ac085fa76ae86ca912"
+    },
+    {
+      "path": "figure_authorization_baselines.png",
+      "bytes": 54542,
+      "sha256": "354e5e34637a9ce66c7e2267f61a25ee14fedcb5ae4559446c490e72f6055ce0"
+    },
+    {
+      "path": "figure_end_to_end_scaling.png",
+      "bytes": 85758,
+      "sha256": "4160ac2dda36a7722c3ffca1f9b7e089df0a04e14dd2eab65fef25301fb91fcc"
+    },
+    {
+      "path": "figure_instrumented_aead_packets.png",
+      "bytes": 55187,
+      "sha256": "a602732253200112fa7b0bbfd837b2699dd2c0b43330b160050fa289028630db"
+    },
+    {
+      "path": "figure_qss_scaling.png",
+      "bytes": 82608,
+      "sha256": "487a4067d402a83ec00dd6267e7ce3ad0ca070a494f231cff877d07d1ea54460"
+    },
+    {
+      "path": "instrumented_aead_packets_raw.csv",
+      "bytes": 63815,
+      "sha256": "54ce737ccb073656d1633992359378f54e756a68291e774a1448b99d3cadc712"
+    },
+    {
+      "path": "instrumented_aead_packets_summary.csv",
+      "bytes": 777,
+      "sha256": "e431a5d6b3914d781e8d65fb2c8085cabbb8860345a302b1a7f3d19e18c719e4"
+    },
+    {
+      "path": "legacy_aead_packet_sizes.csv",
+      "bytes": 117,
+      "sha256": "9b1c4e37dc85130be4041e9de95845834f6f4208ac6d6f5a8ceb1bb7937d634c"
+    },
+    {
+      "path": "legacy_comparison_context.json",
+      "bytes": 372,
+      "sha256": "66909fabe2f92714ef3ed44028b94df09474969e3b0fe62a7d49f5914d20357b"
+    },
+    {
+      "path": "legacy_end_to_end_pqcrypto_eight_runs.csv",
+      "bytes": 571,
+      "sha256": "268d6131673c26c237dc1d85588a74974e11b13143cb442cdbbcf1f51f3f8d7d"
+    },
+    {
+      "path": "phase_latency_raw.csv",
+      "bytes": 103893,
+      "sha256": "272d0ef85f4dba6a706667aae2a2ff766b8fefa0117d3d622a48ad0e064c8575"
+    },
+    {
+      "path": "phase_statistics.csv",
+      "bytes": 4636,
+      "sha256": "665ab69f2a458c062e83d8f04974000d5706643189f10a3bbf0c29ae98259159"
+    },
+    {
+      "path": "pqc_object_sizes.csv",
+      "bytes": 503,
+      "sha256": "77cbf44f47f330b5baf5687e0ec5c43e3f6ad2ce1725ce6c8700bfa980be22ff"
+    },
+    {
+      "path": "qss_resource_scaling_raw.csv",
+      "bytes": 13061,
+      "sha256": "f22e2935a3307ca54506621e0f24930a6fe8e39baefec34f823805239c0e2d54"
+    },
+    {
+      "path": "qss_scaling_statistics.csv",
+      "bytes": 945,
+      "sha256": "4bfe9d519f910fc125c7561d7562365515c609d86d2eed6b1ef0fcf2001b6bc9"
+    },
+    {
+      "path": "qsv2g_core_reference.py",
+      "bytes": 28813,
+      "sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758"
+    },
+    {
+      "path": "run_log.txt",
+      "bytes": 2055,
+      "sha256": "ce1ab2f8ba6a39fbba737a2f8993d9de24974099aa8abadd126b79d010cda601"
+    },
+    {
+      "path": "selected_aead_packet_totals.csv",
+      "bytes": 1440,
+      "sha256": "c648f81335425f935c3964d2733c1c4b51530a6971e2900b9d9e8d8eee55dd9d"
+    },
+    {
+      "path": "source_hashes.json",
+      "bytes": 392,
+      "sha256": "8c267c35f84eb737e455e3e25218635535df37af39e6e8d901a07a68d974bd04"
+    },
+    {
+      "path": "stage04_summary.json",
+      "bytes": 1383,
+      "sha256": "4ce3ce0d9b72c3048bee68b8e19a0ba1b031a100275c5506dcd56dc024c79147"
+    }
+  ],
+  "source_code_sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758",
+  "protocol_section_sha256": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2",
+  "generated_at_utc": "2026-10-26T19:37:39.888525+00:00",
+  "manifest_note": "Hashes verify artifact integrity, not authenticity of cloud provenance or security proof."
+}

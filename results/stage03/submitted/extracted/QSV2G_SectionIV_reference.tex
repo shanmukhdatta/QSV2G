@@ -1,0 +1,2949 @@
+\documentclass[twocolumn,10pt,journal]{IEEEtran}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{cite}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{orcidlink}
+
+\begin{document}
+\title{QSV2G: A Threshold Quantum Secret Sharing-Based Cross-Domain Authentication Scheme for Privacy-Preserving Vehicle-to-Grid Networks}
+\author{Kumar~Prateek~\orcidlink{0000-0003-3528-3082},
+Shanmukh~Datta }
+\maketitle
+
+\begin{abstract}
+Cross-domain vehicle-to-grid (V2G) communication requires participant authentication and explicit authorization of charging and discharging operations. Successful authentication alone does not establish permission for an energy transfer within agreed limits and validity conditions. This paper proposes QSV2G, an architecture combining pseudonymous participant authentication with a verifiable 2-of-3 quantum secret sharing (QSS) authorization interface. The architecture distributes authorization responsibility among a Home/Registration Authority, a Visited Utility Authority, and an Independent Grid/Trust Authority. Following participant authentication and session establishment, authorization requires valid contributions from at least two distinct authorities for the same transaction context. This context binds the electric vehicle (EV) pseudonym and station identity to the session, requested operation, freshness values, authorized limits, and validity interval. The EV verifies the protected decision and authorization proof before executing the energy transfer, without receiving individual authority contributions. Routine requests use pseudonyms to limit direct disclosure of the EV's real identity. QSV2G specifies the cross-domain workflow, context-binding requirements, endpoint verification conditions, and threshold trust boundaries. The resulting contribution is an architectural and interface-level specification; concrete QSS and authorization-proof constructions, together with the adapted authentication procedure, remain necessary for end-to-end security analysis and performance evaluation.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Vehicle-to-grid, cross-domain authentication, quantum secret sharing, threshold authorization, pseudonymity, distributed trust.
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:qsv2g_introduction}
+
+Vehicle-to-grid (V2G) communication supports coordinated energy exchange between electric vehicles (EVs) and the electricity grid. With compatible bidirectional charging equipment, an EV can receive energy for transportation and return stored energy to the grid. This capability can support demand management and participation in utility grid-service programs~\cite{doe_bidirectional}. Its operation requires communication among vehicles, charging infrastructure, and backend services. The resulting cybersecurity problem extends across organizational boundaries: the NIST cybersecurity profile for extreme fast charging considers EVs, charging infrastructure, cloud or third-party operations, and utility and building networks as interconnected domains~\cite{nist_ir8473}.
+
+Cross-domain operation introduces a distinction between establishing participant legitimacy and granting permission for an energy transfer. Consider a registered EV requesting service from a visited charging station (CS). Successful authentication should establish the communicating participants, but it does not, by itself, determine whether that station may charge or discharge the EV, under which limits, or for how long. An authorization decision must therefore identify the permitted operation and remain bound to the participants and session for which it was issued. For example, permission to charge an EV in one session must not be interpreted as permission to discharge it in another. Routine communication should also minimize disclosure of the EV's real identity to visited infrastructure.
+
+Quantum-related threats provide a further motivation for examining the cryptographic foundations of this communication. NIST's publication of its first three finalized post-quantum cryptography standards in 2024 establishes an important route toward addressing these threats~\cite{nist_pqc2024}. Quantum communication offers a different family of mechanisms. Within V2G research, Prateek \emph{et al.} proposed QSKA, a privacy-preserving mutual authentication scheme using superdense coding together with hash- and password-based mechanisms~\cite{prateek2024qska}. QSKA provides the authentication baseline considered in this work. Our focus is the additional authorization decision required when a pseudonymous EV requests a specific energy-transfer operation across utility domains; the authentication and enrollment procedures require adaptation to this setting.
+
+Quantum secret sharing (QSS) provides a foundation for distributing access to secret information across multiple participants. In a threshold construction, an authorized subset can recover the protected secret, whereas an unauthorized subset cannot obtain it under the construction's security assumptions~\cite{cleve1999quantum}. This principle motivates distributing authorization responsibility rather than assigning unilateral approval capability to one authority. However, threshold secret sharing does not automatically yield a verifiable authorization protocol: the association between distributed material, context-specific contributions, and an endpoint-verifiable decision must also be defined.
+
+To address this problem, we propose QSV2G, a cross-domain authentication and authorization architecture that combines QSKA-style pseudonymous participant authentication with a verifiable 2-of-3 QSS authorization interface. The architecture introduces three logical roles: the Home/Registration Authority (UC-A), the Visited Utility Authority (UC-B), and the Independent Grid/Trust Authority (UC-C). Following participant authentication and session establishment, authorization requires valid contributions from at least two distinct authorities for the same transaction context. The threshold policy permits progress when one authority is unavailable and the remaining two provide valid approvals. It does not provide an individual authority with veto power, and two colluding authorities lie outside the intended one-authority threshold boundary.
+
+The authorization context binds the EV pseudonym, station identity, session identifier, requested charging or discharging operation, both participants' nonces and timestamps, the authorized limit, and the validity interval. The station returns a protected decision and a short-lived authorization proof. Before executing the operation, the EV must verify response authenticity, session and request consistency, freshness, limits, validity, the authorization proof, and an accepting decision. Individual authority contributions are not forwarded to the EV. Pseudonyms replace real identities in routine requests, although pseudonym use alone does not establish unlinkability across sessions.
+
+\subsection{Contributions}
+The contributions of this work are as follows:
+\begin{enumerate}
+\item \textit{Separation of authentication and operation authorization:} We define a cross-domain workflow in which participant authentication precedes an explicit authorization decision for a particular charging or discharging operation.
+\item \textit{Distributed authorization architecture:} We specify three authority roles and a 2-of-3 approval policy, including distinct-authority verification, rejection when the threshold is unmet, and the policy's availability and collusion boundaries.
+\item \textit{Context-bound decision and endpoint checks:} We define the authorization context, protected response fields, and EV-side acceptance conditions needed to associate permission with the intended participants, session, operation, limits, and validity.
+\item \textit{Explicit realization requirements:} We identify the interfaces that a concrete implementation must supply, including pseudonym bootstrap, adapted participant authentication, verifiable QSS contributions, authorization-proof verification, and session protection.
+\end{enumerate}
+
+The present contribution is an architectural and interface-level specification. Its concrete QSS construction, authorization-token mechanism, and authentication adaptation remain to be instantiated and analyzed together. Accordingly, the specification does not establish end-to-end quantum security, unconditional security, formal verification results, or measured performance improvements. These outcomes require a complete cryptographic realization and a corresponding security and experimental evaluation.
+
+\subsection{Organization}
+Section~\ref{sec2} reviews the relevant literature. Section~\ref{sec3} defines the system and adversary models, security requirements, and assumptions. Section~\ref{sec4} presents the proposed protocol interfaces and identifies the constructions required for their realization.
+
+\section{Related Work}
+\label{sec2}
+
+Research relevant to QSV2G spans privacy-preserving V2G authentication, cross-domain authentication and access control, post-quantum and quantum-communication-based security, and quantum secret sharing. These areas address complementary requirements: establishing participant legitimacy, protecting identity information, coordinating trust across domains, and distributing control over sensitive operations.
+
+Gope and Sikdar~\cite{gope2019efficient} proposed a privacy-preserving authentication scheme for energy-internet-based V2G communication using lightweight primitives, including one-way hash functions. Their scheme establishes a symmetric key through which a customer accesses a service provider's services. This work illustrates the importance of combining participant authentication, key establishment, and privacy in V2G communication. For QSV2G, these functions form the basis of a protected EV--CS session. A separate design requirement is to associate an authorization decision with the particular charging or discharging operation requested within that session.
+
+Cross-domain V2G authentication has also been investigated explicitly. Miao \emph{et al.}~\cite{miao2024threec} proposed 3C Authentication, which combines certificateless authentication with a consortium blockchain and considers both individual and aggregated verification. Kwon \emph{et al.}~\cite{kwon2024multidomain} developed a blockchain-based multi-domain V2G authentication protocol that uses hash functions and XOR operations for intra-domain authentication, while incorporating elliptic-curve cryptography and physical unclonable functions for cross-domain authentication. These studies provide relevant approaches to establishing trust when vehicles access services across administrative domains. Their use of distributed infrastructure should be distinguished from QSV2G's proposed requirement that at least two designated authorities approve the same operation context.
+
+Authorization is itself an established topic in vehicular security. Ali \emph{et al.}~\cite{ali2023blockauth} proposed BlockAuth, a blockchain-based framework for cross-border vehicle authentication and authorization. Its smart contract evaluates service-provider access policies and incorporates separation of duty and least privilege. Although BlockAuth addresses a broader intelligent-transportation setting rather than the specific V2G energy-transfer workflow considered here, it demonstrates that authentication and policy-based authorization have already been combined in prior work. Accordingly, QSV2G's intended contribution concerns the integration of threshold approval with a pseudonymous V2G session and explicit endpoint checks; it does not originate the distinction between authentication and authorization.
+
+Post-quantum authentication offers another relevant line of research. Dharminder and Mishra~\cite{dharminder2020lcppa} presented LCPPA, a lattice-based conditional privacy-preserving authentication framework for vehicular communication that relies on the short integer solution problem and considers service revocation. Such constructions pursue quantum resistance through computational assumptions while operating with classical cryptographic mechanisms. At the primitive level, NIST's ML-KEM standard bases key establishment on the computational difficulty of the Module Learning with Errors problem~\cite{nist2024mlkem}. Reliance on a computational assumption is therefore not, by itself, evidence that a post-quantum scheme is insecure. For the present comparison, the relevant distinction is between protecting cryptographic exchanges against quantum adversaries and distributing authority over an application-specific authorization decision.
+
+Quantum-communication-based V2G authentication is represented directly by QSKA. Prateek \emph{et al.}~\cite{prateek2024qska} combine superdense coding, hashing, and password-based authentication and report security verification using Coq. QSKA supplies the authentication baseline considered in QSV2G. Our proposed workflow adds three logical authorization roles and requires context-consistent threshold approval after participant authentication and session establishment. This adaptation requires compatible enrollment, pseudonym availability, and authenticated session binding. Consequently, QSKA's reported verification and performance results cannot be transferred automatically to QSV2G's additional messages and authorization mechanisms.
+
+The cryptographic foundations of distributed quantum control come from QSS research. Cleve, Gottesman, and Lo~\cite{cleve1999quantum} established quantum threshold secret sharing, in which an authorized subset can reconstruct a secret quantum state while smaller subsets obtain no information about it. Addressing malicious participation requires additional mechanisms. Ben-Or \emph{et al.}~\cite{benor2006vqss} developed verifiable quantum secret sharing and secure multiparty quantum computation with a strict honest majority, using approximate quantum error-correcting codes and quantum authentication techniques. These results provide foundations for evaluating a verifiable-QSS realization, but they do not directly define a V2G authorization token or its binding to an EV request. Likewise, collecting two classical approval messages is insufficient to instantiate a QSS construction.
+
+Against this background, QSV2G specifies a 2-of-3 authorization interface involving a Home/Registration Authority, a Visited Utility Authority, and an Independent Grid/Trust Authority. Contributions must refer to the same pseudonym, station, session, operation, freshness values, limits, and validity interval. The EV receives a protected decision and authorization proof, rather than individual authority contributions, and must verify the response before execution. The present contribution is this architecture and its verification interfaces. A concrete QSS construction, authorization-proof mechanism, and adapted authentication procedure remain necessary to establish its security and evaluate its costs. This scope supports comparison with existing authentication, access-control, and QSS approaches without claiming demonstrated superiority or end-to-end quantum security.
+
+\section{System Model} \label{sec3}
+This section defines the system model, adversary capabilities, security and privacy requirements, assumptions, and cryptographic background used by QSV2G. The model extends the QSKA-style EV--CS authentication setting to a cross-domain V2G environment in which a roaming EV may request service from a charging station operated outside its home administrative domain. The central modeling change is that participant authentication and operation authorization are separated: EV and CS legitimacy is established through the adapted QSKA-style authentication layer, whereas permission for a particular charging or discharging transaction is distributed across three logical authorization authorities.
+
+\subsection{Cross-Domain V2G System Model}
+Consider an electric vehicle $EV_i$ registered in a home administrative domain and a visited charging station $CS_j$ operated by another utility domain. QSV2G introduces three logical authorization roles: UC-A, the Home/Registration Authority; UC-B, the Visited Utility Authority; and UC-C, an Independent Grid/Trust Authority. These roles do not replace the EV or CS authentication procedure. Instead, after successful participant authentication, they jointly determine whether the exact V2G operation requested in the current session is authorized.
+
+Fig.~\ref{fig:qsv2g_architecture} summarizes the logical system architecture and separates participant authentication from distributed operation authorization.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{figures/qsv2g_architecture.pdf}
+\caption{QSV2G logical architecture. Participant authentication precedes context-bound authorization by UC-A, UC-B, and UC-C. The station's authorization-processing block verifies contributions and applies the 2-of-3 rule; it is logic, not a fourth authority. The figure shows logical interfaces; the QSS construction and context-record transport remain to be instantiated.}
+\label{fig:qsv2g_architecture}
+\end{figure}
+
+The system contains the following entities.
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Electric Vehicle ($EV_i$):} The EV is a mobile and comparatively resource-constrained endpoint equipped with an onboard unit capable of bidirectional communication with charging infrastructure. It can operate as an energy consumer during \texttt{CHARGE} and as an energy supplier during \texttt{DISCHARGE}. During normal protocol execution, the EV is represented by a current pseudonym $PID$ rather than its real identity $I_{EV_i}$. The EV holds the credential material required by the QSKA-style participant-authentication layer and participates in fresh session establishment with the visited CS.
+
+    \item \textbf{Visited Charging Station ($CS_j$):} The CS provides the physical interface for charging or discharging and maintains the transaction state associated with the active EV session. It is identified by $CSID$, participates in mutual participant authentication, constructs the authorization context after authentication, forwards the context to the authorization authorities, verifies returned authorization contributions, applies the threshold rule, and sends the protected authorization result to the EV. Possession of $CSID$ alone is not sufficient to establish station legitimacy.
+
+    \item \textbf{UC-A -- Home/Registration Authority:} UC-A represents the EV's home administrative or registration domain. It maintains the home-side information required for registration, credential validation, local policy enforcement, and revocation checking. During the authorization phase it may issue one context-bound authorization contribution for the current request after its local checks succeed.
+
+    \item \textbf{UC-B -- Visited Utility Authority:} UC-B represents the utility domain that operates or governs the visited charging infrastructure. It evaluates the current request under visited-domain policies, including operation-specific constraints, validity, limits, and revocation information available to that domain. An approving UC-B supplies its own context-bound authorization contribution.
+
+    \item \textbf{UC-C -- Independent Grid/Trust Authority:} UC-C provides an independent authorization role separate from the home and visited utility domains. It evaluates the same request context under its applicable grid/trust policy and, when approved, supplies a third independently attributable authorization contribution.
+\end{itemize}
+
+The three authorities form a $2$-of-$3$ threshold authorization layer. Any two distinct valid contributions may satisfy the authorization threshold; one contribution alone is insufficient. Consequently, normal service can continue when one authority is unavailable and the other two provide valid approvals, while no single authority is intended to authorize a transaction independently. The threshold layer is logical authorization processing rather than a fourth utility entity. Individual QSS contributions remain within this authorization layer and are not sent to the EV.
+
+
+
+QSV2G therefore uses two logically separate trust decisions. First, the participant-authentication layer determines whether the EV and CS are legitimate protocol participants. Second, the threshold-authorization layer determines whether enough independent authorities approve the exact operation under the current session context. Successful authentication does not by itself authorize an energy transfer, and a threshold result does not replace authentication or the EV's final verification of the protected station response.
+
+\subsection{Adversary Model}
+For classical protocol messages, QSV2G uses a Dolev--Yao-style network adversary \cite{dolev1983security}. An external adversary may eavesdrop on, intercept, delay, replay, reorder, inject, or modify messages exchanged among the EV, CS, and authorization infrastructure. The adversary may observe a pseudonym and attempt to reuse it, impersonate an EV or CS, replay an earlier authorization result, substitute one requested operation for another, alter an energy/power limit or validity interval, or move an old authorization result to a different charging station or session. The model therefore requires authentication evidence in addition to possession of public identifiers and requires authorization to be bound to the current transaction context.
+
+The symbolic network model abstracts cryptographic operations as ideal; it does not establish their security against a quantum computer or model attacks on quantum states. A concrete realization must separately specify quantum capabilities, admissible channel operations, entanglement-distribution assumptions, and the security of the selected classical primitives against quantum adversaries. Full compromise of the EV's trusted execution logic is outside the intended endpoint-verification guarantee. A compromised CS remains an adversarial case for authorization-proof verification. Side-channel resistance and physical control of the charging hardware require separate analysis.
+
+The distributed authorization layer introduces additional adversarial cases not present in a purely centralized trust model. A malicious or compromised authority may refuse service, remain unavailable, or return a forged, corrupted, stale, or context-mismatched authorization contribution. Such a contribution must not count toward the threshold unless it satisfies the selected verifiable-QSS verification procedure for the same authorization context. QSV2G also considers one authority to be temporarily unavailable without preventing service when the other two distinct authorities return valid contributions.
+
+The compromise boundary is explicit. For the selected $t=2$, $n=3$ policy, one compromised authority must not be able to authorize an operation independently. If two authorities collude or are simultaneously compromised, however, they may potentially satisfy the numerical threshold. Hence, the threshold layer is intended to tolerate at most $t-1=1$ compromised authority for independent-authorization resistance, subject to the security properties of the final verifiable-QSS construction. The protocol does not claim security against an arbitrary number of compromised authorities. The final model must also define whether corruption is static, adaptive, or sequential across the lifetime of the authorization material; a numerical threshold alone does not address accumulation of compromised shares over time.
+
+The visited CS is not granted unrestricted trust merely because it terminates the local EV connection. A malicious or impersonated station may attempt to return an unauthorized \texttt{ACCEPT} decision, but the EV is required to validate the protected session response and the corresponding authorization proof before acting on it. Because the exact $AuthToken$ construction and its verification procedure are not yet instantiated, this section states the required trust boundary rather than claiming a completed proof against a compromised CS.
+
+Denial-of-service is treated as an availability condition rather than a confidentiality guarantee. One unavailable authority can be tolerated by the $2$-of-$3$ rule, whereas two unavailable or invalid authorities can prevent threshold authorization. No protocol can force an unavailable participant to respond, and QSV2G does not claim availability when fewer than two valid authority contributions can be obtained.
+
+\subsection{Security and Privacy Requirements}
+The security goals are derived from the cross-domain trust model and the protocol interfaces defined above. Table~\ref{secreq} lists the requirements that the QSV2G construction must satisfy. These requirements are intentionally stated independently of the still-unselected internal verifiable-QSS algorithm; the security analysis must later show whether the final instantiated construction meets them.
+
+\begin{table*}[!t]
+\caption{Security and Privacy Requirements of QSV2G}
+\label{secreq}
+\centering
+\scriptsize
+\renewcommand{\arraystretch}{1.14}
+\begin{tabular}{@{}p{0.10\textwidth}p{0.20\textwidth}p{0.62\textwidth}@{}}
+\hline
+ID & Requirement & Definition\\
+\hline
+SPR1 & Participant mutual authentication & The EV and visited CS must establish the legitimacy of the communicating peer before a transaction proceeds to operation authorization.\\
+SPR2 & Cross-domain authorization correctness & A V2G operation is accepted only for an authenticated transaction for which the required threshold of valid authority contributions is obtained for the same context.\\
+SPR3 & Threshold enforcement & With $t=2$ and $n=3$, one authority contribution is insufficient; at least two distinct valid contributions are required for an authorization-level \texttt{ACCEPT}.\\
+SPR4 & Verifiable context-bound shares & Forged, corrupted, stale, duplicate, or context-mismatched authority contributions must not be counted as valid threshold shares.\\
+SPR5 & Replay and context-substitution resistance & Authorization for one session, station, operation, nonce set, time interval, or limit must not be reusable as authorization for a different context.\\
+SPR6 & Fine-grained operation control & Authorization must distinguish \texttt{CHARGE} from \texttt{DISCHARGE} and bind the permitted energy/power limit and validity interval to the approved transaction.\\
+SPR7 & EV identity privacy & Routine cross-domain execution must use the EV pseudonym rather than disclosing $I_{EV_i}$ to the visited CS or a passive network observer.\\
+SPR8 & Protected CS-to-EV response & The final station response must provide the confidentiality/integrity/authenticity properties required by the selected session-protection mechanism and must be bound to the active session.\\
+SPR9 & Single-authority compromise tolerance & Compromise of one authority must not, by itself, be sufficient to authorize a transaction under the $2$-of-$3$ threshold rule.\\
+SPR10 & Single-authority unavailability tolerance & One unavailable authority must not necessarily prevent a legitimate transaction when the other two authorities provide valid contributions.\\
+SPR11 & Revocation enforcement & An authority that identifies the current $PID$ as revoked must not issue an approving contribution for that request.\\
+SPR12 & Controlled accountability & Normal operation remains pseudonymous, while exceptional identity disclosure, if required, must occur only through a separately authorized multi-authority procedure; its concrete cryptographic construction is outside the current core flow.\\
+SPR13 & Fresh session binding & The response accepted by the EV must correspond to the active $SID$, EV/CS nonces, timestamps, requested operation, limit, validity, and authorization proof. Freshness alone is not treated as a proof of forward secrecy.\\
+\hline
+\end{tabular}
+\end{table*}
+
+Fresh session identifiers, nonces, and timestamps support session/context freshness but do not by themselves establish forward secrecy; that property may be claimed only if the final key-establishment mechanism provides it. Use of QSS does not automatically make the complete QSV2G protocol unconditionally secure. End-to-end security depends on the concrete QSS construction, participant-authentication procedure, key-establishment method, hash/MAC or AEAD primitive, and the assumptions under which they are analyzed.
+
+\subsection{Assumptions}
+QSV2G is developed under the following assumptions.
+\begin{enumerate}[leftmargin=*]
+    \item $EV_i$ and $CS_j$ complete the required enrollment/registration process before online execution and possess the credential material needed by the adapted QSKA-style authentication layer. The EV also has a valid pseudonym $PID$ available before initiating the cross-domain request; the exact bootstrap procedure that provisions this pseudonym must be fixed by the final authentication instantiation.
+
+    \item UC-A, UC-B, and UC-C are logically distinct authorization roles. Each authority can independently evaluate the request information required by its local policy and can access the revocation state applicable to its decision. The architecture does not assume that all three authorities must approve every transaction.
+
+    \item The selected verifiable-QSS construction realizes a $2$-of-$3$ access structure, prevents one share from independently providing authorization capability, and provides a mechanism by which forged, stale, or context-mismatched contributions can be detected before threshold counting. QSV2G does not prescribe the internal quantum share-generation, encoding, reconstruction, or commitment equations at this stage.
+
+    \item The long-term authorization material is not exposed to the EV or treated as an ordinary reusable session credential at the CS. If the selected QSS construction requires temporary internal reconstruction, its reconstruction point, lifetime, erasure, and exposure assumptions must be defined by that concrete construction.
+
+    \item The session-protection mechanism establishes a key $K_{EV-CS}$ that is available only to the intended authenticated EV--CS session under the assumptions of the selected key-establishment method. QSV2G requires fresh per-session binding but does not assume forward secrecy unless that method formally provides it.
+
+    \item The hash, HMAC/encryption, or AEAD primitives used by the final implementation are selected with appropriate security parameters and are used according to their required nonce/key rules. Their standard cryptographic properties are assumed only to the extent required by the instantiated protocol.
+
+    \item EV, CS, and authorities can perform freshness checks on nonces and timestamps. The exact clock-skew tolerance and timeout values are implementation parameters; QSV2G does not rely on timestamps alone: nonce and session freshness also require generation rules, authenticated binding, and retained transaction state.
+
+    \item For a successful online authorization, at least two distinct authorities must be reachable and willing to return valid contributions. One unavailable authority is tolerated by design; the unavailability of two authorities may cause the request to be rejected or to time out.
+\end{enumerate}
+
+\subsection{Cryptographic Background}
+QSV2G combines two different cryptographic roles: QSKA-style participant authentication and threshold QSS-based distributed operation authorization. They are complementary. The former is used to establish legitimate protocol participants and session-related secret material; the latter is introduced to distribute the authorization decision for a cross-domain V2G operation.
+
+\subsubsection{QSKA-Style Superdense-Coding Authentication Baseline}
+The QSKA baseline \cite{prateek2024qska} uses superdense coding to transfer authentication-related secret information between V2G entities. In the standard two-qubit construction, two parties share an entangled Bell pair~\cite{bennett1992dense}
+\begin{equation}
+\lvert\Phi^{+}\rangle=\frac{1}{\sqrt{2}}\left(\lvert00\rangle+\lvert11\rangle\right).
+\label{eq:bell_pair}
+\end{equation}
+To encode two classical bits $(a,b)\in\{0,1\}^{2}$, the sender applies the corresponding Pauli operation to its qubit; the receiver subsequently performs the superdense-coding decoding operations and measures the two qubits to recover the encoded pair. Thus, the authentication baseline can communicate two classical bits through one transmitted qubit when the required entanglement has already been established. This accounting excludes the resources needed to distribute and maintain entanglement; dense coding alone is not an authentication or secrecy proof. QSV2G considers this QSKA-style mechanism for the participant-authentication/credential-establishment role; it does not treat superdense coding itself as the new distributed authorization mechanism.
+
+The adapted QSKA-style authentication layer is intentionally referenced at the interface level in Section~\ref{sec4}. The exact adaptation required to make a valid pseudonym available before a roaming request, and the precise authenticated transcript binding the request fields to $Proof_{EV}$, must be fixed by the final authentication implementation. These details must not be silently inferred from the original single-domain QSKA sequence when they differ from the QSV2G cross-domain flow.
+
+\subsubsection{Threshold QSS Authorization Abstraction}
+For distributed authorization, QSV2G specifies a threshold access structure over the three authorities, motivated by QSS and verifiable-QSS constructions~\cite{cleve1999quantum,benor2006vqss}. Let
+\begin{equation}
+\mathcal{P}=\{A,B,C\}
+\end{equation}
+denote the set of authorization roles. The authorized access structure is
+\begin{equation}
+\Gamma=\{X\subseteq\mathcal{P}:|X|\geq2\}.
+\label{eq:qss_access_structure}
+\end{equation}
+Equation~\eqref{eq:qss_access_structure} specifies only the intended $2$-of-$3$ authorization semantics: any two distinct authorities form an authorized set, while a single authority does not. It is not a share-generation or reconstruction algorithm.
+
+The selected verifiable-QSS construction must eventually instantiate how long-term authorization material is prepared and distributed, how an authority produces a context-bound online contribution, how the CS-side authorization logic verifies that contribution, and how the threshold result is converted into a short-lived authorization proof. Here, $AC$ denotes the authorization-context digest and $Share_a$ denotes authority UC-$a$'s contribution; Section~\ref{sec4} defines their use. Until a construction is selected, QSV2G represents the required online verification interface abstractly as $\operatorname{Verify}(Share_a,AC)$ and leaves quantum-state preparation, reconstruction, and verification equations to that construction. This separation keeps the system and trust model precise while leaving the quantum secret-sharing primitive to be instantiated and analyzed explicitly.
+
+\section{Proposed Protocol}
+\label{sec4}
+
+QSV2G is a privacy-preserving authentication and distributed
+authorization protocol for cross-domain vehicle-to-grid (V2G)
+communication. It distinguishes participant authentication
+from transaction authorization, as successful authentication
+alone does not permit a visited charging station (CS) to
+perform unrestricted charging or discharging operations
+for a roaming electric vehicle (EV). To address this,
+the protocol specifies a 2-of-3 quantum-secret-sharing-assisted
+authorization framework in which three utility authorities
+participate in authorizing an operation under a common
+session context. Pseudonyms are used during routine
+communication to limit the exposure of EV identities.
+The protocol covers system initialization, participant
+authentication and session establishment, distributed
+authorization, and protected response verification before
+energy exchange. The notations used throughout QSV2G are
+summarized in Table~\ref{tab:qsv2g_notation}, while
+Fig.~\ref{fig:qsv2g_architecture} illustrates the
+proposed protocol architecture.
+
+\subsection{Protocol Overview and Notation}
+\label{subsec:qsv2g_overview}
+The participants are an electric vehicle $EV_i$, a visited charging
+station $CS_j$, and three utility authorities: UC-A (home registration),
+UC-B (visited utility), and UC-C (independent grid/trust). During
+registration, UC-A and UC-B provision participant credentials; for an
+online request, those authorities validate the respective EV and CS.
+The EV and CS then establish a fresh authenticated session. Independently
+of that authentication result, the three authorities evaluate an agreed
+transaction context and use their reserved quantum shares only after
+receiving the required local approvals. A two-authority, signed
+authorization token permits the EV to verify the resulting decision
+without receiving the reconstructed QSS material.
+
+The $(2,3)$ sharing access structure applies to the authorization
+resources, not automatically to all registration, consent-verification,
+or session-establishment services. In the present construction UC-A is
+needed online for EV credential and consent validation, and UC-B for CS
+validation and proof collection. Consequently, the QSS layer supports
+reconstruction by any two share holders, but uninterrupted end-to-end
+operation during an arbitrary authority outage is not claimed. Quantum
+state preparation and sampling checks below assume honest preparation;
+they do not implement malicious-secure verifiable QSS. Table~\ref{tab:qsv2g_notation}
+lists the principal notation. All hashed and authenticated multi-field
+inputs use an unambiguous, domain-separated $\operatorname{Encode}$
+function with fixed field ordering, typed lengths, and units.
+For a candidate implementation, $H$ is SHA-256 and the HMAC/HKDF
+instantiations use SHA-256; cryptographic domain-separation tags
+are encoded as fixed byte strings.
+
+\begin{table}[!t]
+\caption{Main notation used in the QSV2G protocol}
+\label{tab:qsv2g_notation}
+\centering
+\scriptsize
+\renewcommand{\arraystretch}{1.07}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.33\columnwidth}>{\raggedright\arraybackslash}p{0.62\columnwidth}@{}}
+\hline
+Symbol & Description\\
+\hline
+$EV_i$, $CS_j$ & Vehicle and visited charging station\\
+UC-A/B/C, $\mathcal P$ & Three authorities, $\mathcal P=\{A,B,C\}$\\
+$PID_i$, $CSID_j$ & Registered vehicle pseudonym and station ID\\
+$K_i^{reg}$, $K_j^{reg}$ & Enrollment authentication secrets\\
+$K_A^{pid}$ & UC-A key for pseudonym issuance\\
+$OP$, $LIM$, $VLD$ & Operation, typed limit, validity interval\\
+$N_E$, $N_C$ & Fresh vehicle and station nonces\\
+$TS_E$, $TS_C$ & Vehicle and station timestamps\\
+$ek_i$, $dk_i$, $ct_j$ & ML-KEM keys and encapsulation ciphertext\\
+$ss$, $PRK$, $SID$ & KEM secret, extracted key, session identifier\\
+$K_{E\to C}$, $K_{C\to E}$ & Direction-specific AEAD traffic keys\\
+$\nu$, $L$, $\mathcal Q_a^{(\nu)}$ & QSS resource ID, ternary length, share bundle\\
+$\mathbf s_a^{(\nu)}$, $C_a^{(\nu)}$ & Dealer contribution and commitment\\
+$\mathbf S_{auth}^{(\nu)}$ & Combined one-time classical secret\\
+$M_{\mathrm{ctx}}$, $AC$ & Agreed transaction record and digest\\
+$\tau_E^{AC}$ & UC-A-verifiable EV consent tag\\
+$d_a(AC)$, $\alpha_a^{(\nu)}$ & Authority policy result and approval record\\
+$D_{\mathrm{QSS}}$, $D_{\mathrm{auth}}$ & Reconstruction and authorization outcomes\\
+$AuthToken$, $\sigma_a$ & Signed authorization token and signatures\\
+$\operatorname{Encode}$, $H$ & Canonical encoding and cryptographic hash\\
+$\bot$ & Failure or missing value\\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{System Initialization}
+\label{subsec:qsv2g_initialization}
+System initialization establishes the registration credentials
+and quantum resources used in subsequent V2G transactions.
+UC-A enrolls electric vehicles, UC-B enrolls charging stations,
+and the three utility authorities prepare distributed QSS
+resources for threshold authorization. The following procedure
+specifies credential provisioning, Bell-state-based registration
+verification, quantum-share preparation, and the state retained
+by each participant upon completion.
+
+% 1. EV Registration and Pseudonym Setup
+\noindent\textbf{1) EV Registration and Pseudonym Setup:}
+The electric vehicle $EV_i$ enrolls with its home utility
+authority UC-A before requesting cross-domain V2G services.
+The registration procedure comprises the following steps.
+
+\textit{Step 1: Initial credential establishment.}
+During secure enrollment, UC-A associates the registered
+identity $I_{EV_i}$ with a secret $K_i^{reg}$, provisioned
+to $EV_i$ through an authenticated and confidential channel.
+The subsequent quantum-assisted exchange verifies possession
+of this pre-established credential; it does not generate the
+registration secret. UC-A sends a fresh challenge $r_A$
+through the authenticated enrollment channel and prepares $m$
+Bell pairs in the state
+
+\begin{equation}
+|\Phi^{+}\rangle_{AB}
+=
+\frac{|00\rangle+|11\rangle}{\sqrt{2}}.
+\label{eq:ev_reg_bell}
+\end{equation}
+
+For each pair, UC-A retains qubit $B$ and transmits
+qubit $A$ to $EV_i$ through the quantum channel.
+
+\textit{Step 2: Quantum encoding.}
+Upon receiving the challenge $r_A$, the EV computes
+a registration authentication value
+
+\begin{equation}
+T_i =
+\operatorname{Trunc}_{2m}
+\left[
+\operatorname{HMAC}_{K_i^{reg}}
+\left(
+\mathrm{REG}\parallel I_{EV_i}\parallel r_A
+\right)
+\right].
+\label{eq:ev_reg_tag}
+\end{equation}
+
+For HMAC-SHA-256, the number of Bell pairs is constrained by
+$1\leq m\leq128$, since each pair encodes two bits and the
+untruncated authentication tag has 256 bits. A deployment must
+select $m$ according to its authentication-security target;
+smaller values are suitable only for explicitly limited tests.
+The $2m$-bit authentication value is divided into
+two-bit blocks $(a_k,b_k)$. For each block, the EV
+encodes the corresponding Bell pair by applying
+
+\begin{equation}
+U_{a_kb_k}=Z^{a_k}X^{b_k},
+\qquad a_k,b_k\in\{0,1\},
+\label{eq:ev_reg_pauli}
+\end{equation}
+
+to its qubit, obtaining
+
+\begin{equation}
+|\Phi_{a_kb_k}\rangle
+=
+(U_{a_kb_k}\otimes I)
+|\Phi^{+}\rangle.
+\label{eq:ev_reg_encoded}
+\end{equation}
+
+The encoded qubits are transmitted back to UC-A.
+
+\textit{Step 3: Quantum decoding and verification.}
+UC-A performs a controlled-NOT operation, using
+the returned qubit as the control, followed by a
+Hadamard operation on that qubit:
+
+\begin{equation}
+|\psi_k\rangle
+=
+(H\otimes I)
+\operatorname{CNOT}_{A\rightarrow B}
+|\Phi_{a_kb_k}\rangle.
+\label{eq:ev_reg_decode}
+\end{equation}
+
+Measurement in the computational basis recovers
+the encoded pair $(a_k,b_k)$. UC-A concatenates the
+recovered blocks to obtain $\widehat{T}_i$ and checks
+
+\begin{equation}
+\widehat{T}_i
+\stackrel{?}{=}
+\operatorname{Trunc}_{2m}
+\left[
+\operatorname{HMAC}_{K_i^{reg}}
+\left(
+\mathrm{REG}\parallel I_{EV_i}\parallel r_A
+\right)
+\right].
+\label{eq:ev_reg_verify}
+\end{equation}
+
+Registration authentication succeeds only when
+the recovered authentication value matches the
+locally computed value for the outstanding challenge.
+Both parties reject expired or already used challenges; the
+Bell-state transport is not a substitute for the protected
+initial provisioning of $K_i^{reg}$.
+
+\textit{Step 4: Pseudonym provisioning.}
+Following successful verification, UC-A generates
+a pseudonym using a secret authority key $K_A^{pid}$,
+a fresh pseudonym nonce $r_i$, and a validity
+parameter $V_i$:
+
+\begin{equation}
+PID_i =
+\operatorname{Trunc}_{\ell}
+\left[
+\operatorname{HMAC}_{K_A^{pid}}
+\left(
+I_{EV_i}\parallel r_i\parallel V_i
+\right)
+\right].
+\label{eq:ev_reg_pid}
+\end{equation}
+
+UC-A stores the association between $PID_i$ and
+the registered EV identity and delivers the
+pseudonym to the EV through an authenticated,
+confidential registration channel. The EV stores
+$PID_i$ for subsequent cross-domain authentication
+requests.
+
+% 2. Charging Station Registration
+\noindent\textbf{2) Charging Station Registration:}
+Prior to providing V2G services, the charging station
+$CS_j$ registers with its utility authority UC-B.
+The registration follows the Bell-state-based authentication
+procedure established for $EV_i$, with station-specific
+credentials and verification parameters. The steps are
+described as follows.
+
+\textit{Step 1: Station credential establishment.}
+During secure enrollment, UC-B assigns $CSID_j$ to the
+charging station and provisions the shared registration secret
+$K_j^{reg}$ through an authenticated and confidential channel.
+UC-B retains the associated credential record. As in EV
+registration, the Bell-state exchange verifies possession
+of the established secret rather than generating a new one.
+UC-B sends a fresh challenge $r_B$ over the protected enrollment
+channel and prepares $m$ Bell
+pairs according to (\ref{eq:ev_reg_bell}). For each pair,
+UC-B transmits one qubit to $CS_j$ and retains its partner.
+
+\textit{Step 2: Authentication value generation.}
+Upon receiving $r_B$, the charging station computes
+
+\begin{equation}
+T_j =
+\operatorname{Trunc}_{2m}
+\left[
+\operatorname{HMAC}_{K_j^{reg}}
+\left(
+\mathrm{CSREG}\parallel CSID_j\parallel r_B
+\right)
+\right].
+\label{eq:cs_reg_auth}
+\end{equation}
+
+The resulting authentication value is divided into
+$m$ two-bit blocks. For each block, $CS_j$ applies
+the corresponding Pauli operation defined in
+(\ref{eq:ev_reg_pauli}) to its received qubit and
+returns the encoded qubits to UC-B.
+
+\textit{Step 3: Registration verification.}
+UC-B performs Bell-state decoding using the returned
+qubits and their retained counterparts, following
+(\ref{eq:ev_reg_decode}). The measurement outcomes
+are concatenated to reconstruct $\widehat{T}_j$.
+UC-B then verifies
+
+\begin{equation}
+\widehat{T}_j
+\stackrel{?}{=}
+\operatorname{Trunc}_{2m}
+\left[
+\operatorname{HMAC}_{K_j^{reg}}
+\left(
+\mathrm{CSREG}\parallel CSID_j\parallel r_B
+\right)
+\right].
+\label{eq:cs_reg_verify}
+\end{equation}
+
+If the verification succeeds, UC-B confirms the
+registration of $CS_j$ and retains its credential
+association for subsequent authentication requests.
+Otherwise, the registration attempt is rejected. A challenge
+$r_B$ is accepted at most once within its enrollment window.
+
+% 3. Distributed QSS Setup
+\noindent\textbf{3) Distributed QSS Setup:}
+The utility authorities UC-A, UC-B, and UC-C establish
+a $(2,3)$-threshold quantum secret sharing (QSS)
+arrangement using a three-qutrit encoding motivated by the
+threshold construction of Cleve \emph{et al.}~\cite{cleve1999quantum}.
+Here the shared data are classical ternary symbols encoded into
+entangled states; the procedure does not claim to reconstruct an
+arbitrary unknown quantum state.
+This setup encodes one-time secret contributions into
+quantum shares held separately by the authorities. Any
+two designated share holders can subsequently recover
+the encoded classical symbols. The procedure follows.
+
+\textit{Authority signing credentials.}
+Each UC-$a$ holds an ML-DSA-65 signing key pair;
+its verification key is bound to the corresponding authority identity.
+The EV and CS must obtain authentic public keys before accepting
+authorization tokens. The private keys remain with their owners.
+
+Each utility authority UC-$a$ is provisioned
+with an ML-DSA-65 signing key pair
+
+\begin{equation}
+(sk_a^{sig},pk_a^{sig})
+\leftarrow
+\operatorname{ML\mbox{-}DSA.KeyGen}(),
+\qquad a\in\mathcal{P}.
+\label{eq:qsv2g_authority_signing_keys}
+\end{equation}
+
+The public verification keys are bound to
+their respective authority identities through
+authenticated credentials. The EV and CS
+must possess a trusted means of validating
+these credentials before accepting any
+authority-issued authorization proof.
+The private signing keys remain under the
+exclusive control of their corresponding
+authorities.
+
+\textit{Step 1: Distributed secret generation.}
+Let $\mathcal{P}=\{A,B,C\}$ denote the set of utility
+authorities. Each authority UC-$a$, where
+$a\in\mathcal{P}$, independently selects a random
+ternary secret vector
+
+\begin{equation}
+\mathbf{s}_{a}^{(\nu)}
+=
+(s_{a,1}^{(\nu)},\ldots,s_{a,L}^{(\nu)})
+\in\mathbb{Z}_3^L,
+\label{eq:qss_local_secret}
+\end{equation}
+
+Here $\nu$ identifies a uniquely provisioned, single-use quantum
+resource, and $L$ is the number of independent uniform ternary symbols.
+In a deployment $L$ must be selected for the target secrecy level,
+including resistance to quantum-accelerated guessing; small $L$ may
+be used only for a labeled proof-of-concept simulation. The dealers
+are assumed honest during state preparation unless a separately
+validated malicious-dealer verification mechanism is added.
+
+For each authorization resource $\nu$, UC-$a$
+also computes a commitment to its secret
+contribution:
+
+\begin{equation}
+\begin{aligned}
+C_a^{(\nu)}
+=
+H\big(
+&\mathrm{QSV2G\mbox{-}QSS\mbox{-}COM}
+\parallel a\\
+&\parallel\nu
+\parallel
+\operatorname{Encode}
+(\mathbf{s}_a^{(\nu)})
+\big).
+\end{aligned}
+\label{eq:qsv2g_qss_commitment}
+\end{equation}
+
+Each authority distributes its commitment
+to the other authorities over authenticated
+communication channels before the associated
+quantum shares are used. The commitments are
+retained with resource identifier $\nu$ for
+subsequent reconstruction verification.
+The random secret vectors must have sufficient
+entropy to prevent recovery by exhaustive
+search against their commitments.
+
+The combined authorization secret is
+defined componentwise as
+
+\begin{equation}
+\mathbf{S}_{auth}^{(\nu)}
+=
+\left(
+\sum_{a\in\mathcal{P}}
+\mathbf{s}_{a}^{(\nu)}
+\right)\bmod 3.
+\label{eq:qss_combined_secret}
+\end{equation}
+
+Each authority separately encodes and distributes its
+own secret contribution using the QSS procedure below.
+An authorized pair must recover the contributions from
+all three authorities before computing the combined
+secret in (\ref{eq:qss_combined_secret}). An individual
+authority knows its own contribution, but the shares it
+holds from other authorities reveal none of their
+protected symbols.
+
+\textit{Step 2: Quantum-state preparation.}
+For each symbol $s_{a,k}^{(\nu)}$, UC-$a$
+prepares a three-qutrit entangled state using
+the encoding
+
+\begin{equation}
+\begin{aligned}
+|\Psi(s)\rangle_{ABC}
+=
+\frac{1}{\sqrt{3}}
+\sum_{r=0}^{2}
+&|r\rangle_A
+|r+s\rangle_B\\
+&\otimes |r+2s\rangle_C,
+\end{aligned}
+\label{eq:qss_qutrit_encoding}
+\end{equation}
+
+where $s,r\in\mathbb{Z}_3$ and all additions
+are performed modulo three. The three possible
+encoded basis states are
+
+\begin{equation}
+\begin{aligned}
+|\Psi(0)\rangle
+&=\frac{|000\rangle+|111\rangle+|222\rangle}
+{\sqrt{3}},\\
+|\Psi(1)\rangle
+&=\frac{|012\rangle+|120\rangle+|201\rangle}
+{\sqrt{3}},\\
+|\Psi(2)\rangle
+&=\frac{|021\rangle+|102\rangle+|210\rangle}
+{\sqrt{3}}.
+\end{aligned}
+\label{eq:qss_encoded_basis}
+\end{equation}
+
+Each encoded state contains three quantum
+subsystems, with one subsystem designated
+for each utility authority.
+
+\textit{Step 3: Quantum-share distribution.}
+Every authority distributes the three subsystems
+of its encoded states according to their
+corresponding authority labels. UC-$a$ retains
+its designated subsystems and transmits the
+remaining subsystems to the other authorities
+through authenticated quantum channels.
+
+Consequently, UC-$b$ receives a quantum-share
+register from each participating authority.
+Its complete share bundle for resource $\nu$
+is represented as
+
+\begin{equation}
+\mathcal{Q}_{b}^{(\nu)}
+=
+\left\{
+q_{a\rightarrow b,k}^{(\nu)}
+:
+a\in\mathcal{P},\
+1\leq k\leq L
+\right\},
+\label{eq:qss_share_bundle}
+\end{equation}
+
+where $q_{a\rightarrow b,k}^{(\nu)}$
+denotes the subsystem generated by UC-$a$
+and assigned to UC-$b$.
+
+For the encoding in
+(\ref{eq:qss_qutrit_encoding}), the reduced
+density operator of any individual subsystem
+satisfies
+
+\begin{equation}
+\rho_b
+=
+\operatorname{Tr}_{\mathcal{P}\setminus\{b\}}
+\left(
+|\Psi(s)\rangle
+\langle\Psi(s)|
+\right)
+=
+\frac{I_3}{3},
+\label{eq:qss_single_share_privacy}
+\end{equation}
+
+where $I_3$ is the three-dimensional identity
+operator. Since this reduced state is independent of
+$s$, an individual share discloses no information
+about its encoded secret symbol.
+
+For the encoded classical symbols, a pair of authorities
+can recover $s$ from computational-basis measurements.
+Let $x_A$, $x_B$, and $x_C$ denote the outcomes for
+the respective subsystems. Equation
+(\ref{eq:qss_qutrit_encoding}) gives
+
+\begin{equation}
+\begin{aligned}
+x_A &= r,\\
+x_B &= (r+s)\bmod 3,\\
+x_C &= (r+2s)\bmod 3.
+\end{aligned}
+\label{eq:qss_measurement_relation}
+\end{equation}
+
+Accordingly, the reconstruction rule for each permitted
+pair is
+
+\begin{equation}
+\widehat{s}=\begin{cases}
+(x_B-x_A)\bmod 3, & \{A,B\},\\
+2(x_C-x_A)\bmod 3, & \{A,C\},\\
+(x_C-x_B)\bmod 3, & \{B,C\}.
+\end{cases}
+\label{eq:qss_pair_recovery}
+\end{equation}
+
+These equations specify recovery of an encoded classical
+symbol, not a coherent reconstruction circuit for an
+arbitrary quantum secret. Reconstruction is performed
+only after the corresponding transaction is approved.
+
+\textit{Step 4: Quantum-state consistency checks.}
+Before accepting the distributed resources,
+the authorities perform consistency tests on
+randomly selected auxiliary encoded states.
+For a qutrit, the generalized Pauli operators
+are defined as
+
+\begin{equation}
+X|j\rangle=|j+1\bmod 3\rangle,
+\qquad
+Z|j\rangle=\omega^j|j\rangle,
+\label{eq:qss_qutrit_pauli}
+\end{equation}
+
+where $\omega=e^{2\pi i/3}$.
+
+The encoded states in
+(\ref{eq:qss_qutrit_encoding}) satisfy
+
+\begin{equation}
+\begin{aligned}
+(X_A\otimes X_B\otimes X_C)
+|\Psi(s)\rangle
+&=|\Psi(s)\rangle,\\
+(Z_A\otimes Z_B\otimes Z_C)
+|\Psi(s)\rangle
+&=|\Psi(s)\rangle.
+\end{aligned}
+\label{eq:qss_state_consistency}
+\end{equation}
+
+For randomly selected auxiliary states, the authorities
+measure in the corresponding generalized Pauli basis and
+compare the outcomes over authenticated classical channels.
+For either operator in (\ref{eq:qss_state_consistency}),
+the product of the local eigenvalue outcomes must equal
+unity. Tested states are discarded and cannot be used
+for reconstruction. These tests check consistency with
+the encoded subspace, but do not identify the encoded
+symbol or establish verifiability against an arbitrary
+malicious authority; a separate malicious-secure verification construction
+and proof would be required for that stronger claim. The checks
+also require authenticated announcement of the sampled positions
+after distribution, and sampled qutrits may not be returned to the
+production share pool.
+
+The remaining unmeasured share registers are reserved as
+one-time authorization resources. Following independent
+approval of a common authorization context $AC$, a permitted
+pair may participate in threshold reconstruction. The
+transaction-specific reconstruction exchange and subsequent
+proof generation belong to the distributed authorization
+phase.
+
+% 4. Initialization Completion
+\noindent\textbf{4) Initialization Completion:}
+After registration, $EV_i$ retains $K_i^{reg}$ and its
+assigned pseudonym $PID_i$, while UC-A maintains the
+associated identity and credential records. Likewise,
+$CS_j$ stores $CSID_j$ and $K_j^{reg}$; UC-B retains
+the corresponding registration record. Each authority
+UC-$a$ maintains its assigned quantum-share bundles
+$\mathcal{Q}_{a}^{(\nu)}$ indexed by authorization resource
+$\nu$. Test states are discarded, while unmeasured
+resources are reserved for later threshold operations.
+Each resource identifier is unique and is assigned to
+at most one reconstruction attempt. A share that has
+been measured, rejected, or consumed is not reused.
+Registration credentials and reserved quantum shares
+remain under the control of their respective holders;
+no long-term QSS share or complete authorization secret
+is supplied to $EV_i$ or $CS_j$. The resulting state is
+available to the authentication and distributed
+authorization phases.
+
+\subsection{Authentication and Session Establishment}
+\label{subsec:qsv2g_authentication}
+
+% Short opening paragraph introducing online authentication.
+Following system initialization, $EV_i$ initiates an
+authentication exchange with the visited charging station
+$CS_j$ using its registered pseudonym $PID_i$. The
+registration secrets established earlier are used to
+verify the participants without repeating the enrollment
+procedure. Since the EV and CS belong to different utility
+domains, UC-A and UC-B participate in validating their
+respective credentials. Fresh nonces and timestamps are
+incorporated into the authentication messages to bind
+the exchange to the current request and detect replayed
+transmissions. Upon successful mutual authentication,
+the EV and CS derive distinct keys for each communication
+direction and a session identifier for subsequent exchanges.
+The procedure consists of EV request generation,
+cross-domain authentication, charging station verification,
+and session key establishment.
+
+% 1. EV Authentication Request Generation
+\noindent\textbf{1) EV Authentication Request Generation:}
+To request a V2G service, $EV_i$ selects an operation
+$OP\in\{\mathrm{CHARGE},\mathrm{DISCHARGE}\}$ and obtains
+the identifier $CSID_j$ advertised by the visited charging
+station. The EV generates a fresh random nonce $N_E$
+and records its current timestamp $TS_E$. Using the
+registration secret $K_i^{reg}$, it computes an
+authentication tag over the request parameters as
+
+\begin{equation}
+\begin{aligned}
+\tau_E = \operatorname{HMAC}_{K_i^{reg}}\big(
+&\mathrm{EV\_AUTH}\parallel PID_i
+\parallel CSID_j\\
+&\parallel OP\parallel N_E
+\parallel TS_E\big).
+\end{aligned}
+\label{eq:ev_auth_proof}
+\end{equation}
+
+Here, the constant $\mathrm{EV\_AUTH}$ distinguishes
+online authentication from the registration procedure.
+Including $CSID_j$ and $OP$ binds the tag to the intended
+station and requested service, while $N_E$ and $TS_E$
+identify the current authentication attempt. All fields
+are encoded unambiguously before the HMAC is evaluated.
+
+The EV then constructs the authentication request
+
+\begin{equation}
+\begin{aligned}
+Req_{EV} = (&PID_i, CSID_j, OP,\\
+            &N_E, TS_E, \tau_E),
+\end{aligned}
+\label{eq:ev_auth_request}
+\end{equation}
+
+and transmits $Req_{EV}$ to $CS_j$. Since the station
+does not possess $K_i^{reg}$, it cannot independently
+verify $\tau_E$. Instead, the request is submitted
+for validation by UC-A through the cross-domain
+authentication procedure described next.
+
+% 2. Cross-Domain EV Authentication
+\noindent\textbf{2) Cross-Domain EV Authentication:}
+Upon receiving $Req_{EV}$, the visited charging station
+$CS_j$ initiates verification through UC-B, which forwards
+the authentication request to the EV's home authority,
+UC-A. The exchange between utility authorities takes
+place over authenticated and confidential communication
+channels. UC-A verifies the EV using the registration
+information established during system initialization.
+The procedure is performed as follows.
+
+\textit{Step 1: Authentication request forwarding.}
+The charging station forwards the received request
+(\ref{eq:ev_auth_request}) to UC-B together with its
+station identifier $CSID_j$. UC-B relays the request
+to UC-A without modifying the authentication fields.
+The identity of the home authority is resolved through
+the registered pseudonym-routing information. The
+vehicle's real identity is not included in the forwarded
+request.
+
+\textit{Step 2: Credential and freshness verification.}
+On receiving the request, UC-A locates the registration
+record associated with $PID_i$ and retrieves the
+corresponding secret $K_i^{reg}$. The authority first
+checks whether the pseudonym remains valid and whether
+the registration record has been revoked.
+
+To reject stale or previously processed requests,
+UC-A verifies the timestamp and nonce according to
+
+\begin{equation}
+\begin{aligned}
+\operatorname{Fresh}_{E}
+=
+\bigl(&|T_A-TS_E|\leq\Delta_T\bigr)
+\\
+&\land
+\bigl(N_E\notin\mathcal{N}_i\bigr),
+\end{aligned}
+\label{eq:ev_auth_freshness}
+\end{equation}
+
+where $T_A$ denotes the verification time at UC-A,
+$\Delta_T$ is the maximum permitted clock deviation
+and transmission delay, and $\mathcal{N}_i$ contains
+the previously accepted nonces associated with
+$PID_i$ within the replay-protection window.
+An invalid timestamp or repeated nonce causes
+the authentication attempt to be rejected.
+
+\textit{Step 3: Authentication proof verification.}
+After the freshness checks, UC-A independently
+computes the expected authentication tag using
+the stored registration secret:
+
+\begin{equation}
+\begin{aligned}
+\tau_E^{*}
+=
+\operatorname{HMAC}_{K_i^{reg}}\big(
+&\mathrm{EV\_AUTH}\parallel PID_i
+\parallel CSID_j\\
+&\parallel OP\parallel N_E
+\parallel TS_E\big).
+\end{aligned}
+\label{eq:ev_auth_recomputed}
+\end{equation}
+
+The received tag $\tau_E$ is then compared with
+$\tau_E^{*}$ using a constant-time comparison.
+The EV is accepted only if its registration record
+is valid, the freshness requirements are satisfied,
+and the authentication tags match:
+
+\begin{equation}
+\begin{aligned}
+\operatorname{Auth}_{EV}
+={}&\operatorname{Valid}(PID_i)
+\\
+&\land\operatorname{Fresh}_{E}
+\\
+&\land
+(\tau_E\stackrel{?}{=}\tau_E^{*}).
+\end{aligned}
+\label{eq:ev_auth_decision}
+\end{equation}
+
+Here, $\operatorname{Valid}(PID_i)$ denotes
+the successful registration-status and
+pseudonym-validity checks. Following successful
+verification, UC-A atomically records $N_E$
+in the replay-protection state for $PID_i$,
+preventing the same request from being accepted
+again.
+
+\textit{Step 4: Authentication result forwarding.}
+UC-A constructs a session-bound authentication
+result containing the verified pseudonym,
+station identifier, requested operation, and
+EV nonce:
+
+\begin{equation}
+\begin{aligned}
+R_A = (&PID_i,CSID_j,OP,N_E,\\
+       &TS_E,\operatorname{Auth}_{EV}).
+\end{aligned}
+\label{eq:ev_auth_result}
+\end{equation}
+
+UC-A transmits $R_A$ to UC-B through their
+authenticated channel. UC-B forwards the result
+to $CS_j$ through its protected station
+communication channel. The receiving parties
+accept the result only from the authenticated
+authority and associate it with the corresponding
+pending request.
+
+A successful result establishes that UC-A has
+verified the EV's registered credentials and
+the freshness of its request. It does not,
+however, authenticate the charging station
+to the EV or authorize the requested energy
+operation. Station authentication and subsequent
+session establishment are performed in the
+following steps.
+
+% 3. Charging Station Authentication
+\noindent\textbf{3) Charging Station Authentication:}
+After receiving a successful EV authentication result
+$R_A$, the charging station $CS_j$ must establish its
+legitimacy to the requesting vehicle. Since the EV
+does not possess the station's registration secret
+$K_j^{reg}$, station authentication is performed
+through UC-B, with UC-A providing an EV-verifiable
+confirmation. The procedure consists of the
+following steps.
+
+\textit{Step 1: Station authentication proof generation.}
+The charging station generates a fresh random nonce
+$N_C$ and records its current timestamp $TS_C$.
+Using its previously established registration
+secret $K_j^{reg}$, $CS_j$ computes
+
+\begin{equation}
+\begin{aligned}
+\tau_C =
+\operatorname{HMAC}_{K_j^{reg}}\big(
+&\mathrm{CS\_AUTH}\parallel CSID_j
+\parallel PID_i\\
+&\parallel OP\parallel N_E
+\parallel N_C\parallel TS_C
+\big).
+\end{aligned}
+\label{eq:cs_auth_proof}
+\end{equation}
+
+The value $\mathrm{CS\_AUTH}$ provides domain
+separation from the registration and EV
+authentication procedures. The inclusion of
+$PID_i$, $N_E$, and $OP$ binds the station's
+proof to the EV request already validated by
+UC-A. The charging station sends
+
+\begin{equation}
+M_C =
+(CSID_j,PID_i,OP,N_E,N_C,TS_C,\tau_C)
+\label{eq:cs_auth_message}
+\end{equation}
+
+to UC-B through their authenticated
+communication channel.
+
+\textit{Step 2: Station credential verification.}
+Upon receiving $M_C$, UC-B retrieves the
+registration secret associated with $CSID_j$
+and checks the station's registration and
+revocation status. The authority also verifies
+that the request fields correspond to a
+successful and pending EV authentication
+result $R_A$.
+
+To prevent the acceptance of stale or repeated
+station authentication messages, UC-B checks
+
+\begin{equation}
+\begin{aligned}
+\operatorname{Fresh}_{C}
+=
+\bigl(&|T_B-TS_C|\leq\Delta_T\bigr)
+\\
+&\land
+\bigl(N_C\notin\mathcal{N}_j\bigr),
+\end{aligned}
+\label{eq:cs_auth_freshness}
+\end{equation}
+
+where $T_B$ denotes the current time at UC-B,
+and $\mathcal{N}_j$ maintains the accepted
+station nonces within the replay-protection
+window.
+
+UC-B independently recomputes the expected
+authentication tag as
+
+\begin{equation}
+\begin{aligned}
+\tau_C^{*} =
+\operatorname{HMAC}_{K_j^{reg}}\big(
+&\mathrm{CS\_AUTH}\parallel CSID_j
+\parallel PID_i\\
+&\parallel OP\parallel N_E
+\parallel N_C\parallel TS_C
+\big).
+\end{aligned}
+\label{eq:cs_auth_expected}
+\end{equation}
+
+The charging station is authenticated only
+when its registration record is valid,
+the associated EV authentication result is
+successful, the freshness checks pass,
+and the authentication tags match:
+
+\begin{equation}
+\begin{aligned}
+\operatorname{Auth}_{CS}
+={}&\operatorname{Valid}(CSID_j)
+\\
+&\land\operatorname{Bind}(M_C,R_A)
+\\
+&\land\operatorname{Fresh}_{C}
+\\
+&\land(\tau_C\stackrel{?}{=}\tau_C^{*}).
+\end{aligned}
+\label{eq:cs_auth_decision}
+\end{equation}
+
+Here, $\operatorname{Bind}(M_C,R_A)$ verifies
+the agreement of $PID_i$, $CSID_j$, $OP$,
+and $N_E$ across the two messages. UC-B
+atomically records $N_C$ upon successful
+verification.
+
+\textit{Step 3: Cross-domain authentication confirmation.}
+Following successful verification, UC-B sends
+the authenticated station-validation result
+
+\begin{equation}
+\begin{aligned}
+R_B = (&PID_i,CSID_j,OP,N_E,\\
+       &N_C,TS_C,\operatorname{Auth}_{CS})
+\end{aligned}
+\label{eq:cs_auth_result}
+\end{equation}
+
+to UC-A through the protected inter-authority
+channel. UC-A checks that $R_B$ corresponds
+to the EV request authenticated earlier.
+It then generates an EV-verifiable confirmation
+
+\begin{equation}
+\begin{aligned}
+\tau_A =
+\operatorname{HMAC}_{K_i^{reg}}\big(
+&\mathrm{CS\_CONF}\parallel PID_i
+\parallel CSID_j\\
+&\parallel OP\parallel N_E
+\parallel N_C\parallel TS_C\\
+&\parallel\operatorname{Auth}_{CS}
+\big).
+\end{aligned}
+\label{eq:cs_auth_confirmation}
+\end{equation}
+
+UC-A returns the confirmation together with
+the associated authentication fields through
+UC-B and $CS_j$ to the EV.
+
+\textit{Step 4: EV-side confirmation verification.}
+On receiving the confirmation, $EV_i$
+recomputes the expected value of $\tau_A$
+using its registration secret $K_i^{reg}$.
+The EV checks the authentication tag,
+the validity of $TS_C$, the received station
+identifier, and the agreement of $PID_i$,
+$OP$, and $N_E$ with its outstanding request.
+It also requires
+$\operatorname{Auth}_{CS}=1$.
+
+If these checks succeed, the EV accepts
+UC-A's confirmation that UC-B has verified
+the registered station for the current
+authentication exchange. The nonce $N_C$
+is retained for session establishment.
+Proof of possession of the resulting session
+key by the communicating endpoint is
+completed through the subsequent key
+confirmation procedure. No charging or
+discharging operation is authorized at
+this stage.
+
+% 4. Session Key Generation and Establishment
+\noindent\textbf{4) Session Key Generation and Establishment:}
+Following the successful authentication of $EV_i$ and
+$CS_j$, the participants establish a fresh session key
+using the module-lattice-based key encapsulation mechanism
+ML-KEM-768. The authenticated registration credentials
+are used to bind the key-establishment exchange to the
+previously verified participants. The procedure is
+described below.
+
+\textit{Step 1: EV key generation.}
+The EV generates a fresh ML-KEM key pair for the current
+authentication exchange:
+
+\begin{equation}
+(ek_i,dk_i)
+\leftarrow
+\operatorname{ML\mbox{-}KEM.KeyGen}().
+\label{eq:qsv2g_kem_keygen}
+\end{equation}
+
+Here, $ek_i$ is the encapsulation key and $dk_i$ is
+the corresponding decapsulation key. To authenticate
+the encapsulation key, $EV_i$ computes
+
+\begin{equation}
+\begin{aligned}
+M_E^K=\operatorname{Encode}(&PID_i,CSID_j,OP,N_E,\\
+&N_C,TS_E,TS_C,ek_i),\\
+\tau_E^K=\operatorname{HMAC}_{K_i^{reg}}(&\mathrm{KEM\mbox{-}EV}
+\parallel H(M_E^K)).
+\end{aligned}
+\label{eq:qsv2g_kem_ev_proof}
+\end{equation}
+
+After validating UC-A's station confirmation and $N_C$,
+the EV sends $(ek_i,\tau_E^{K})$ to $CS_j$. The station
+forwards these values through UC-B to UC-A.
+UC-A verifies the tag using the registered EV
+credential and confirms that the values belong
+to the pending authentication exchange.
+The validated encapsulation key is subsequently
+made available to $CS_j$ through UC-B's
+authenticated channel.
+
+\textit{Step 2: Session-secret encapsulation.}
+After receiving the validated encapsulation key,
+$CS_j$ invokes the ML-KEM encapsulation algorithm:
+
+\begin{equation}
+(ct_j,ss_j)
+\leftarrow
+\operatorname{ML\mbox{-}KEM.Encaps}(ek_i),
+\label{eq:qsv2g_kem_encaps}
+\end{equation}
+
+where $ct_j$ denotes the encapsulation ciphertext
+and $ss_j$ is the newly generated shared secret.
+
+The station constructs a canonical session transcript
+
+\begin{equation}
+\begin{aligned}
+\mathcal{T} =
+\operatorname{Encode}(&PID_i,CSID_j,OP,N_E,N_C,\\
+                     &TS_E,TS_C,ek_i,ct_j),
+\end{aligned}
+\label{eq:qsv2g_session_transcript}
+\end{equation}
+
+where $\operatorname{Encode}$ denotes an unambiguous,
+length-delimited representation of the included
+fields. The station authenticates the transcript
+with its registration key:
+
+\begin{equation}
+\tau_C^{K}
+=
+\operatorname{HMAC}_{K_j^{reg}}
+\left(
+\mathrm{KEM\mbox{-}CS}\parallel H(\mathcal{T})
+\right).
+\label{eq:qsv2g_kem_cs_proof}
+\end{equation}
+
+The ciphertext and authentication tag are sent
+to UC-B for verification.
+
+\textit{Step 3: Authenticated ciphertext delivery.}
+UC-B verifies $\tau_C^{K}$ against the registered
+station credential and confirms that the transcript
+matches the previously authenticated request.
+Following successful verification, UC-B forwards
+the validated transcript and station-authentication
+result to UC-A over the protected inter-authority
+channel.
+
+UC-A checks the association between the transcript
+and the authenticated EV request. It then generates
+an EV-verifiable confirmation:
+
+\begin{equation}
+\tau_A^{K}
+=
+\operatorname{HMAC}_{K_i^{reg}}
+\left(
+\mathrm{KEM\mbox{-}CONF}
+\parallel H(\mathcal{T})
+\parallel \mathrm{ACCEPT}
+\right).
+\label{eq:qsv2g_kem_authority_conf}
+\end{equation}
+
+UC-A returns $\tau_A^{K}$ through UC-B and
+$CS_j$ to the EV. The station also forwards
+$ct_j$ and the transcript fields required
+for independent verification.
+
+Before decapsulation, $EV_i$ verifies
+$\tau_A^{K}$, checks the agreement of $PID_i$,
+$CSID_j$, $OP$, and $N_E$ with its pending
+request, and validates the received station
+nonce and timestamp.
+
+If these checks succeed, the EV decapsulates
+the received ciphertext:
+
+\begin{equation}
+ss_i
+=
+\operatorname{ML\mbox{-}KEM.Decaps}
+(dk_i,ct_j).
+\label{eq:qsv2g_kem_decaps}
+\end{equation}
+
+For a correctly generated and delivered ciphertext,
+ML-KEM correctness implies matching secrets except with its
+specified negligible decapsulation-failure probability
+$\varepsilon_{\mathrm{KEM}}$:
+
+\begin{equation}
+\Pr[ss_i=ss_j]\ge 1-\varepsilon_{\mathrm{KEM}}.
+\label{eq:qsv2g_kem_shared_secret}
+\end{equation}
+
+Key confirmation below detects a mismatched shared secret;
+an invalid confirmation aborts before transaction approval.
+
+\textit{Step 4: Session identifier and key derivation.}
+Both participants independently derive a session
+identifier from the authenticated transcript:
+
+\begin{equation}
+SID=
+\operatorname{Trunc}_{\lambda}
+\left[
+H\left(
+\mathrm{QSV2G\mbox{-}SID}
+\parallel\mathcal{T}
+\right)
+\right],
+\label{eq:qsv2g_session_id}
+\end{equation}
+
+where $\lambda$ specifies the identifier length.
+The session identifier is public and is not
+used as secret keying material.
+
+Using the shared secret $ss$, the EV and CS
+derive a pseudorandom key through HKDF:
+
+\begin{equation}
+\begin{aligned}
+salt &=
+H(N_E\parallel N_C),\\
+PRK &=
+\operatorname{HKDF\mbox{-}Extract}(salt,ss).
+\end{aligned}
+\label{eq:qsv2g_hkdf_extract}
+\end{equation}
+
+Two direction-specific AES-256-GCM traffic keys are derived
+from the same extracted pseudorandom key, with distinct labels:
+
+\begin{equation}
+\begin{aligned}
+I_E &=\mathrm{QSV2G\mbox{-}E2C}\parallel H(\mathcal T),\\
+I_C &=\mathrm{QSV2G\mbox{-}C2E}\parallel H(\mathcal T),\\
+K_{E\to C}&=\operatorname{HKDF\mbox{-}Expand}(PRK,I_E,32),\\
+K_{C\to E}&=\operatorname{HKDF\mbox{-}Expand}(PRK,I_C,32).
+\end{aligned}
+\label{eq:qsv2g_session_key}
+\end{equation}
+
+Each key has 32 bytes. The EV uses $K_{E\to C}$ only to
+encrypt messages to the CS, and the station uses $K_{C\to E}$
+only to encrypt messages to the EV. Each sender uses a separate,
+monotonically advancing 96-bit GCM nonce counter for its direction;
+a counter is never rolled back or reused under the same key. The
+implementation must stop transmission before counter exhaustion.
+AES-256-GCM is the chosen authenticated-encryption mechanism for
+this protocol; derived traffic keys are never reused as HMAC keys.
+
+Two separate confirmation keys are derived
+with distinct application labels:
+
+\begin{equation}
+\begin{aligned}
+K_E^{conf}
+&=\operatorname{HKDF\mbox{-}Expand}
+\left(PRK,\mathrm{KC\mbox{-}EV}
+\parallel H(\mathcal{T}),32\right),\\
+K_C^{conf}
+&=\operatorname{HKDF\mbox{-}Expand}
+\left(PRK,\mathrm{KC\mbox{-}CS}
+\parallel H(\mathcal{T}),32\right).
+\end{aligned}
+\label{eq:qsv2g_confirmation_keys}
+\end{equation}
+
+\textit{Step 5: Mutual key confirmation.}
+The EV first computes a confirmation tag:
+
+\begin{equation}
+\mu_E=
+\operatorname{HMAC}_{K_E^{conf}}
+\left(
+\mathrm{EV\mbox{-}FINISHED}
+\parallel SID\parallel H(\mathcal{T})
+\right).
+\label{eq:qsv2g_ev_finished}
+\end{equation}
+
+It sends $(SID,\mu_E)$ to $CS_j$.
+The station independently verifies $\mu_E$
+using its derived confirmation key. If the
+verification succeeds, $CS_j$ computes
+
+\begin{equation}
+\mu_C=
+\operatorname{HMAC}_{K_C^{conf}}
+\left(
+\mathrm{CS\mbox{-}FINISHED}
+\parallel SID\parallel H(\mathcal{T})
+\parallel\mu_E
+\right).
+\label{eq:qsv2g_cs_finished}
+\end{equation}
+
+The station sends $\mu_C$ to the EV, which
+verifies the tag using its locally derived
+$K_C^{conf}$. An invalid confirmation causes
+the session to be rejected, and neither
+participant proceeds with authorization.
+
+Upon successful key confirmation, both
+participants retain $SID$ and the two direction-specific
+traffic keys $K_{E\to C}$ and $K_{C\to E}$.
+The temporary decapsulation key $dk_i$,
+intermediate shared secret $ss$, and
+temporary confirmation-key material are
+securely erased when no longer required.
+The authenticated session provides the
+communication context for the subsequent
+distributed authorization procedure; it
+does not itself grant permission to perform
+a charging or discharging operation.
+
+\subsection{Distributed Authorization}
+
+% Short opening paragraph
+Once the session has been authenticated and its traffic keys confirmed,
+$CS_j$ initiates authorization for the operation requested
+by $EV_i$. The station first constructs an authorization
+context that identifies the current session and specifies
+the permitted transaction parameters. UC-A, UC-B, and UC-C
+then evaluate the request according to their respective
+authorization policies. Authorities that approve the
+request participate in the threshold procedure using the
+quantum shares prepared during system initialization.
+A valid authorization requires contributions from at
+least two distinct authorities. The resulting decision
+is bound to the transaction context through an
+authorization proof, which is subsequently delivered
+to the EV for verification. The following steps describe
+context generation, authority-side validation,
+threshold reconstruction, and proof generation.
+
+% 1. Authorization Context Generation
+\noindent\textbf{1) Authorization Context Generation:}
+After establishing the authenticated session, $CS_j$
+determines the transaction parameters associated with
+the operation requested by $EV_i$. These include the
+permitted energy or power limit $LIM$ and the validity
+interval $VLD$. The values must be agreed upon before
+the charging station submits the request for distributed
+authorization.
+
+\textit{Step 1: Transaction parameter agreement.}
+The station prepares a transaction record
+
+\begin{equation}
+\begin{aligned}
+M_{\mathrm{ctx}}=\operatorname{Encode}\big(
+&PID_i,CSID_j,SID,OP,N_E,N_C,\\
+&TS_E,TS_C,LIM,VLD
+\big),
+\end{aligned}
+\label{eq:qsv2g_context_record}
+\end{equation}
+
+where $TS_C$ is the station timestamp authenticated
+during session establishment. The parameter $LIM$
+specifies a numerical bound together with its unit,
+whereas $VLD$ identifies the interval within which
+the authorization may be exercised.
+
+The station transmits $M_{\mathrm{ctx}}$ to the EV
+over the authenticated session using
+
+\begin{equation}
+(C_{\mathrm{ctx}},Tag_{\mathrm{ctx}})
+=
+\operatorname{AEAD.Enc}_{K_{C\to E}}
+(n_{\mathrm{ctx}},M_{\mathrm{ctx}},AD_{\mathrm{ctx}}),
+\label{eq:qsv2g_context_offer}
+\end{equation}
+
+where $n_{\mathrm{ctx}}$ is the next 96-bit CS-to-EV nonce,
+and $AD_{\mathrm{ctx}}=\operatorname{Encode}(
+\mathrm{QSV2G\mbox{-}CTX},SID,CSID_j)$ is authenticated
+associated data. The nonce, ciphertext, and GCM tag are delivered
+together; the EV rejects the record on authentication failure.
+
+Upon successful decryption, $EV_i$ checks the
+session identifier, station identity, requested
+operation, freshness values, and proposed limits.
+The vehicle rejects parameters that do not match
+its outstanding request or exceed its accepted
+operating constraints.
+
+If the proposed transaction is acceptable,
+the EV computes $AC$ from the validated record
+and generates the consent tag $\tau_E^{AC}$
+as defined in (\ref{eq:qsv2g_ev_authz_consent}).
+It returns an authenticated acknowledgment
+containing $(SID,AC,\tau_E^{AC})$, protected under
+$K_{E\to C}$ with a fresh EV-to-CS GCM nonce.
+The CS verifies the acknowledgment and forwards
+$\tau_E^{AC}$ unchanged with the authority request;
+the station itself cannot verify the EV's registration-key tag.
+
+\textit{Step 2: Authorization context computation.}
+The station computes a transaction-specific digest
+from the agreed record:
+
+\begin{equation}
+AC=
+H\left(
+\mathrm{QSV2G\mbox{-}AC}
+\parallel M_{\mathrm{ctx}}
+\right).
+\label{eq:qsv2g_context}
+\end{equation}
+
+The digest covers every field in $M_{\mathrm{ctx}}$;
+changing any typed field yields a different hash input.
+The $\operatorname{Encode}$ function uses a
+deterministic, unambiguous representation of
+each field, including explicit lengths, data
+types, and units. Consequently, two records
+containing different transaction parameters
+cannot be interpreted as the same encoded input.
+
+The resulting digest identifies the particular
+authorization request. A change in the station,
+session, operation, freshness values, permitted
+limit, or validity interval changes the encoded
+record and, except with negligible hash-collision
+probability, produces a different $AC$.
+
+\textit{Step 3: Distribution of the authorization request.}
+The charging station submits the context record
+and its digest to UC-A, UC-B, and UC-C through
+authenticated authority communication channels:
+
+\begin{equation}
+Req_{\mathrm{auth}}
+=
+(M_{\mathrm{ctx}},AC,\tau_E^{AC}).
+\label{eq:qsv2g_authz_request}
+\end{equation}
+
+Each authority independently recomputes
+$H(\mathrm{QSV2G\mbox{-}AC}\parallel M_{\mathrm{ctx}})$
+and compares the result with the received $AC$.
+A mismatch causes the request to be rejected
+before policy evaluation.
+
+The digest serves as the common reference for
+the subsequent authority decisions and quantum
+threshold operations. It does not, by itself,
+constitute authorization evidence; an approving
+authority must separately authenticate and bind
+its contribution to the validated context.
+
+% 2. Distributed Authority Verification
+\noindent\textbf{2) Distributed Authority Verification:}
+Upon receiving $Req_{\mathrm{auth}}$, the utility authorities
+independently examine the transaction record before
+contributing to the threshold authorization procedure.
+Each authority evaluates the same authorization context
+$AC$, but applies the policies associated with its
+administrative role. The verification process is
+described below.
+
+\textit{Step 1: Verification of transaction evidence.}
+UC-A retrieves the enrollment record associated with
+$PID_i$ and confirms the EV authentication result
+established earlier. UC-B verifies the corresponding
+station authentication result, while UC-C obtains
+authenticated confirmation of both results through
+the inter-authority communication channels.
+
+Each authority checks the received context and rejects expired,
+unknown, or revoked state; UC-B and UC-C require an authenticated,
+current consent-status statement from UC-A. The authorities compare
+the transaction identifiers, operation, and freshness parameters in
+$M_{\mathrm{ctx}}$ with the completed authentication
+exchange. In particular, $SID$, $PID_i$, $CSID_j$,
+$OP$, $N_E$, and $N_C$ must correspond to the
+same authenticated session.
+
+To provide UC-A with verifiable evidence that the EV
+accepted the proposed transaction parameters,
+$EV_i$ computes
+
+\begin{equation}
+\tau_E^{AC} =
+\operatorname{HMAC}_{K_i^{reg}}
+\left(
+\mathrm{AUTHZ\mbox{-}CONSENT}
+\parallel AC
+\right).
+\label{eq:qsv2g_ev_authz_consent}
+\end{equation}
+
+The tag is generated after the EV validates
+$M_{\mathrm{ctx}}$ and is included in its
+authenticated acknowledgment to $CS_j$.
+The submitted $Req_{\mathrm{auth}}$ includes
+$\tau_E^{AC}$, which UC-A verifies using its enrollment record. UC-A recomputes the expected
+value using the registration secret associated with
+$PID_i$ and checks
+
+\begin{equation}
+\begin{aligned}
+\tau_{E,*}^{AC} &=\operatorname{HMAC}_{K_i^{reg}}\big(\\
+&\quad \mathrm{AUTHZ\mbox{-}CONSENT}\parallel AC\big),\\
+\operatorname{Consent}_{E}&=
+[\tau_E^{AC}\stackrel{?}{=}\tau_{E,*}^{AC}].
+\end{aligned}
+\label{eq:qsv2g_ev_consent_verify}
+\end{equation}
+
+UC-A communicates its authenticated verification
+result to UC-B and UC-C. Such confirmation is an attestation by
+UC-A, not independently verifiable EV consent at UC-B or UC-C;
+those authorities require an unrevoked and authenticated UC-A
+trust relationship. A missing or invalid
+consent confirmation prevents an authority from
+treating the CS-submitted record as evidence of
+EV agreement.
+
+\textit{Step 2: Local policy and revocation checks.}
+Let $\mathcal{P}=\{A,B,C\}$ denote the utility
+authorities. Each UC-$a$ evaluates the requested
+operation under its local policy
+$\Pi_a(M_{\mathrm{ctx}})$.
+
+UC-A checks the EV's registration status and
+home-domain permissions. UC-B examines the
+visited station's authorization to provide the
+requested service, including applicable
+operational limits. UC-C evaluates the
+independent grid or trust constraints associated
+with the transaction. The policies may differ
+for charging and discharging operations.
+
+Each authority also checks whether the EV's
+pseudonym is revoked according to the revocation
+information available to that authority:
+
+\begin{equation}
+\operatorname{Revoked}_a(PID_i)=0,
+\qquad a\in\mathcal{P}.
+\label{eq:qsv2g_revocation}
+\end{equation}
+
+The result is incorporated into the authority's
+local decision. Revocation evidence from another domain must be
+authenticated and sufficiently fresh under an explicitly stated
+update policy; a local cache alone does not establish universal
+revocation freshness. A successful authentication
+exchange does not override a subsequent policy
+restriction or revocation condition.
+
+\textit{Step 3: Authority decision computation.}
+For each UC-$a$, define the transaction-validity
+condition
+
+\begin{equation}
+\begin{aligned}
+V_a(AC)={}&
+\operatorname{ContextValid}_a(AC)\\
+&\land\operatorname{AuthValid}_a(SID)\\
+&\land\operatorname{ConsentValid}_a(AC)\\
+&\land\operatorname{TimeValid}_a(VLD),
+\end{aligned}
+\label{eq:qsv2g_authority_validation}
+\end{equation}
+
+where the predicates represent the authority's
+verification of the submitted context, authenticated
+session, EV consent evidence, and transaction
+validity interval. For UC-B and UC-C, consent
+validation uses the authenticated verification
+result issued by UC-A.
+
+The authority's decision is then
+
+\begin{equation}
+d_a(AC)=
+\begin{cases}
+1, &
+V_a(AC)=1
+\land \Pi_a(M_{\mathrm{ctx}})=1\\
+&\land
+\operatorname{Revoked}_a(PID_i)=0,\\[2pt]
+0, & \text{otherwise}.
+\end{cases}
+\label{eq:qsv2g_authority_decision}
+\end{equation}
+
+An authority sets $d_a(AC)=1$ only when all
+applicable checks succeed. A rejected, expired,
+or inconsistent request yields $d_a(AC)=0$.
+
+\textit{Step 4: Context-bound approval recording.}
+An approving authority records its decision
+together with the authorization context and
+the identifier $\nu$ of the allocated QSS
+resource:
+
+\begin{equation}
+\alpha_a^{(\nu)}
+=
+(a,AC,\nu,d_a(AC)).
+\label{eq:qsv2g_authority_approval}
+\end{equation}
+
+Before proceeding, the participating authorities
+must agree on the same unconsumed resource
+identifier $\nu$. Approval records are exchanged
+only through authenticated authority channels
+and are associated with the pending transaction.
+
+Each authority may issue at most one effective
+approval for a given $(AC,\nu)$ pair. Duplicate
+records, mismatched contexts, and approvals
+associated with consumed resources are not
+eligible for threshold processing.
+
+Only authorities with $d_a(AC)=1$ proceed
+to the quantum-share reconstruction procedure.
+A rejecting or unavailable authority contributes
+no share. This threshold rule applies after prior authentication
+and authenticated EV consent verification have succeeded. In this
+specified online flow UC-A and UC-B are therefore required for
+pre-authorization checks even if either authority's QSS share is
+not selected. The approval record $\alpha_a^{(\nu)}$
+is an authenticated policy decision; it is not
+itself a quantum share or an independently
+EV-verifiable authorization token.
+
+% 3. Quantum Share Reconstruction and Threshold Verification
+\noindent\textbf{3) Quantum Share Reconstruction and
+Threshold Verification:}
+Following authority-side validation, the approved
+participants execute the threshold recovery procedure
+using the quantum resources prepared during system
+initialization. For each authorization resource $\nu$,
+the registered shares are associated with the three
+utility authorities and can be recovered through any
+authorized pair. The procedure is performed as follows.
+
+\textit{Step 1: Selection of the authorized pair.}
+Let $\mathcal{A}_{AC}$ denote the set of distinct
+authorities that approved the current authorization
+context:
+
+\begin{equation}
+\mathcal{A}_{AC}
+=
+\left\{
+a\in\mathcal{P}
+\mid d_a(AC)=1
+\right\}.
+\label{eq:qsv2g_approved_set}
+\end{equation}
+
+Threshold processing is permitted only when
+
+\begin{equation}
+|\mathcal{A}_{AC}|\geq 2.
+\label{eq:qsv2g_approval_threshold}
+\end{equation}
+
+If fewer than two authorities approve the request,
+the authorization procedure terminates without
+reconstructing the protected secret.
+
+Otherwise, two distinct authorities $u$ and $v$
+are selected such that
+
+\begin{equation}
+\{u,v\}\subseteq\mathcal{A}_{AC},
+\qquad
+u\neq v.
+\label{eq:qsv2g_selected_pair}
+\end{equation}
+
+The selected authorities verify that their approval
+records refer to the same $(AC,\nu)$ pair and that
+the corresponding quantum resource remains available.
+Before any measurement, the authorities perform an authenticated,
+crash-durable reservation transition
+$\mathrm{UNUSED}\rightarrow\mathrm{RESERVED}(AC,u,v)$.
+Both share holders must acknowledge the same tuple; a conflict,
+uncertain state, or communication failure causes fail-closed rejection.
+The resource is dedicated to this attempt and cannot be used by a
+concurrent request. Reuse after any attempted measurement is forbidden.
+
+\textit{Step 2: Quantum-share measurement.}
+Each selected authority retrieves its assigned
+quantum-share bundle $\mathcal{Q}_{u}^{(\nu)}$
+or $\mathcal{Q}_{v}^{(\nu)}$, as defined in
+(\ref{eq:qss_share_bundle}).
+
+For every secret contribution generated by UC-$a$,
+where $a\in\mathcal{P}$, the selected authorities
+measure their corresponding qutrit subsystems in
+the computational basis.
+
+The measurements produce outcomes
+
+\begin{equation}
+x_{a\rightarrow u,k}^{(\nu)},
+\quad
+x_{a\rightarrow v,k}^{(\nu)}
+\in\mathbb{Z}_3,
+\label{eq:qsv2g_qss_measurements}
+\end{equation}
+
+for $1\leq k\leq L$.
+
+The authorities exchange the required measurement
+outcomes through their authenticated and confidential
+communication channel. Each measurement transcript
+is associated with the authorized context $AC$,
+resource identifier $\nu$, and identities of the
+participating authorities.
+
+The measurement consumes the corresponding
+quantum subsystems. Their outcomes must not be
+accepted from another transaction or reused with
+a different authorization context.
+
+\textit{Step 3: Reconstruction of secret contributions.}
+Define the authority positions as
+
+\begin{equation}
+\iota(A)=0,\qquad
+\iota(B)=1,\qquad
+\iota(C)=2.
+\label{eq:qsv2g_authority_positions}
+\end{equation}
+
+According to the quantum-state encoding in
+(\ref{eq:qss_qutrit_encoding}), the measurement
+outcome of subsystem $b$ satisfies
+
+\begin{equation}
+x_{a\rightarrow b,k}^{(\nu)}
+=
+\left(
+r_{a,k}^{(\nu)}
++
+\iota(b)s_{a,k}^{(\nu)}
+\right)\bmod 3.
+\label{eq:qsv2g_qss_outcome_relation}
+\end{equation}
+
+Subtracting the outcomes obtained by the selected
+authorities eliminates the random encoding value
+$r_{a,k}^{(\nu)}$.
+
+The reconstructed contribution is therefore
+
+\begin{equation}
+\begin{aligned}
+\widehat{s}_{a,k}^{(\nu)}
+={}&
+\left(
+x_{a\rightarrow v,k}^{(\nu)}
+-
+x_{a\rightarrow u,k}^{(\nu)}
+\right)\\
+&\cdot
+\left(
+\iota(v)-\iota(u)
+\right)^{-1}
+\bmod 3,
+\end{aligned}
+\label{eq:qsv2g_qss_recover_symbol}
+\end{equation}
+
+where the inverse is taken in $\mathbb{Z}_3$.
+Because $u\neq v$, the denominator is nonzero
+and has a multiplicative inverse.
+
+This expression applies to each of the permitted
+authority pairs and is consistent with the
+pairwise recovery relations established during
+QSS initialization.
+
+For each original contributing authority,
+the recovered symbols form the vector
+
+\begin{equation}
+\widehat{\mathbf{s}}_a^{(\nu)}
+=
+\left(
+\widehat{s}_{a,1}^{(\nu)},
+\ldots,
+\widehat{s}_{a,L}^{(\nu)}
+\right).
+\label{eq:qsv2g_recovered_contribution}
+\end{equation}
+
+The combined authorization secret is recovered
+componentwise as
+
+\begin{equation}
+\widehat{\mathbf{S}}_{auth}^{(\nu)}
+=
+\left(
+\sum_{a\in\mathcal{P}}
+\widehat{\mathbf{s}}_a^{(\nu)}
+\right)\bmod 3.
+\label{eq:qsv2g_reconstructed_secret}
+\end{equation}
+
+For correctly prepared and distributed quantum
+shares, the reconstruction equations yield
+
+\begin{equation}
+\widehat{\mathbf{S}}_{auth}^{(\nu)}
+=
+\mathbf{S}_{auth}^{(\nu)}.
+\label{eq:qsv2g_qss_correctness}
+\end{equation}
+
+\textit{Step 4: Verification of recovered contributions.}
+To check the reconstructed values against their
+originally registered contributions, the authorities
+use the authenticated commitments
+$C_a^{(\nu)}$ established during QSS setup.
+
+For every $a\in\mathcal{P}$, the selected pair
+computes
+
+\begin{equation}
+\begin{aligned}
+\widehat{C}_a^{(\nu)}
+=
+H\big(
+&\mathrm{QSV2G\mbox{-}QSS\mbox{-}COM}
+\parallel a\\
+&\parallel\nu
+\parallel
+\operatorname{Encode}
+(\widehat{\mathbf{s}}_a^{(\nu)})
+\big).
+\end{aligned}
+\label{eq:qsv2g_reconstructed_commitment}
+\end{equation}
+
+The reconstructed contribution is accepted only
+when the locally computed commitment matches
+the registered commitment:
+
+\begin{equation}
+V_a^{QSS}
+=
+\left(
+\widehat{C}_a^{(\nu)}
+\stackrel{?}{=}
+C_a^{(\nu)}
+\right).
+\label{eq:qsv2g_qss_commitment_check}
+\end{equation}
+
+All three reconstructed contributions must satisfy
+their respective checks:
+
+\begin{equation}
+V_{\mathrm{rec}}
+=
+\bigwedge_{a\in\mathcal{P}}
+V_a^{QSS}.
+\label{eq:qsv2g_qss_reconstruction_valid}
+\end{equation}
+
+A mismatch causes the reconstruction attempt
+to be rejected. The resource is marked consumed,
+and its measured quantum subsystems are not
+returned to the available resource pool.
+
+These commitment checks provide computational
+consistency between recovered classical values
+and registered secret contributions. They do
+not, by themselves, verify every quantum-state
+operation or guarantee security against arbitrary
+malicious behavior during share distribution.
+
+\textit{Step 5: Threshold reconstruction decision.}
+The reconstruction is accepted only if two
+distinct authorities approved the context,
+their records refer to the same resource previously reserved
+while unused, and all reconstructed secret contributions
+pass the commitment checks.
+
+The corresponding decision is
+
+\begin{equation}
+D_{\mathrm{QSS}}=
+\begin{cases}
+1, &
+|\mathcal{A}_{AC}|\geq 2
+\land V_{\mathrm{rec}}=1\\
+&\land
+\operatorname{ResourceValid}(AC,\nu)=1,\\[2pt]
+0, & \text{otherwise}.
+\end{cases}
+\label{eq:qsv2g_qss_threshold_decision}
+\end{equation}
+
+Here $\operatorname{ResourceValid}(AC,\nu)$ means that,
+\emph{before the current measurement}, the resource was unconsumed,
+reserved exclusively for $(AC,u,v)$ by both participants, and no
+previous attempt used it. The corresponding state transition to
+$\mathrm{CONSUMED}$ is recorded after this attempt, including on
+failure. A lost or uncertain acknowledgement never permits reuse.
+
+If $D_{\mathrm{QSS}}=1$, the selected authorities
+retain the validated reconstruction result
+only for the subsequent authorization-proof
+generation procedure. The classical measurement
+outcomes and recovered secret values remain
+restricted to the authorized reconstruction
+participants.
+
+The resource $\nu$ is durably marked consumed after
+its reconstruction attempt, regardless of
+its outcome. A successful threshold result
+establishes that the selected authorities
+participated in recovering the registered
+secret contributions for the allocated resource.
+The separate authorization proof must still
+bind their authenticated approval decisions
+to the specific transaction context $AC$.
+
+% 4. Authorization Proof Generation
+\noindent\textbf{4) Authorization Proof Generation:}
+After successful threshold reconstruction, the participating
+authorities generate a transaction-specific authorization
+proof. The reconstructed secret remains within the
+authorized authority pair; neither the charging station
+nor the EV receives the quantum shares or the recovered
+secret. Instead, the authorities issue independently
+verifiable attestations binding their approval decisions
+and the QSS reconstruction result to the current
+authorization context.
+
+\textit{Step 1: Reconstruction-result binding.}
+Let $u,v\in\mathcal{A}_{AC}$ denote the two distinct
+authorities selected for reconstruction, with
+$D_{\mathrm{QSS}}=1$. The participating authorities
+compute a digest of the recovered authorization secret:
+
+\begin{equation}
+\begin{aligned}
+h_{\mathrm{rec}}
+=
+H\big(
+&\mathrm{QSV2G\mbox{-}REC}
+\parallel AC\parallel\nu\\
+&\parallel
+\operatorname{Encode}
+(\widehat{\mathbf{S}}_{auth}^{(\nu)})
+\big).
+\end{aligned}
+\label{eq:qsv2g_reconstruction_digest}
+\end{equation}
+
+The digest cryptographically binds the locally recovered secret to
+the context under the assumed entropy of the original contributions.
+It is an authority statement, not a publicly checkable QSS proof.
+Low-entropy test vectors must not be used for real authorization
+since public hashes/commitments would permit offline guessing.
+The authorities verify that they obtained the same
+result and that the contribution checks defined in
+(\ref{eq:qsv2g_qss_reconstruction_valid}) succeeded.
+The recovered secret is not included in the
+authorization messages, and the recovered plaintext and measurement
+outcomes are deleted after token generation and necessary audit checks.
+
+\textit{Step 2: Authorization statement construction.}
+The two authorities form a common authorization
+statement containing the session identifier,
+authorization context, QSS resource identifier,
+participating authorities, reconstruction digest,
+and validity interval:
+
+\begin{equation}
+\begin{aligned}
+M_{\mathrm{auth}}
+=
+\operatorname{Encode}\big(
+&\mathrm{QSV2G\mbox{-}AUTHZ},AC,SID,\\
+&\nu,u,v,h_{\mathrm{rec}},VLD,
+\mathrm{ACCEPT}
+\big).
+\end{aligned}
+\label{eq:qsv2g_authorization_statement}
+\end{equation}
+
+The operation $OP$, permitted limit $LIM$,
+participant identifiers, and session nonces
+are already bound to $AC$ through
+(\ref{eq:qsv2g_context}).
+
+Each selected authority independently checks
+that $M_{\mathrm{auth}}$ corresponds to its
+previously accepted approval record
+$\alpha_a^{(\nu)}$, that $D_{\mathrm{QSS}}=1$,
+and that the selected resource has not been
+assigned to another transaction.
+
+\textit{Step 3: Independent authority attestations.}
+Let $(sk_a^{sig},pk_a^{sig})$ denote the
+authenticated ML-DSA signing and verification
+key pair belonging to UC-$a$.
+
+Each participating authority signs the common
+authorization statement:
+
+\begin{equation}
+\sigma_a
+=
+\operatorname{ML\mbox{-}DSA.Sign}
+\left(
+sk_a^{sig},M_{\mathrm{auth}}
+\right),
+\quad a\in\{u,v\}.
+\label{eq:qsv2g_authority_signature}
+\end{equation}
+
+An authority produces $\sigma_a$ only after
+its local authorization decision is positive
+and the reconstruction checks succeed.
+The two signatures must originate from
+distinct registered utility authorities.
+
+The resulting authorization proof is
+
+\begin{equation}
+\begin{aligned}
+AuthToken=
+(&M_{\mathrm{auth}},
+\sigma_u,\sigma_v).
+\end{aligned}
+\label{eq:qsv2g_auth_token}
+\end{equation}
+
+The token identifies the participating
+authorities but contains neither their
+quantum-share registers nor the recovered
+authorization secret. Signatures attest the signers' reconstruction
+and approval decisions; they do not constitute a publicly
+verifiable proof of the quantum measurements.
+
+\textit{Step 4: Proof collection and threshold validation.}
+UC-B acts as the authorization-proof collector in the specified
+online design. Its availability is required; changing collectors
+would require an additional authenticated collector-election and
+routing procedure, which is not defined here.
+The selected authorities transmit their signed
+statements to UC-B through authenticated
+communication channels.
+
+UC-B checks that both signatures refer to
+the same authorization statement and verifies
+
+\begin{equation}
+\begin{aligned}
+V_{\mathrm{sig}}
+={}&
+\operatorname{ML\mbox{-}DSA.Verify}
+(pk_u^{sig},M_{\mathrm{auth}},\sigma_u)\\
+&\land
+\operatorname{ML\mbox{-}DSA.Verify}
+(pk_v^{sig},M_{\mathrm{auth}},\sigma_v).
+\end{aligned}
+\label{eq:qsv2g_authorization_signatures_verify}
+\end{equation}
+
+The final authorization decision is
+
+\begin{equation}
+D_{\mathrm{auth}}=
+\begin{cases}
+1, &
+D_{\mathrm{QSS}}=1
+\land V_{\mathrm{sig}}=1\\
+&\land u\neq v
+\land \operatorname{Valid}(AC,\nu,VLD)=1,\\[2pt]
+0, & \text{otherwise}.
+\end{cases}
+\label{eq:qsv2g_final_authorization_decision}
+\end{equation}
+
+Here, $\operatorname{Valid}(AC,\nu,VLD)$
+requires the authorization context to match
+the pending transaction, the resource to
+be assigned to that transaction, and the
+authorization validity interval to remain
+unexpired.
+
+UC-B forwards $AuthToken$ and the authorization
+decision to $CS_j$ only if the required
+verification checks succeed. Otherwise,
+the request is rejected and the reserved
+QSS resource is not made available for reuse.
+
+\textit{Step 5: Proof retention and delivery.}
+The authorization result is recorded against
+$(SID,AC,\nu)$ so that subsequent requests
+cannot claim the same consumed authorization
+resource.
+
+The charging station retains the received
+$AuthToken$ with the pending session state.
+It subsequently delivers the token to $EV_i$
+inside the protected authorization response.
+
+The EV independently verifies the authority
+signatures using their authenticated public
+verification keys and checks that the
+authorization statement matches its locally
+accepted transaction context. These
+EV-side checks and the conditions for
+executing the authorized operation are
+specified in the following subsection.
+
+\subsection{Protected Response and Execution}
+\label{subsec:qsv2g_protected_execution}
+
+% Short opening paragraph
+Following the distributed authorization procedure,
+$CS_j$ prepares the authorization response for $EV_i$.
+The response carries the threshold authorization proof
+and the transaction parameters bound to the established
+session. It is protected using the previously derived
+CS-to-EV traffic key $K_{C\to E}$ to prevent unauthorized
+modification or disclosure during transmission.
+Upon reception, the EV verifies the message integrity,
+authority signatures, and agreement with its accepted
+authorization context before allowing the requested
+operation. The subsequent exchange is restricted by
+the approved limits and validity interval, while
+rejected, expired, or completed transactions are
+prevented from being executed again. The following
+steps specify response protection, EV-side verification,
+energy exchange, and session termination.
+
+% 1. Protected Authorization Response Generation
+\noindent\textbf{1) Protected Authorization Response Generation:}
+Upon receiving the authorization result from UC-B,
+$CS_j$ verifies that the decision corresponds to its
+pending session and authorization context $AC$.
+For an accepted request, the station checks the two
+authority signatures contained in $AuthToken$ using
+(\ref{eq:qsv2g_authorization_signatures_verify}).
+It also confirms that the authorization statement
+specifies the expected $SID$, $AC$, and validity
+interval $VLD$. The station proceeds with response
+generation only after these checks succeed.
+
+\textit{Step 1: Response message construction.}
+The station prepares an authorization response
+containing the transaction identifiers, authorization
+decision, and permitted operating parameters:
+
+\begin{equation}
+\begin{aligned}
+M_{\mathrm{resp}} =
+\operatorname{Encode}\big(
+&SID,PID_i,CSID_j,AC,OP,\\
+&N_E,N_C,LIM,VLD,\\
+&D_{\mathrm{auth}},AuthToken
+\big).
+\end{aligned}
+\label{eq:qsv2g_response_message}
+\end{equation}
+
+For an accepted transaction, $D_{\mathrm{auth}}=1$
+and $AuthToken$ contains the two authority
+attestations defined in (\ref{eq:qsv2g_auth_token}).
+For a rejected transaction, $D_{\mathrm{auth}}=0$
+and the token field is set to $\bot$, indicating
+that no valid authorization proof is available.
+The inclusion of $AC$ allows the EV to associate
+the returned decision with its previously
+accepted transaction parameters.
+
+\textit{Step 2: Authenticated response encryption.}
+The station protects $M_{\mathrm{resp}}$ using
+the established CS-to-EV traffic key $K_{C\to E}$ and
+an authenticated encryption with associated
+data (AEAD) algorithm. It selects a fresh
+nonce $n_{\mathrm{resp}}$ that has not been
+used previously with the same session key.
+The associated data is constructed as
+
+\begin{equation}
+AD_{\mathrm{resp}} =
+\operatorname{Encode}
+\left(
+\mathrm{QSV2G\mbox{-}RESP},
+SID,CSID_j
+\right).
+\label{eq:qsv2g_response_ad}
+\end{equation}
+
+The protected response is generated by
+
+\begin{equation}
+\begin{aligned}
+(C_{\mathrm{resp}},Tag_{\mathrm{resp}})
+=
+\operatorname{AEAD.Enc}_{K_{C\to E}}\big(
+&n_{\mathrm{resp}},\\
+&M_{\mathrm{resp}},
+AD_{\mathrm{resp}}
+\big).
+\end{aligned}
+\label{eq:qsv2g_response_encryption}
+\end{equation}
+
+Here, $C_{\mathrm{resp}}$ denotes the encrypted
+authorization message, while
+$Tag_{\mathrm{resp}}$ provides authentication
+and integrity protection for the ciphertext
+and associated data. The nonce is transmitted
+in cleartext and must remain unique across
+all encryption operations performed under
+$K_{C\to E}$. The CS-to-EV nonce counter is advanced across both context
+proposals and response/termination messages; each encryption
+uses a new value. The EV-to-CS direction has its own key and
+counter. All AEAD associated data are encoded canonically.
+
+\textit{Step 3: Protected response transmission.}
+The charging station transmits
+
+\begin{equation}
+Resp_{CS} =
+\left(
+SID,n_{\mathrm{resp}},
+C_{\mathrm{resp}},
+Tag_{\mathrm{resp}}
+\right)
+\label{eq:qsv2g_protected_response}
+\end{equation}
+
+to $EV_i$. The session identifier enables
+the vehicle to select the corresponding
+session key and reconstruct
+$AD_{\mathrm{resp}}$ for authenticated
+decryption. The station retains the
+authorization result and its association
+with $(SID,AC)$ in the pending transaction
+record.
+
+The transmitted response does not disclose
+the reconstructed QSS secret or individual
+quantum shares. The EV obtains only the
+protected authorization result and, when
+the operation is approved, the signed
+threshold authorization proof. Verification
+of the received response is performed by
+the EV before any energy-transfer operation
+is permitted.
+
+
+% 2. EV-Side Authorization Verification
+\noindent\textbf{2) EV-Side Authorization Verification:}
+Upon receiving $Resp_{CS}$, the electric vehicle
+$EV_i$ verifies the protected authorization result
+before accepting the requested V2G operation.
+The verification procedure is performed as follows.
+
+\textit{Step 1: Authenticated response decryption.}
+The EV retrieves $K_{C\to E}$ using the received
+session identifier $SID$ and reconstructs the
+associated data $AD_{\mathrm{resp}}$ according to
+(\ref{eq:qsv2g_response_ad}). It then performs
+authenticated decryption:
+
+\begin{equation}
+\begin{aligned}
+M_{\mathrm{resp}}^{*}
+=
+\operatorname{AEAD.Dec}_{K_{C\to E}}\big(
+&n_{\mathrm{resp}},\\
+&C_{\mathrm{resp}},
+Tag_{\mathrm{resp}},\\
+&AD_{\mathrm{resp}}
+\big).
+\end{aligned}
+\label{eq:qsv2g_response_decryption}
+\end{equation}
+
+If authentication fails, the decryption algorithm
+returns $\bot$, and the response is rejected.
+The EV also rejects a response nonce previously
+accepted under the same session key. Only an
+authenticated plaintext is processed further.
+
+\textit{Step 2: Session and context verification.}
+After decoding $M_{\mathrm{resp}}^{*}$, the EV
+compares the received $SID$, $PID_i$, $CSID_j$,
+$OP$, $N_E$, and $N_C$ with its locally retained
+session information. The returned operating
+limit $LIM$ and validity interval $VLD$ must
+also agree with the transaction parameters
+accepted earlier.
+
+Using its retained transaction record
+$M_{\mathrm{ctx}}$, the EV independently
+recomputes the authorization context:
+
+\begin{equation}
+AC_{EV}
+=
+H\left(
+\mathrm{QSV2G\mbox{-}AC}
+\parallel M_{\mathrm{ctx}}
+\right).
+\label{eq:qsv2g_ev_context_verify}
+\end{equation}
+
+The received context is accepted only when
+
+\begin{equation}
+AC_{EV}\stackrel{?}{=}AC.
+\label{eq:qsv2g_ev_context_match}
+\end{equation}
+
+This check ensures that the returned decision
+refers to the transaction parameters previously
+accepted by the EV. The vehicle additionally
+verifies that its current time falls within
+$VLD$, allowing for the specified clock
+synchronization tolerance.
+
+\textit{Step 3: Threshold authorization proof verification.}
+For an accepted authorization response, $EV_i$
+extracts $AuthToken$ and decodes the signed
+statement $M_{\mathrm{auth}}$ defined in
+(\ref{eq:qsv2g_authorization_statement}).
+
+The EV first checks that the statement contains
+the expected $AC$, $SID$, and $VLD$, together
+with an authorization decision of
+$\mathrm{ACCEPT}$. The resource identifier
+$\nu$ must be associated with the current
+transaction, while the two signing authorities
+$u$ and $v$ must be distinct members of
+$\mathcal{P}$.
+
+Using the authenticated public verification
+keys of the corresponding authorities,
+the EV verifies both signatures according
+to (\ref{eq:qsv2g_authorization_signatures_verify}).
+The verification result is expressed as
+
+\begin{equation}
+\begin{aligned}
+V_{\mathrm{token}}
+={}&V_{\mathrm{sig}}
+\land (u\neq v)\\
+&\land \operatorname{AuthorityValid}(u,v)\\
+&\land \operatorname{StatementMatch}
+(M_{\mathrm{auth}},AC_{EV},SID,VLD).
+\end{aligned}
+\label{eq:qsv2g_ev_token_verify}
+\end{equation}
+
+Here, $\operatorname{AuthorityValid}(u,v)$
+requires both verification keys to belong to
+recognized utility authorities. The predicate
+$\operatorname{StatementMatch}$ verifies the
+agreement of the signed authorization fields
+with the EV's authenticated transaction state.
+
+The reconstruction digest $h_{\mathrm{rec}}$
+is covered by the authority signatures.
+The EV does not recover the QSS secret or
+independently recompute this digest. Instead,
+it verifies the authorities' signed
+attestation to the threshold result.
+
+\textit{Step 4: Final authorization acceptance.}
+The EV accepts the authorization only when
+the protected response is authentic, the
+session and context checks succeed, the
+authorization token is valid, and the
+transaction remains eligible for execution.
+
+Let $V_{\mathrm{sess}}$ denote the successful
+session-field checks, $V_{\mathrm{ctx}}$
+the agreement of the transaction parameters,
+and $V_{\mathrm{time}}$ the validity-interval
+check. The final EV decision is
+
+\begin{equation}
+\begin{aligned}
+D_{EV}
+={}&
+\operatorname{AEADValid}(Resp_{CS})
+\land V_{\mathrm{sess}}\\
+&\land V_{\mathrm{ctx}}
+\land V_{\mathrm{time}}\\
+&\land V_{\mathrm{token}}
+\land (D_{\mathrm{auth}}=1)\\
+&\land
+\operatorname{Unused}(SID,AC,\nu).
+\end{aligned}
+\label{eq:qsv2g_ev_final_decision}
+\end{equation}
+
+The predicate $\operatorname{Unused}$ checks that no earlier
+execution was started for $(SID,AC,\nu)$ and that this transaction
+is not already in a terminal state. Upon successful verification,
+the EV atomically records its authorization as pending execution.
+A repeated response does not issue a second execution grant.
+
+If any verification condition fails,
+$D_{EV}=0$, and the EV refuses the
+requested energy exchange. A response
+carrying $D_{\mathrm{auth}}=0$ is treated
+as an authenticated rejection and does not
+require an authorization token.
+
+A positive $D_{EV}$ establishes the EV's
+acceptance of the authority-issued permission.
+Actual energy transfer remains subject to
+the operating limits and execution controls
+specified in the following procedure.
+
+
+% 3. Authorized Energy Exchange
+\noindent\textbf{3) Authorized Energy Exchange:}
+After verifying the authorization response, $EV_i$
+initiates the approved V2G operation through an
+authenticated execution request. The charging station
+permits energy transfer only when the request matches
+its locally verified authorization record. Both
+participants enforce the operation, permitted limits,
+and validity interval throughout the transaction.
+The execution procedure is described as follows.
+
+\textit{Step 1: Execution request confirmation.}
+If $D_{EV}=1$, the EV generates a fresh execution
+nonce $N_X$ and constructs
+
+\begin{equation}
+M_{\mathrm{start}} =
+\operatorname{Encode}
+\left(
+\mathrm{QSV2G\mbox{-}START},
+SID,AC,\nu,OP,N_X
+\right).
+\label{eq:qsv2g_execution_request}
+\end{equation}
+
+The message is transmitted to $CS_j$ using the
+authenticated session channel established earlier.
+Its confidentiality and integrity are protected
+with $K_{E\to C}$, using a fresh AEAD nonce
+according to the session nonce-allocation rules.
+
+On receiving the request, $CS_j$ verifies its
+message authentication and compares $SID$, $AC$,
+$\nu$, and $OP$ with the authorization statement
+retained for the pending transaction. The station
+also confirms that the authorization has not
+expired or been consumed by another execution.
+
+The station's execution permission is evaluated over its
+locally authenticated start request and durable transaction state
+and is defined as
+
+\begin{equation}
+\begin{aligned}
+D_{CS}^{exec}={}&
+\operatorname{ValidStart}(M_{\mathrm{start}})\\
+&\land(D_{\mathrm{auth}}=1)\\
+&\land\operatorname{Unused}(SID,AC,\nu)\\
+&\land\operatorname{TimeValid}(VLD).
+\end{aligned}
+\label{eq:qsv2g_cs_execution_decision}
+\end{equation}
+
+A positive result permits the station to
+activate the corresponding charging or
+discharging controller. Before activation,
+the transaction state is atomically changed
+from \textsc{authorized} to \textsc{active},
+preventing a second request from starting
+the same authorized operation.
+
+\textit{Step 2: Operation and limit enforcement.}
+Let the authorization limit be represented by
+
+\begin{equation}
+LIM=(L_{\mathrm{type}},L_{\max},U_L),
+\label{eq:qsv2g_execution_limit}
+\end{equation}
+
+where $L_{\mathrm{type}}$ identifies the
+quantity being restricted, $L_{\max}$
+specifies its maximum authorized value,
+and $U_L$ denotes the corresponding unit.
+
+For an energy-limited transaction, let
+$P_{\mathrm{tr}}(t)\geq 0$ denote the
+measured magnitude of power transferred
+between the EV and station. The cumulative
+transferred energy is
+
+\begin{equation}
+E_{\mathrm{tr}}(t)
+=
+\int_{t_0}^{t}
+P_{\mathrm{tr}}(\tau)\,d\tau,
+\label{eq:qsv2g_transferred_energy}
+\end{equation}
+
+where $t_0$ is the execution start time.
+The station must enforce
+
+\begin{equation}
+E_{\mathrm{tr}}(t)\leq E_{\max},
+\qquad
+E_{\max}=L_{\max},
+\label{eq:qsv2g_energy_constraint}
+\end{equation}
+
+when $L_{\mathrm{type}}=\mathrm{ENERGY}$.
+
+For a power-limited authorization,
+the corresponding condition is
+
+\begin{equation}
+P_{\mathrm{tr}}(t)\leq P_{\max},
+\qquad
+P_{\max}=L_{\max},
+\label{eq:qsv2g_power_constraint}
+\end{equation}
+
+when $L_{\mathrm{type}}=\mathrm{POWER}$.
+The appropriate constraint is selected
+from the signed authorization context.
+Any additional equipment or grid safety
+limits remain independently enforceable.
+
+The operation $OP$ determines the permitted
+direction of transfer. For
+$OP=\mathrm{CHARGE}$, energy flows from
+the charging infrastructure to the EV.
+For $OP=\mathrm{DISCHARGE}$, the EV
+supplies energy to the grid through the
+authorized station interface. A change
+of direction requires a new authorization.
+
+\textit{Step 3: Validity and execution monitoring.}
+Let the authorized validity interval be
+
+\begin{equation}
+VLD=[t_{\mathrm{begin}},t_{\mathrm{end}}],
+\label{eq:qsv2g_execution_validity}
+\end{equation}
+
+with $t_{\mathrm{begin}}<t_{\mathrm{end}}$.
+Energy exchange is permitted only while
+the execution time lies within this interval.
+
+The station continuously evaluates the
+execution condition
+
+\begin{equation}
+\begin{aligned}
+\operatorname{Permit}(t)
+={}&
+\operatorname{Active}(SID,AC,\nu)\\
+&\land
+(t_{\mathrm{begin}}\leq t\leq t_{\mathrm{end}})\\
+&\land
+\operatorname{DirectionValid}(OP,t)\\
+&\land
+\operatorname{LimitValid}(LIM,t)\\
+&\land
+\operatorname{SafetyValid}(t).
+\end{aligned}
+\label{eq:qsv2g_execution_permission}
+\end{equation}
+
+The predicate $\operatorname{LimitValid}$
+evaluates the applicable energy or power
+constraint, while
+$\operatorname{SafetyValid}$ represents
+the independent operational interlocks
+of the charging infrastructure.
+
+If any condition becomes false, $CS_j$
+must stop further authorized transfer
+and place the transaction in a
+non-active state. The EV may independently
+request termination if its local operating
+conditions no longer permit the exchange.
+
+The limits must be enforced using trusted
+measurements and a controller capable of
+interrupting energy transfer. Cryptographic
+authorization alone does not guarantee
+physical compliance with these constraints.
+
+\textit{Step 4: Execution record and replay prevention.}
+During execution, the station maintains a
+transaction record associated with
+$(SID,AC,\nu)$, including the operation,
+measured energy, and execution state.
+
+The persistent state machine uses the following forward-only
+execution transitions (a failed or expired authorization is terminal):
+
+\begin{equation}
+\begin{aligned}
+\textsc{authorized}
+&\rightarrow \textsc{active},\\
+\textsc{active}
+&\rightarrow
+\{\textsc{completed},
+  \textsc{interrupted}\}.
+\end{aligned}
+\label{eq:qsv2g_execution_states}
+\end{equation}
+
+An authorization that has entered the
+\textsc{active}, \textsc{completed}, or
+\textsc{interrupted} state cannot initiate
+a new execution using the same
+$(SID,AC,\nu)$ identifier. Repeated start
+messages are rejected without restarting
+the physical transfer.
+
+The final execution outcome and associated
+metering information are retained for
+session termination and transaction
+recording. Any subsequent charging or
+discharging operation requires a new
+authorization context and a fresh
+authorization procedure.
+
+% 4. Session Termination and Exceptional Handling
+\noindent\textbf{4) Session Termination and Exceptional Handling:}
+The V2G session terminates when the authorized energy
+transfer is completed, interrupted, or no longer
+permitted under the established transaction conditions.
+The charging station records the final execution
+state and communicates the outcome to the EV through
+the authenticated session channel. Termination and
+exceptional conditions are handled as follows.
+
+\textit{Step 1: Transaction finalization.}
+Let $t_f$ denote the time at which energy transfer
+ends. The charging station obtains the final
+metered energy $E_{\mathrm{tr}}(t_f)$ and determines
+the execution status $S_f$ as
+
+\begin{equation}
+S_f\in
+\{\mathrm{COMPLETED},\mathrm{INTERRUPTED}\}.
+\label{eq:qsv2g_final_status}
+\end{equation}
+
+The status $\mathrm{COMPLETED}$ indicates that
+the authorized transaction ended normally,
+whereas $\mathrm{INTERRUPTED}$ represents
+termination before normal completion because
+of an operational, communication, or
+authorization-related condition.
+
+The station prepares the final transaction record
+
+\begin{equation}
+\begin{aligned}
+M_{\mathrm{term}}=
+\operatorname{Encode}\big(
+&SID,AC,\nu,OP,S_f,\\
+&t_f,E_{\mathrm{tr}}(t_f)
+\big).
+\end{aligned}
+\label{eq:qsv2g_termination_record}
+\end{equation}
+
+The recorded energy represents the measured
+quantity exchanged during the transaction.
+Its accuracy depends on the integrity and
+calibration of the associated metering system.
+
+\textit{Step 2: Protected termination confirmation.}
+The station generates a fresh AEAD nonce
+$n_{\mathrm{term}}$ and protects the final record
+using the established session key:
+
+\begin{equation}
+\begin{aligned}
+(C_{\mathrm{term}},Tag_{\mathrm{term}})
+=
+\operatorname{AEAD.Enc}_{K_{C\to E}}\big(
+&n_{\mathrm{term}},\\
+&M_{\mathrm{term}},
+AD_{\mathrm{term}}
+\big),
+\end{aligned}
+\label{eq:qsv2g_termination_protection}
+\end{equation}
+
+where
+
+\begin{equation}
+AD_{\mathrm{term}}=
+\operatorname{Encode}
+(\mathrm{QSV2G\mbox{-}TERM},SID,CSID_j).
+\label{eq:qsv2g_termination_ad}
+\end{equation}
+
+The nonce is allocated using the persistent CS-to-EV
+96-bit counter and the existing $K_{C\to E}$ key.
+The station transmits the protected record
+to $EV_i$.
+
+Upon receipt, the EV verifies the AEAD tag
+and confirms that $SID$, $AC$, $\nu$, and
+$OP$ correspond to its active transaction.
+It records the authenticated termination
+status and the reported metering information.
+A receipt acknowledgment may be returned
+over the same protected channel.
+
+The station does not postpone a required
+physical shutdown while waiting for this
+acknowledgment. If receipt delivery fails,
+the termination record remains available
+for authenticated reconciliation.
+
+\textit{Step 3: Expiry and interruption handling.}
+An active transaction is interrupted if its
+validity interval expires, the permitted
+operating constraints are violated, or a
+safety condition requires shutdown.
+Loss of the protected communication channel
+also prevents further cryptographically
+authorized control commands and triggers
+the configured safe-stop procedure.
+
+The terminal execution state is recorded
+against $(SID,AC,\nu)$, and the corresponding
+authorization cannot initiate another
+energy-transfer operation. A repeated
+execution or termination message must not
+reactivate a completed or interrupted
+transaction.
+
+If an interruption occurs before the
+termination record can be exchanged, the
+station retains the locally observed
+execution outcome. The EV and station may
+later reconcile their records through an
+authenticated communication channel.
+A new charging or discharging attempt
+requires a new session authorization rather
+than reuse of the earlier $AuthToken$.
+
+\textit{Step 4: Revocation and resource closure.}
+If an authority reports a relevant credential
+revocation or withdrawal of authorization,
+the station applies the corresponding
+termination policy. A revocation received
+during an active transaction must be
+authenticated and checked against the
+affected participant and authorization
+context before the station changes the
+execution state.
+
+The consumed QSS resource $\nu$ remains
+unavailable for future reconstruction.
+The authorities retain the minimum records
+required to associate its use with the
+corresponding authorization decision.
+
+After termination processing, the EV and
+CS invalidate the session for further
+execution requests, persist the terminal transaction state, and
+erase $K_{E\to C}$ and $K_{C\to E}$ when no further authenticated
+reconciliation is required. If reconciliation remains pending,
+separate restricted retention rules must govern the keys and records. Transaction records required for
+accounting, auditing, or dispute resolution
+may be retained according to the applicable
+retention policy.
+
+Any exceptional request to resolve a
+pseudonym to a registered EV identity is
+handled by UC-A under the established
+disclosure policy. Such disclosure is
+separate from routine session termination
+and does not expose the QSS authorization
+secret or the EV--CS session key.
+
+\section{Security Analysis} \label{sec5}
+\subsection{Security Features Supported}
+\subsection{Security Verification}
+\subsection{Security Features Comparison}
+
+\section{Performance Evaluation} \label{sec6}
+\subsection{Simulation Setup and Benchmarks}
+\subsection{Results and Analysis}
+\subsection{Computation Overhead} \label{comp}
+\subsection{Energy Consumption} \label{ene}
+\subsection{Communication Overhead} \label{comm}
+
+\section{Conclusion and Future work} \label{sec7}
+
+\bibliographystyle{IEEEtran}
+\bibliography{new}
+\end{document}

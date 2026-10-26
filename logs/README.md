@@ -7,3 +7,8 @@
 - [../results/](../results/) — authentic structured CSV and JSON result files, transaction traces, and submitted ZIPs for all suites.
 
 Stage 01 and Stage 02 submitted ZIPs report Kaggle environment hints but **do not contain complete original Kaggle console logs, immutable run links, or Kaggle-executed notebook snapshots**. These are outstanding provenance items, not present evidence. Do not relabel local preflight output as Kaggle output.
+
+- [Stage 03 submitted notebook-generated log](stage03/) — exact extract from the Stage 03 result ZIP.
+- [Stage 04 submitted notebook-generated log](stage04/) — exact extract from the Stage 04 result ZIP.
+
+These files are not complete Kaggle job console histories and do not include immutable Kaggle run IDs.

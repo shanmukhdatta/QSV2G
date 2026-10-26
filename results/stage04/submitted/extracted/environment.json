@@ -1,0 +1,14 @@
+{
+  "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+  "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+  "os": "posix",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3",
+  "matplotlib": "3.10.0",
+  "cryptography": "50.0.1",
+  "pqcrypto": "1.0.0",
+  "backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "openssl_version": "OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)",
+  "kaggle_path_detected": true,
+  "note": "Environment metadata is reported by this execution, not cryptographic attestation."
+}

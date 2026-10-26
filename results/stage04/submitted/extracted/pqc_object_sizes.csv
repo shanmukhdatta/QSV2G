@@ -1,0 +1,8 @@
+object,size_bytes,scope
+ML-KEM-768 public key,1184,actual backend output; encoding backend dependent
+ML-KEM-768 secret key,2400,actual backend output; not sent as protocol message
+ML-KEM-768 ciphertext,1088,actual backend output
+ML-KEM-768 shared secret,32,actual backend output; not sent as plaintext
+ML-DSA-65 public key,1952,actual backend output; encoding backend dependent
+ML-DSA-65 secret key,4032,actual backend output; not sent as protocol message
+ML-DSA-65 signature,3309,actual backend output

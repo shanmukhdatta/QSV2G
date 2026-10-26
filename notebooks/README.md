@@ -15,3 +15,8 @@ Three original experiment notebooks are preserved as runnable `.ipynb` source fi
 
 - [Stage 01: baseline reproducibility](stage01/README.md)
 - [Stage 02: security analysis — corrected Kaggle version](stage02/README.md)
+
+- [Stage 03 quantum noise and QSS reliability](stage03/) — Kaggle-ready source notebook and separately labelled local preflight.
+- [Stage 04 computational performance and baselines](stage04/) — Kaggle-ready source and an **unfinished** local diagnostic attempt, not a complete benchmark.
+
+Kaggle executed notebook revisions and immutable cloud run URLs were not supplied for these stages.

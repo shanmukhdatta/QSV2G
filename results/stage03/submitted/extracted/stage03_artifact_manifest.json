@@ -1,0 +1,103 @@
+{
+  "stage": "03",
+  "hash_algorithm": "sha256",
+  "manifest_does_not_list_itself": true,
+  "files": [
+    {
+      "path": "QSV2G_SectionIV_reference.tex",
+      "bytes": 121736,
+      "sha256": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2"
+    },
+    {
+      "path": "README_RESULTS.md",
+      "bytes": 2189,
+      "sha256": "7d6c7a19aca86f5c75c7e1eab0e3c5abc53b1326171922bd24e0d4e0d5ea19b2"
+    },
+    {
+      "path": "authority_availability_assumptions.csv",
+      "bytes": 941,
+      "sha256": "33b3ef8457c1d16112e7d8d226120107f09ad695fa536af4ee4e610540190f0d"
+    },
+    {
+      "path": "legacy_qutrit_x_error_trials_original.csv",
+      "bytes": 707,
+      "sha256": "b55b31f50c15b8cf3d9dea2336bbaef873947041042163763ca9a77fd053bfaa"
+    },
+    {
+      "path": "legacy_vs_new_pauli_x.png",
+      "bytes": 144790,
+      "sha256": "85da76a55813dd8b062fcc6f6cb403b6a24b4e547b716eaaeef9672ddd2bbaa7"
+    },
+    {
+      "path": "legacy_x_comparison.csv",
+      "bytes": 5705,
+      "sha256": "ffefd5c5129451e6474d9b50a84755d80fbdb7cf917db46a8637eb92d95e3c55"
+    },
+    {
+      "path": "noise_channel_summary.csv",
+      "bytes": 3248,
+      "sha256": "33a564ef614936abe395a2363247145c9e014efa3265446f8d15c28a4cf86d5e"
+    },
+    {
+      "path": "noise_model_reconstruction.png",
+      "bytes": 140639,
+      "sha256": "de58b9c44af35b2897b426d3c09c3387d8225efe33a78c2eb9bd35549e951897"
+    },
+    {
+      "path": "noise_trial_aggregates.csv",
+      "bytes": 49355,
+      "sha256": "008d5c1f833214ca8c600bbe5b9737141e612f203810ae93efd622f9038012c9"
+    },
+    {
+      "path": "noise_trial_events.csv.gz",
+      "bytes": 942581,
+      "sha256": "a83dfc9a3399913f4eff96bf176eed3cb5d4304469faddac994493f0b2f18b17"
+    },
+    {
+      "path": "outcome_totals_by_model.csv",
+      "bytes": 166,
+      "sha256": "022857637c91e74ec4bacdf2b7ed639bee0785a005b6e44bf9540ce8fe405a97"
+    },
+    {
+      "path": "qss_codespace_probability.png",
+      "bytes": 121168,
+      "sha256": "741ada723dc8f4caf87289771af1e4220134ea4b4d9c28a32df2b3cfdea7a3b9"
+    },
+    {
+      "path": "qsv2g_core_reference.py",
+      "bytes": 28813,
+      "sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758"
+    },
+    {
+      "path": "quantum_fidelity_codespace.csv",
+      "bytes": 40664,
+      "sha256": "63e23d138fada923fab05dd335d6b9e92b8756aabb5fd2b8772ed97b9e9d962c"
+    },
+    {
+      "path": "quantum_state_fidelity.png",
+      "bytes": 109284,
+      "sha256": "2ce7aeb543379e9605b1ab40ecbfaafc223b67b059569db3df1f5749b409b63e"
+    },
+    {
+      "path": "resource_length_independence_extrapolation.csv",
+      "bytes": 21823,
+      "sha256": "02b5f068f770743a1c86bac5adb5dd43fb21d95e14c982d46f07154456bc750e"
+    },
+    {
+      "path": "resource_length_theoretical_reliability.png",
+      "bytes": 116315,
+      "sha256": "a0071a0c7fe0615ae1fe64e930fd65c6a71a43085b1b12d58f139b53b4bc9370"
+    },
+    {
+      "path": "stage03_console_log.txt",
+      "bytes": 1023,
+      "sha256": "25da441770c7a698bd9879a127650aff7db285bece47f7169ddb0b54ddb04a72"
+    },
+    {
+      "path": "stage03_summary.json",
+      "bytes": 2121,
+      "sha256": "f7bb6395f8b3faab11d8e3879950b70bbc2fff2f1c18047a75226edb684ca2b4"
+    }
+  ],
+  "file_count": 19
+}

@@ -24,3 +24,11 @@ Available execution evidence:
 - Original Kaggle URLs, immutable revision identifiers, full run history for the three notebook families, raw download metadata, and complete environment lockfiles were **not supplied**. The console extract supports reported execution details, but cannot by itself authenticate the run's origin or associate it with an immutable Kaggle revision.
 
 This archive is a reproducibility aid. Equation mapping is curated traceability, not mathematical/formal proof.
+
+## Stage 03 and Stage 04 archived experiments
+
+Preserved original submitted ZIP SHA-256: Stage 03 `b76f05afca3d872ce3bc7b4ea043ec7e10ef3d555e042cdadc0eda8e5f0b0d95`; Stage 04 `9a60827099be191398931b8ddf036c5664b4f19410c0761de54031ad869f11e0`.
+
+All 19 Stage 03 and 27 Stage 04 internal member checksums match. Their extracted files and the duplicated notebook-created log extracts are byte-identical to the original archives. Both reference the same archived QSV2G core and the earlier revised Section IV text.
+
+The archives' Kaggle path indicators, Python package versions, environment metadata and notebook-generated logs are **reported evidence**, not authenticated Kaggle run history. Full cloud execution logs, immutable revision IDs and executed Kaggle notebook snapshots are not supplied. The locally incomplete Stage 04 attempt is preserved only for diagnostics. These artifacts demonstrate software simulation and benchmarks, not malicious-secure QSS, real quantum-network operation or formal quantum advantage.

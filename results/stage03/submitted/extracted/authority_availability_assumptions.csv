@@ -1,0 +1,9 @@
+offline_authorities,online_authorities,qss_pair_exists,qsv2g_full_workflow_possible_under_A_B_online_assumption,note
+(none),ABC,True,True,Availability abstraction; no explicit quantum-channel erasure or real network modeled
+A,BC,True,False,Availability abstraction; no explicit quantum-channel erasure or real network modeled
+B,AC,True,False,Availability abstraction; no explicit quantum-channel erasure or real network modeled
+C,AB,True,True,Availability abstraction; no explicit quantum-channel erasure or real network modeled
+AB,C,False,False,Availability abstraction; no explicit quantum-channel erasure or real network modeled
+AC,B,False,False,Availability abstraction; no explicit quantum-channel erasure or real network modeled
+BC,A,False,False,Availability abstraction; no explicit quantum-channel erasure or real network modeled
+ABC,,False,False,Availability abstraction; no explicit quantum-channel erasure or real network modeled

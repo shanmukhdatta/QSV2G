@@ -1,0 +1,6 @@
+model,shots,correct,wrong,abort
+combined,63000,53839,9161,0
+dephasing,63000,63000,0,0
+depolarizing,63000,58948,4052,0
+erasure,63000,56840,0,6160
+x,63000,56738,6262,0

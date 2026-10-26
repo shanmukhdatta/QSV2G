@@ -1,0 +1,14 @@
+QSV2G Stage 03 / Kaggle runtime: True / output: /kaggle/working/qsv2g_stage03
+Core SHA256: 2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758
+Section IV SHA256: 4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2
+Legacy X CSV SHA256: b55b31f50c15b8cf3d9dea2336bbaef873947041042163763ca9a77fd053bfaa
+Legacy X rows: 21 with 900 shots each
+Statevector and decoder: verified against exact reference AST, three logical symbols and three authorized pairs.
+Analytical probability checks: PASS (X, dephasing, depolarizing, flagged erasure, combined, all pairs).
+Executed: 315 configurations, 315000 trials, 2.83 seconds
+Per-channel total correct/wrong/abort:
+Historical X comparison: 42 rows, no historical CSV modified.
+Saved: five publication-candidate figures and all underlying CSVs.
+Availability: QSS threshold reconstruction and QSV2G full workflow distinguished.
+Monte Carlo Wilson95 coverage: 307 / 315 | max abs difference from exact probability: 0.029
+STAGE RESULT: PASS_WITH_MODEL_LIMITATIONS
