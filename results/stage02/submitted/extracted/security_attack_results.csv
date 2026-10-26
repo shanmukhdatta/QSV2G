@@ -1,0 +1,81 @@
+case_id,group,requirement,model_boundary,expected,observed,matches_expectation,interpretation,observed_detail
+A01,A,SPR1,reference_run_demo,REJECTED,REJECTED,True,EV credential/proof tamper,EV proof rejected
+A02,A,SPR1,reference_run_demo,REJECTED,REJECTED,True,CS credential/proof tamper,CS proof rejected
+A03,A,"SPR5,SPR8",reference_run_demo,REJECTED,REJECTED,True,Encrypted context tamper,AEAD authentication failure
+A04,A,SPR11,reference_run_demo,REJECTED,REJECTED,True,Revoked participant,EV revoked
+A05,A,SPR2,reference_run_demo,REJECTED,REJECTED,True,Invalid EV consent,UC-A rejected EV consent
+A06,A,"SPR2,SPR3",reference_run_demo,REJECTED,REJECTED,True,One approving authority,fewer than two distinct approvals
+A07,A,"SPR2,SPR3",reference_run_demo,REJECTED,REJECTED,True,No approving authorities,fewer than two distinct approvals
+A08,A,SPR4,reference_run_demo,REJECTED,REJECTED,True,QSS tampered during reconstruction,QSS reconstructed commitment mismatch
+A09,A,SPR9,reference_run_demo,REJECTED,REJECTED,True,Signature tamper before collector,invalid authority signature
+A10,A,SPR8,reference_run_demo,REJECTED,REJECTED,True,Protected response ciphertext tamper,AEAD authentication failure
+A11,A,SPR9,reference_run_demo,REJECTED,REJECTED,True,Token signature tamper after collector,EV token signature invalid
+A12,A,"SPR5,SPR13",reference_run_demo,REJECTED,REJECTED,True,Expired transaction,context expired
+A13,A,SPR6,reference_run_demo,REJECTED,REJECTED,True,Invalid zero energy limit,invalid operation or energy limit
+A14,A,SPR10,reference_run_demo,REJECTED,REJECTED,True,Unavailable UC-A,UC-A and UC-B required for online registration
+A15,A,SPR10,reference_run_demo,REJECTED,REJECTED,True,Unavailable UC-B,UC-A and UC-B required for online registration
+A16,A,SPR10,reference_run_demo,ACCEPTED,ACCEPTED,True,UC-C unavailable; AB can complete when A and B are online,
+A17,A,"SPR1,SPR2,SPR3,SPR6",reference_run_demo,ACCEPTED,ACCEPTED,True,Happy-path CHARGE with pair AB,
+A18,A,"SPR1,SPR2,SPR3,SPR6",reference_run_demo,ACCEPTED,ACCEPTED,True,Happy-path CHARGE with pair AC,
+A19,A,"SPR1,SPR2,SPR3,SPR6",reference_run_demo,ACCEPTED,ACCEPTED,True,Happy-path CHARGE with pair BC,
+A20,A,"SPR1,SPR2,SPR3,SPR6",reference_run_demo,ACCEPTED,ACCEPTED,True,Happy-path DISCHARGE with pair AB,
+A21,A,"SPR1,SPR2,SPR3,SPR6",reference_run_demo,ACCEPTED,ACCEPTED,True,Happy-path DISCHARGE with pair AC,
+A22,A,"SPR1,SPR2,SPR3,SPR6",reference_run_demo,ACCEPTED,ACCEPTED,True,Happy-path DISCHARGE with pair BC,
+A23,A,SPR13,simulated_protocol,REJECTED,REJECTED,True,Old EV timestamp rejected by time window,stale EV timestamp
+A24,A,"SPR5,SPR13",injected_randomness_unit_test,REJECTED,REJECTED,True,Forced duplicate EV nonce rejected,EV nonce replay
+A25,A,"SPR5,SPR13",injected_randomness_unit_test,REJECTED,REJECTED,True,Forced duplicate CS nonce rejected,CS nonce replay
+A26,A,SPR1,simulated_protocol,REJECTED,REJECTED,True,Authentication before registration is rejected,register first
+B01,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field PID,context mismatch
+B02,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field CSID,context mismatch
+B03,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field SID,context mismatch
+B04,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field OP,context mismatch
+B05,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field NE,context mismatch
+B06,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field NC,context mismatch
+B07,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field TS_E,context mismatch
+B08,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field TS_CS,context mismatch
+B09,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field LIM,context mismatch
+B10,B,"SPR2,SPR5,SPR6,SPR13",internal_context_mutation,REJECTED,REJECTED,True,Changed bound field VLD,context mismatch
+B11,B,"SPR2,SPR5",simulated_protocol,REJECTED,REJECTED,True,Altered authorization digest violates authenticated consent,UC-A rejected EV consent
+B12,B,SPR5,canonical_length_prefix,DISTINCT,DISTINCT,True,Different field boundaries have different canonical byte encodings,
+B13,B,SPR8,actual_AESGCM,REJECTED,REJECTED,True,Authenticated ciphertext modification rejected,AEAD authentication failure
+B14,B,SPR8,actual_AESGCM,ACCEPTED,ACCEPTED,True,Untampered packet decrypts,
+B15,B,"SPR5,SPR13",actual_AESGCM,REJECTED,REJECTED,True,Duplicate accepted packet nonce rejected,duplicate or malformed AEAD nonce
+B16,B,SPR8,actual_AESGCM,REJECTED,REJECTED,True,Wrong associated data fails authentication,AEAD authentication failure
+B17,B,SPR8,actual_AESGCM,REJECTED,REJECTED,True,Malformed nonce length rejected,duplicate or malformed AEAD nonce
+B18,B,SPR8,directional_KDF,DISTINCT,DISTINCT,True,EV-to-CS and CS-to-EV derived keys differ,
+B19,B,"SPR5,SPR8",deployment_limitation,EXPOSED,EXPOSED,True,KEY/COUNTER RESTART HAZARD: repeated AES-GCM nonce under same traffic key,
+B20,B,"SPR2,SPR5,SPR6",trusted_object_state_corruption,EXPOSED,EXPOSED,True,Check whether EV-side reference simulator independently keeps original OP after station state mutation; NOT a network attacker test.,
+CAB,C,"SPR3,SPR4",ideal_statevector,ACCEPTED,ACCEPTED,True,"Ideal pair ('A', 'B'): 90/90 measured trits correct",
+CAC,C,"SPR3,SPR4",ideal_statevector,ACCEPTED,ACCEPTED,True,"Ideal pair ('A', 'C'): 90/90 measured trits correct",
+CBC,C,"SPR3,SPR4",ideal_statevector,ACCEPTED,ACCEPTED,True,"Ideal pair ('B', 'C'): 90/90 measured trits correct",
+C04,C,SPR7,ideal_one_share_marginal,IDEAL_PRIVACY,IDEAL_PRIVACY,True,One ideal quantum share has marginal I3/3; public commitments and protocol metadata are excluded,
+C05,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered A quantum state for pair AB,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C06,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered B quantum state for pair AB,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C07,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered C quantum state for pair AB,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C08,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered A quantum state for pair AC,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C09,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered B quantum state for pair AC,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C10,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered C quantum state for pair AC,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C11,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered A quantum state for pair BC,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C12,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered B quantum state for pair BC,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C13,C,SPR4,post_commitment_state_substitution,REJECTED,REJECTED,True,Altered C quantum state for pair BC,QSS reconstructed commitment mismatch; resource_state=CONSUMED
+C14,C,SPR4,simulated_protocol,REJECTED,REJECTED,True,Tampered prior commitment rejected,QSS reconstructed commitment mismatch
+C15,C,SPR4,resource_lifecycle,CONSUMED,CONSUMED,True,Failed reconstruction consumes measured states,
+C16,C,SPR3,simulated_protocol,REJECTED,REJECTED,True,Double reservation rejected,QSS resource already reserved or consumed
+C17,C,SPR4,simulated_protocol,REJECTED,REJECTED,True,Wrong AC cannot reconstruct reserved quantum resource,QSS reservation mismatch
+C18,C,SPR3,simulated_protocol,REJECTED,REJECTED,True,Single share cannot reserve an authorized reconstruction pair,pair invalid
+C19,C,SPR4,simulated_protocol,REJECTED,REJECTED,True,Consumed resource is unavailable for reuse,QSS resource already reserved or consumed
+C20,C,SPR4,known_limitation_dishonest_dealer,EXPOSED,EXPOSED,True,Self-consistent dealer substitutes secret and commitment without detection,"[0, 2, 1, 2, 1, 0, 0]"
+C21,C,SPR4,known_limitation_stabilizers,EXPOSED,EXPOSED,True,All three encoded symbols satisfy same tested stabilizers; logical intent not identified,
+C22,C,SPR7,parameterization_caveat,EXPOSED,EXPOSED,True,L=1 low-entropy commitment dictionary recovery; NOT an attack on the full L=162 setting,
+C23,C,SPR3,simulated_protocol,REJECTED,REJECTED,True,Honest simulator cannot issue token before reconstruction,QSS reconstruction missing
+D01,D,SPR9,simulated_protocol,REJECTED,REJECTED,True,Authority A signature cannot impersonate authority B,EV token signature invalid
+D02,D,"SPR3,SPR4",known_limitation_two_corrupt_signers,EXPOSED,EXPOSED,True,Two actual signing keys attest to reconstruction they deliberately skipped; exceeds <=1-corrupt-authority threat bound.,
+D03,D,"SPR2,SPR9",simulated_protocol,REJECTED,REJECTED,True,Modified signed reconstruction digest rejected,EV token signature invalid
+D04,D,"SPR2,SPR5",simulated_protocol,REJECTED,REJECTED,True,Signed statement for another SID rejected,signed statement context mismatch
+D05,D,SPR5,simulated_protocol,REJECTED,REJECTED,True,Signed statement for another quantum-resource ID rejected,signed statement context mismatch
+D06,D,"SPR5,SPR6",simulated_protocol,REJECTED,REJECTED,True,Repeated energy execution after termination rejected,EV did not accept token
+D07,D,SPR6,integer_energy_counter,WITHIN_LIMIT,WITHIN_LIMIT,True,Integer micro-Wh counter caps modeled transfer; not a physical meter test,energy_mwh=12000.0; limit_mwh=12000
+D08,D,SPR6,simulated_termination,INTERRUPTED,INTERRUPTED,True,Interrupted termination produces authenticated simulated record,
+D09,D,"SPR5,SPR13",simulated_protocol,REJECTED,REJECTED,True,EV rejects expired authorization after signing,authorization expired at EV
+D10,D,SPR3,simulated_protocol,REJECTED,REJECTED,True,Honest issuance fails before quantum reconstruction,QSS reconstruction missing
+D11,D,"SPR2,SPR6",shared_state_simulation_gap,EXPOSED,EXPOSED,True,Reference model lacks an independent EV copy of original accepted OP under internal station-state mutation; NOT proof of network exploit.,

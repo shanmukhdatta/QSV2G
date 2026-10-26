@@ -45,3 +45,8 @@ Do not interpret these tests as cryptographic security guarantees. See `docs/LIM
 - [Reference protocol source](protocol/README.md) | [Environment](environment/README.md) | [Verification scripts](scripts/README.md)
 
 **Disclosure:** The supplied archives do not include independently authenticated Kaggle run history or cloud execution identifiers. Their environment fields are *reported metadata*. Locally executed notebooks are labelled accordingly. The QSKA PDF and full unpublished manuscript are not included. No LICENSE file is provided pending authors' choice of terms.
+## Staged experimental evaluations
+
+- **Stage 01 baseline reproducibility:** [notebook](notebooks/stage01/) · [raw submitted results](results/stage01/) · [audit](docs/stages/STAGE01_AUDIT.md). Uploaded outcomes: 38/38 expected; ideal QSS 720/720.
+- **Stage 02 security analysis:** [corrected notebook](notebooks/stage02/) · [raw submitted results](results/stage02/) · [audit](docs/stages/STAGE02_AUDIT.md). Uploaded outcomes: 80/80 expected with 7 *demonstrated limitations*.
+- [Stage-to-evidence index](docs/STAGE_EVIDENCE_INDEX.md) records the exact source versions and evidence provenance. Original Kaggle console logs and revision URLs for these two stages were not supplied; local preflight logs are labelled explicitly.

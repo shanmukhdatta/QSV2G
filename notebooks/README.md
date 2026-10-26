@@ -11,3 +11,7 @@ Three original experiment notebooks are preserved as runnable `.ipynb` source fi
 **Execution:** Use a recent Python 3 environment or import each notebook into Kaggle. Run the first dependency cell, then Run All. CPU is sufficient for the documented example settings. Internet may be required for first-time dependency installation. The notebook saves outputs to its runtime-specific output directory. Do not claim running in Kaggle based on a local output file.
 
 `local_executed/` contains existing locally executed snapshots, separate from these source notebooks.
+## New experimental stages
+
+- [Stage 01: baseline reproducibility](stage01/README.md)
+- [Stage 02: security analysis — corrected Kaggle version](stage02/README.md)

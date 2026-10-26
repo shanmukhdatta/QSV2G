@@ -1,0 +1,24 @@
+{
+  "project": "QSV2G",
+  "stage": "02_security_analysis",
+  "case_count": 80,
+  "expectations_matched": 80,
+  "mismatches": 0,
+  "assessments": {
+    "PARTIALLY_TESTED": 8,
+    "LIMITATION_DEMONSTRATED": 3,
+    "NOT_ESTABLISHED": 2
+  },
+  "interpretation": "Matching an expected vulnerability is NOT a security success. Software tests are not a proof.",
+  "reference_core_sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758",
+  "reported_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "status": "PASS_WITH_DOCUMENTED_LIMITATIONS",
+  "known_boundaries": [
+    "No malicious-secure VQSS",
+    "No independent EV proof of QSS reconstruction",
+    "Home and visited utility availability dependencies",
+    "Crash-persistent AEAD nonce/state not implemented",
+    "No physical quantum or V2G hardware",
+    "No formal quantum-adversary proof"
+  ]
+}

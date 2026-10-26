@@ -1,0 +1,32 @@
+[
+  {
+    "filename": "environment.json",
+    "size_bytes": 866,
+    "sha256": "c859e4d19492f30c1a7a122c0fc69fd89149c2ade9fbc538def5b968513df614"
+  },
+  {
+    "filename": "security_attack_results.csv",
+    "size_bytes": 10461,
+    "sha256": "b26c06e9655e9d06e4c6b1bd992fb311e93f9bd96cb2e6a5b6b609f4a3e34dc9"
+  },
+  {
+    "filename": "security_limitations.csv",
+    "size_bytes": 1320,
+    "sha256": "8c3d0c02b641da9ef8fbc756796c50090292d289f810d9e9eb22f549528618ea"
+  },
+  {
+    "filename": "security_report.md",
+    "size_bytes": 3421,
+    "sha256": "6b341c8b8c627dafbcb29925f828e9d7546b528581d3d92ce52790837709692c"
+  },
+  {
+    "filename": "security_requirements_matrix.csv",
+    "size_bytes": 2399,
+    "sha256": "77e308093a600a0954a307d856b3867ec444ee2add47fbe3241bd8cbd44bbdd2"
+  },
+  {
+    "filename": "security_summary.json",
+    "size_bytes": 874,
+    "sha256": "52e5c67f95ff032f34b0a1d6265af2b9c6b2623efe4fcb5ad95ee5fd3a757c7a"
+  }
+]

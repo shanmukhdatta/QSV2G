@@ -1,0 +1,194 @@
+# LOCAL preflight executed notebook stdout extract — stage02
+# Source: QSV2G_Stage02_Fixed_Local_Executed.ipynb
+# Not an original Kaggle console log or independent cloud-run attestation.
+# Captured from saved notebook output cells, preserving their source text.
+
+--- cell 3, stream 1, name=stdout ---
+Environment: Linux-6.18.55-x86_64-with-glibc2.41 Python: 3.13.5
+PQC availability: pqcrypto = False ; OpenSSL 3.5+ = True
+Outputs: /mnt/data/qsv2g_stage02_localrun/qsv2g_stage02_security_results
+
+--- cell 5, stream 1, name=stdout ---
+Core SHA256 2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758 PQC provider: OpenSSL 3.5+ ML-KEM-768 + ML-DSA-65 (subprocess)
+
+--- cell 9, stream 1, name=stdout ---
+  A01    MATCH observed=REJECTED     expected=REJECTED     EV credential/proof tamper
+  A02    MATCH observed=REJECTED     expected=REJECTED     CS credential/proof tamper
+
+--- cell 9, stream 2, name=stdout ---
+  A03    MATCH observed=REJECTED     expected=REJECTED     Encrypted context tamper
+
+--- cell 9, stream 3, name=stdout ---
+  A04    MATCH observed=REJECTED     expected=REJECTED     Revoked participant
+
+--- cell 9, stream 4, name=stdout ---
+  A05    MATCH observed=REJECTED     expected=REJECTED     Invalid EV consent
+
+--- cell 9, stream 5, name=stdout ---
+  A06    MATCH observed=REJECTED     expected=REJECTED     One approving authority
+
+--- cell 9, stream 6, name=stdout ---
+  A07    MATCH observed=REJECTED     expected=REJECTED     No approving authorities
+
+--- cell 9, stream 7, name=stdout ---
+  A08    MATCH observed=REJECTED     expected=REJECTED     QSS tampered during reconstruction
+
+--- cell 9, stream 8, name=stdout ---
+  A09    MATCH observed=REJECTED     expected=REJECTED     Signature tamper before collector
+
+--- cell 9, stream 9, name=stdout ---
+  A10    MATCH observed=REJECTED     expected=REJECTED     Protected response ciphertext tamper
+  A11    MATCH observed=REJECTED     expected=REJECTED     Token signature tamper after collector
+
+--- cell 9, stream 10, name=stdout ---
+  A12    MATCH observed=REJECTED     expected=REJECTED     Expired transaction
+
+--- cell 9, stream 11, name=stdout ---
+  A13    MATCH observed=REJECTED     expected=REJECTED     Invalid zero energy limit
+  A14    MATCH observed=REJECTED     expected=REJECTED     Unavailable UC-A
+  A15    MATCH observed=REJECTED     expected=REJECTED     Unavailable UC-B
+
+--- cell 9, stream 12, name=stdout ---
+  A16    MATCH observed=ACCEPTED     expected=ACCEPTED     UC-C unavailable; AB can complete when A and B are online
+
+--- cell 9, stream 13, name=stdout ---
+  A17    MATCH observed=ACCEPTED     expected=ACCEPTED     Happy-path CHARGE with pair AB
+
+--- cell 9, stream 14, name=stdout ---
+  A18    MATCH observed=ACCEPTED     expected=ACCEPTED     Happy-path CHARGE with pair AC
+
+--- cell 9, stream 15, name=stdout ---
+  A19    MATCH observed=ACCEPTED     expected=ACCEPTED     Happy-path CHARGE with pair BC
+
+--- cell 9, stream 16, name=stdout ---
+  A20    MATCH observed=ACCEPTED     expected=ACCEPTED     Happy-path DISCHARGE with pair AB
+
+--- cell 9, stream 17, name=stdout ---
+  A21    MATCH observed=ACCEPTED     expected=ACCEPTED     Happy-path DISCHARGE with pair AC
+
+--- cell 9, stream 18, name=stdout ---
+  A22    MATCH observed=ACCEPTED     expected=ACCEPTED     Happy-path DISCHARGE with pair BC
+  A23    MATCH observed=REJECTED     expected=REJECTED     Old EV timestamp rejected by time window
+
+--- cell 9, stream 19, name=stdout ---
+  A24    MATCH observed=REJECTED     expected=REJECTED     Forced duplicate EV nonce rejected
+  A25    MATCH observed=REJECTED     expected=REJECTED     Forced duplicate CS nonce rejected
+
+--- cell 9, stream 20, name=stdout ---
+  A26    MATCH observed=REJECTED     expected=REJECTED     Authentication before registration is rejected
+A suite complete: 26 cases
+
+--- cell 11, stream 1, name=stdout ---
+  B01    MATCH observed=REJECTED     expected=REJECTED     Changed bound field PID
+  B02    MATCH observed=REJECTED     expected=REJECTED     Changed bound field CSID
+
+--- cell 11, stream 2, name=stdout ---
+  B03    MATCH observed=REJECTED     expected=REJECTED     Changed bound field SID
+
+--- cell 11, stream 3, name=stdout ---
+  B04    MATCH observed=REJECTED     expected=REJECTED     Changed bound field OP
+  B05    MATCH observed=REJECTED     expected=REJECTED     Changed bound field NE
+
+--- cell 11, stream 4, name=stdout ---
+  B06    MATCH observed=REJECTED     expected=REJECTED     Changed bound field NC
+
+--- cell 11, stream 5, name=stdout ---
+  B07    MATCH observed=REJECTED     expected=REJECTED     Changed bound field TS_E
+  B08    MATCH observed=REJECTED     expected=REJECTED     Changed bound field TS_CS
+
+--- cell 11, stream 6, name=stdout ---
+  B09    MATCH observed=REJECTED     expected=REJECTED     Changed bound field LIM
+
+--- cell 11, stream 7, name=stdout ---
+  B10    MATCH observed=REJECTED     expected=REJECTED     Changed bound field VLD
+  B11    MATCH observed=REJECTED     expected=REJECTED     Altered authorization digest violates authenticated consent
+  B12    MATCH observed=DISTINCT     expected=DISTINCT     Different field boundaries have different canonical byte encodings
+  B13    MATCH observed=REJECTED     expected=REJECTED     Authenticated ciphertext modification rejected
+  B14    MATCH observed=ACCEPTED     expected=ACCEPTED     Untampered packet decrypts
+  B15    MATCH observed=REJECTED     expected=REJECTED     Duplicate accepted packet nonce rejected
+  B16    MATCH observed=REJECTED     expected=REJECTED     Wrong associated data fails authentication
+  B17    MATCH observed=REJECTED     expected=REJECTED     Malformed nonce length rejected
+
+--- cell 11, stream 8, name=stdout ---
+  B18    MATCH observed=DISTINCT     expected=DISTINCT     EV-to-CS and CS-to-EV derived keys differ
+  B19    MATCH observed=EXPOSED      expected=EXPOSED      KEY/COUNTER RESTART HAZARD: repeated AES-GCM nonce under same traffic key
+
+--- cell 11, stream 9, name=stdout ---
+  B20    MATCH observed=EXPOSED      expected=EXPOSED      Check whether EV-side reference simulator independently keeps original OP after st
+B suite complete: 46 cases cumulative
+
+--- cell 13, stream 1, name=stdout ---
+  CAB    MATCH observed=ACCEPTED     expected=ACCEPTED     Ideal pair ('A', 'B'): 90/90 measured trits correct
+  CAC    MATCH observed=ACCEPTED     expected=ACCEPTED     Ideal pair ('A', 'C'): 90/90 measured trits correct
+  CBC    MATCH observed=ACCEPTED     expected=ACCEPTED     Ideal pair ('B', 'C'): 90/90 measured trits correct
+  C04    MATCH observed=IDEAL_PRIVACY expected=IDEAL_PRIVACY One ideal quantum share has marginal I3/3; public commitments and protocol metadat
+  C05    MATCH observed=REJECTED     expected=REJECTED     Altered A quantum state for pair AB
+  C06    MATCH observed=REJECTED     expected=REJECTED     Altered B quantum state for pair AB
+  C07    MATCH observed=REJECTED     expected=REJECTED     Altered C quantum state for pair AB
+  C08    MATCH observed=REJECTED     expected=REJECTED     Altered A quantum state for pair AC
+  C09    MATCH observed=REJECTED     expected=REJECTED     Altered B quantum state for pair AC
+  C10    MATCH observed=REJECTED     expected=REJECTED     Altered C quantum state for pair AC
+  C11    MATCH observed=REJECTED     expected=REJECTED     Altered A quantum state for pair BC
+  C12    MATCH observed=REJECTED     expected=REJECTED     Altered B quantum state for pair BC
+  C13    MATCH observed=REJECTED     expected=REJECTED     Altered C quantum state for pair BC
+  C14    MATCH observed=REJECTED     expected=REJECTED     Tampered prior commitment rejected
+  C15    MATCH observed=CONSUMED     expected=CONSUMED     Failed reconstruction consumes measured states
+  C16    MATCH observed=REJECTED     expected=REJECTED     Double reservation rejected
+  C17    MATCH observed=REJECTED     expected=REJECTED     Wrong AC cannot reconstruct reserved quantum resource
+  C18    MATCH observed=REJECTED     expected=REJECTED     Single share cannot reserve an authorized reconstruction pair
+  C19    MATCH observed=REJECTED     expected=REJECTED     Consumed resource is unavailable for reuse
+  C20    MATCH observed=EXPOSED      expected=EXPOSED      Self-consistent dealer substitutes secret and commitment without detection
+  C21    MATCH observed=EXPOSED      expected=EXPOSED      All three encoded symbols satisfy same tested stabilizers; logical intent not iden
+  C22    MATCH observed=EXPOSED      expected=EXPOSED      L=1 low-entropy commitment dictionary recovery; NOT an attack on the full L=162 se
+
+--- cell 13, stream 2, name=stdout ---
+  C23    MATCH observed=REJECTED     expected=REJECTED     Honest simulator cannot issue token before reconstruction
+C suite complete: 69 cases cumulative
+
+--- cell 15, stream 1, name=stdout ---
+  D01    MATCH observed=REJECTED     expected=REJECTED     Authority A signature cannot impersonate authority B
+
+--- cell 15, stream 2, name=stdout ---
+  D02    MATCH observed=EXPOSED      expected=EXPOSED      Two actual signing keys attest to reconstruction they deliberately skipped; exceed
+
+--- cell 15, stream 3, name=stdout ---
+  D03    MATCH observed=REJECTED     expected=REJECTED     Modified signed reconstruction digest rejected
+
+--- cell 15, stream 4, name=stdout ---
+  D04    MATCH observed=REJECTED     expected=REJECTED     Signed statement for another SID rejected
+  D05    MATCH observed=REJECTED     expected=REJECTED     Signed statement for another quantum-resource ID rejected
+
+--- cell 15, stream 5, name=stdout ---
+  D06    MATCH observed=REJECTED     expected=REJECTED     Repeated energy execution after termination rejected
+  D07    MATCH observed=WITHIN_LIMIT expected=WITHIN_LIMIT Integer micro-Wh counter caps modeled transfer; not a physical meter test
+
+--- cell 15, stream 6, name=stdout ---
+  D08    MATCH observed=INTERRUPTED  expected=INTERRUPTED  Interrupted termination produces authenticated simulated record
+  D09    MATCH observed=REJECTED     expected=REJECTED     EV rejects expired authorization after signing
+  D10    MATCH observed=REJECTED     expected=REJECTED     Honest issuance fails before quantum reconstruction
+
+--- cell 15, stream 7, name=stdout ---
+  D11    MATCH observed=EXPOSED      expected=EXPOSED      Reference model lacks an independent EV copy of original accepted OP under interna
+D suite complete: 80 cases cumulative
+
+--- cell 17, stream 1, name=stdout ---
+requirement                              name              assessment
+       SPR1 Participant mutual authentication        PARTIALLY_TESTED
+       SPR2       Context-bound authorization        PARTIALLY_TESTED
+       SPR3             Threshold enforcement LIMITATION_DEMONSTRATED
+       SPR4      QSS contribution consistency LIMITATION_DEMONSTRATED
+       SPR5   Replay and context substitution        PARTIALLY_TESTED
+       SPR6    Fine-grained operation control        PARTIALLY_TESTED
+       SPR7               EV identity privacy         NOT_ESTABLISHED
+       SPR8       Protected CS-to-EV response        PARTIALLY_TESTED
+       SPR9  Single-signer forgery resistance        PARTIALLY_TESTED
+      SPR10     Conditional pair availability LIMITATION_DEMONSTRATED
+      SPR11            Revocation enforcement        PARTIALLY_TESTED
+      SPR12         Controlled accountability         NOT_ESTABLISHED
+      SPR13             Fresh session binding        PARTIALLY_TESTED
+Case count: 80  mismatches: 0
+
+--- cell 19, stream 1, name=stdout ---
+STAGE RESULT: PASS_WITH_DOCUMENTED_LIMITATIONS
+Cases: 80 matched expected: 80 mismatches: 0
+Evidence ZIP: /mnt/data/qsv2g_stage02_localrun/qsv2g_stage02_security_results.zip

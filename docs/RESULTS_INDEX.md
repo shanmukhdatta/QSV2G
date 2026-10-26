@@ -14,3 +14,6 @@
 | Local executed-cell text | `logs/local_executed/*.txt` | Embedded outputs in `notebooks/local_executed/` |
 
 **Input archives:** Unchanged original ZIPs in `results/archives/`. Their identity and reported runtime are described in `docs/PROVENANCE.md`. The independent execution provenance of Kaggle (run page/logs/version) has not been supplied.
+## Reproducibility stages added 2026-10-26
+
+See [Stage Evidence Index](STAGE_EVIDENCE_INDEX.md) for Stage 01/02 test-to-notebook-to-result-to-audit links, per-stage ZIP hashes, and Kaggle provenance limitations.

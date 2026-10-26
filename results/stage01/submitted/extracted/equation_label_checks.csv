@@ -1,0 +1,23 @@
+latex_equation,implementation_symbol,purpose,coverage,symbol_exists,latex_label_exists
+eq:ev_reg_bell,dense_encode_decode,Bell preparation and 2-qubit statevector encoding,implemented,True,True
+eq:ev_reg_tag,QSV2G.register,HMAC-verified Bell transport,implemented,True,True
+eq:cs_reg_auth,QSV2G.register,Station registration proof,implemented,True,True
+eq:qss_qutrit_encoding,qss_state,Three-qutrit ideal state encoding,implemented,True,True
+eq:qss_pair_recovery,recover_symbol,Two-share classical ternary symbol recovery,implemented,True,True
+eq:qsv2g_qss_commitment,new_qss_resource,Classical hash commitment,implemented,True,True
+eq:qss_state_consistency,qss_consistency,Ideal-state stabilizers; not malicious VQSS,partial,True,True
+eq:ev_auth_proof,QSV2G.authenticate,Online EV challenge/credential tag,implemented,True,True
+eq:cs_auth_proof,QSV2G.authenticate,Online station proof,implemented,True,True
+eq:qsv2g_kem_encaps,QSV2G.establish_session,Actual ML-KEM-768 encapsulation,implemented,True,True
+eq:qsv2g_session_key,QSV2G.establish_session,Directional HKDF traffic keys,implemented,True,True
+eq:qsv2g_context,QSV2G.authorization_context,Canonical context hash,implemented,True,True
+eq:qsv2g_ev_authz_consent,QSV2G.authority_verify,EV consent model with registration secret,implemented,True,True
+eq:qsv2g_authority_decision,QSV2G.authority_verify,Toy authority policy and revocation flags,partial,True,True
+eq:qsv2g_qss_recover_symbol,QSSResource.reconstruct,Quantum sampling and classical recovery,implemented,True,True
+eq:qsv2g_qss_commitment_check,QSSResource.reconstruct,Recovered value hash checks,implemented,True,True
+eq:qsv2g_auth_token,QSV2G.issue_token,Two ML-DSA-65 attestations,implemented,True,True
+eq:qsv2g_response_encryption,QSV2G.protected_response,AES-256-GCM response,implemented,True,True
+eq:qsv2g_ev_context_verify,QSV2G.protected_response,EV context and token checks,implemented,True,True
+eq:qsv2g_execution_request,QSV2G.execute,Authenticated execution-start request,implemented,True,True
+eq:qsv2g_execution_states,QSV2G.execute,In-memory single-use state transition,partial,True,True
+eq:qsv2g_termination_protection,QSV2G.terminate,Authenticated termination record,implemented,True,True

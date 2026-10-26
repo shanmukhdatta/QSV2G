@@ -1,0 +1,51 @@
+# LOCAL preflight executed notebook stdout extract — stage01
+# Source: QSV2G_Stage01_Baseline_Local_Executed.ipynb
+# Not an original Kaggle console log or independent cloud-run attestation.
+# Captured from saved notebook output cells, preserving their source text.
+
+--- cell 3, stream 1, name=stdout ---
+Python: 3.13.5 OS: Linux-6.18.55-x86_64-with-glibc2.41
+OpenSSL: OpenSSL 3.5.5 27 Jan 2026 (Library: OpenSSL 3.5.5 27 Jan 2026)
+Run started (UTC): 2026-10-26T16:31:12.796221+00:00
+Baseline output directory: /mnt/data/qsv2g_stage01_localrun/qsv2g_stage01_baseline_results
+
+--- cell 5, stream 1, name=stdout ---
+Pinned Section IV source hash: 4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2
+Prior submitted archive hash: f05cbc3eb70e3425438a22cae25d292ce3ce78787052c1b8e1e7d375d3462030
+Archived baseline: tests 38 ideal recoveries 720
+
+--- cell 7, stream 1, name=stdout ---
+Reference implementation SHA-256 VERIFIED: 2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758
+
+--- cell 9, stream 1, name=stdout ---
+Post-quantum cryptographic backend: OpenSSL 3.5+ ML-KEM-768 + ML-DSA-65 (subprocess)
+Reference harness ready.
+
+--- cell 11, stream 1, name=stdout ---
+QSS corruption and consistency cases complete
+Suite 8 finished in 39.549 ms
+
+--- cell 13, stream 1, name=stdout ---
+Authorization tests complete; known trust limitation recorded explicitly.
+Suite 10 finished in 1129.084 ms
+
+--- cell 15, stream 2, name=stdout ---
+Suite 12 finished in 133.754 ms
+
+--- cell 17, stream 1, name=stdout ---
+Failure and recovery checks complete
+Suite 14 finished in 501.648 ms
+
+--- cell 19, stream 1, name=stdout ---
+Matched 38/38 case outcome categories against submitted archive
+Matched 6/6 authorization workflow results
+Verified 720/720 ideal QSS trials (old and new)
+Found 22/22 equation labels and implementation symbols
+Reference comparison finished in 17.483 ms
+
+--- cell 21, stream 1, name=stdout ---
+STAGE RESULT: PASS
+NEW cases: 38 expected matched: 38 ; archival comparison: 38 / 38
+QSS recovery: 720 / 720
+RESULT ZIP: /mnt/data/qsv2g_stage01_localrun/qsv2g_stage01_baseline_results.zip BYTES: 10272
+Store the executed notebook too; original Kaggle run URL provides stronger provenance.

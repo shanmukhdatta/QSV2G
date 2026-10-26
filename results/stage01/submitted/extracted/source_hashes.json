@@ -1,0 +1,6 @@
+{
+  "reference_core_sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758",
+  "reference_section_iv_tex_sha256": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2",
+  "archived_submitted_validation_zip_sha256": "f05cbc3eb70e3425438a22cae25d292ce3ce78787052c1b8e1e7d375d3462030",
+  "note": "These hashes refer to the earlier tested Section IV revision, not automatically to the latest manuscript."
+}

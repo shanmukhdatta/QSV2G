@@ -9,3 +9,7 @@
 | [`archives/`](archives/) | Original untouched source ZIP files for all available result variants |
 
 Original plots are also extracted into [`../figures/experimental/`](../figures/experimental/). **Do not aggregate cross-environment timing measurements.** All results are from software simulation and should be attributed to their source manifests.
+## Newly uploaded staged experiments
+
+- [Stage 01: original submitted ZIP and extracted files](stage01/README.md)
+- [Stage 02: original submitted ZIP and extracted files](stage02/README.md)

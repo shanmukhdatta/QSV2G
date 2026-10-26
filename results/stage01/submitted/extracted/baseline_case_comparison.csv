@@ -1,0 +1,39 @@
+suite,case,expected_current,observed_current,type_current,expected_archived,observed_archived,type_archived,_merge,expected_match,observed_match,type_match,reproduced
+A,Commitment substitution,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,Ideal AB/AC/BC qutrit recovery,ACCEPTED,ACCEPTED,functional,ACCEPTED,ACCEPTED,functional,both,True,True,True,True
+A,Malicious dealer replaces valid state and its own commitment,ACCEPTED,ACCEPTED,known_limitation,ACCEPTED,ACCEPTED,known_limitation,both,True,True,True,True
+A,"Quantum value substitution dealer A pair ('A', 'B')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Quantum value substitution dealer A pair ('A', 'C')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Quantum value substitution dealer A pair ('B', 'C')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Quantum value substitution dealer B pair ('A', 'B')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Quantum value substitution dealer B pair ('A', 'C')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Quantum value substitution dealer B pair ('B', 'C')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Quantum value substitution dealer C pair ('A', 'B')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Quantum value substitution dealer C pair ('A', 'C')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Quantum value substitution dealer C pair ('B', 'C')",REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+A,"Stabilizers cannot distinguish encoded 0, 1 and 2",NOT_DETECTED,NOT_DETECTED,known_limitation,NOT_DETECTED,NOT_DETECTED,known_limitation,both,True,True,True,True
+B,"Full protocol CHARGE / ('A', 'B')",ACCEPTED,ACCEPTED,functional,ACCEPTED,ACCEPTED,functional,both,True,True,True,True
+B,"Full protocol CHARGE / ('A', 'C')",ACCEPTED,ACCEPTED,functional,ACCEPTED,ACCEPTED,functional,both,True,True,True,True
+B,"Full protocol CHARGE / ('B', 'C')",ACCEPTED,ACCEPTED,functional,ACCEPTED,ACCEPTED,functional,both,True,True,True,True
+B,"Full protocol DISCHARGE / ('A', 'B')",ACCEPTED,ACCEPTED,functional,ACCEPTED,ACCEPTED,functional,both,True,True,True,True
+B,"Full protocol DISCHARGE / ('A', 'C')",ACCEPTED,ACCEPTED,functional,ACCEPTED,ACCEPTED,functional,both,True,True,True,True
+B,"Full protocol DISCHARGE / ('B', 'C')",ACCEPTED,ACCEPTED,functional,ACCEPTED,ACCEPTED,functional,both,True,True,True,True
+B,Honest token issuance before QSS,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+B,Only one approving authority,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+B,Single compromised signer impersonates second authority,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+B,Two colluding signers bypass QSS attestation without reconstruction,ACCEPTED,ACCEPTED,known_limitation,ACCEPTED,ACCEPTED,known_limitation,both,True,True,True,True
+C,End-to-end trace reaches termination,ACCEPTED,ACCEPTED,functional,ACCEPTED,ACCEPTED,functional,both,True,True,True,True
+C,Equation mapping symbols present,MAPPED,MAPPED,functional,MAPPED,MAPPED,functional,both,True,True,True,True
+D,Associated-data substitution,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+D,Authenticated interrupted termination,INTERRUPTED,INTERRUPTED,functional,INTERRUPTED,INTERRUPTED,functional,both,True,True,True,True
+D,Authenticated packet replay,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+D,Competing QSS reservation,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+D,Consumed resource cannot be reassigned,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+D,Expired transaction rejected,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+D,Failed reconstruction burns resource,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+D,Reinstantiating traffic with the same key repeats the nonce,REPEATED,REPEATED,known_limitation,REPEATED,REPEATED,known_limitation,both,True,True,True,True
+D,Second energy execution rejected,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True
+D,UC-A unavailable (full workflow),REJECTED,REJECTED,availability_boundary,REJECTED,REJECTED,availability_boundary,both,True,True,True,True
+D,UC-B unavailable (full workflow),REJECTED,REJECTED,availability_boundary,REJECTED,REJECTED,availability_boundary,both,True,True,True,True
+D,UC-C unavailable (full workflow),ACCEPTED,ACCEPTED,availability_boundary,ACCEPTED,ACCEPTED,availability_boundary,both,True,True,True,True
+D,Unresolved reserved resource cannot be reassigned,REJECTED,REJECTED,functional,REJECTED,REJECTED,functional,both,True,True,True,True

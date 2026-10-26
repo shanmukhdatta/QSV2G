@@ -1,0 +1,26 @@
+{
+  "stage": "01_baseline_reproducibility",
+  "overall": "PASS",
+  "reference_implementation_sha256_match": true,
+  "reference_tex_sha256_match": true,
+  "archived_suite_case_matches": 38,
+  "archived_suite_case_count": 38,
+  "software_validation_expected_matches": 38,
+  "software_validation_cases": 38,
+  "known_limitation_demonstrations": 4,
+  "ideal_qss_correct": 720,
+  "ideal_qss_trials": 720,
+  "charge_discharge_pair_workflows_terminated": 6,
+  "charge_discharge_pair_workflows_total": 6,
+  "equation_labels_verified": 22,
+  "equation_labels_total": 22,
+  "backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "limitations": [
+    "ideal quantum simulator, not quantum networking",
+    "known malicious dealer, stabilizer and attestation limitations remain",
+    "UC-A and UC-B online dependencies remain",
+    "key/nonce state restoration hazard remains",
+    "equation mapping is traceability, not formal verification",
+    "cryptographic entropy means outputs are not bitwise deterministic"
+  ]
+}

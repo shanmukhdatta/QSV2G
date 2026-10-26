@@ -1,0 +1,8 @@
+case_id,group,requirement,model_boundary,expected,observed,matches_expectation,interpretation,observed_detail
+B19,B,"SPR5,SPR8",deployment_limitation,EXPOSED,EXPOSED,True,KEY/COUNTER RESTART HAZARD: repeated AES-GCM nonce under same traffic key,
+B20,B,"SPR2,SPR5,SPR6",trusted_object_state_corruption,EXPOSED,EXPOSED,True,Check whether EV-side reference simulator independently keeps original OP after station state mutation; NOT a network attacker test.,
+C20,C,SPR4,known_limitation_dishonest_dealer,EXPOSED,EXPOSED,True,Self-consistent dealer substitutes secret and commitment without detection,"[0, 2, 1, 2, 1, 0, 0]"
+C21,C,SPR4,known_limitation_stabilizers,EXPOSED,EXPOSED,True,All three encoded symbols satisfy same tested stabilizers; logical intent not identified,
+C22,C,SPR7,parameterization_caveat,EXPOSED,EXPOSED,True,L=1 low-entropy commitment dictionary recovery; NOT an attack on the full L=162 setting,
+D02,D,"SPR3,SPR4",known_limitation_two_corrupt_signers,EXPOSED,EXPOSED,True,Two actual signing keys attest to reconstruction they deliberately skipped; exceeds <=1-corrupt-authority threat bound.,
+D11,D,"SPR2,SPR6",shared_state_simulation_gap,EXPOSED,EXPOSED,True,Reference model lacks an independent EV copy of original accepted OP under internal station-state mutation; NOT proof of network exploit.,

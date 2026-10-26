@@ -1,0 +1,16 @@
+{
+  "utc_timestamp": "2026-10-26T18:14:09.757749+00:00",
+  "python": "3.13.15 (main, Aug  6 2026, 11:06:22) [GCC 13.3.0]",
+  "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+  "run_location_hint": "Kaggle working directory",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)",
+  "pqc_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "numpy": "2.1.3",
+  "pandas": "2.3.3",
+  "cryptography": "50.0.1",
+  "pqcrypto": "1.0.0",
+  "source_code_sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758",
+  "section_iv_reference_sha256": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2",
+  "randomness": "Cryptographic secrets from secrets module; deterministic NumPy seed for sample tests",
+  "kaggle_version_or_run_id": "NOT_CAPTURED_AUTOMATICALLY \u2014 attach Kaggle run URL/revision separately"
+}

@@ -1,0 +1,14 @@
+requirement,name,assessment,case_ids,scientific_qualification
+SPR1,Participant mutual authentication,PARTIALLY_TESTED,"A01,A02,A17,A18,A19,A20,A21,A22",HMAC-based authority-mediated credential validation is simulated; physical and quantum network threats excluded.
+SPR2,Context-bound authorization,PARTIALLY_TESTED,"A05,A06,B01-B12,D03,D04,D11",Canonical AC checked within shared simulation; D11 shows absence of independently held EV intent under corrupted station state.
+SPR3,Threshold enforcement,LIMITATION_DEMONSTRATED,"A06,A07,C16,C18,C23,D02,D10",Honest gate requires reconstruction; two colluding valid signers can bypass it while EV accepts signed attestation.
+SPR4,QSS contribution consistency,LIMITATION_DEMONSTRATED,"A08,C05-C15,C20,C21,D02",Commitment mismatch caught; self-consistent dishonest dealer and logical-state ambiguity persist.
+SPR5,Replay and context substitution,PARTIALLY_TESTED,"A03,A12,A24,A25,B01-B19,D04,D05,D06,D09",Replay and mismatches tested; safe crash-persistent key/state recovery is not implemented.
+SPR6,Fine-grained operation control,PARTIALLY_TESTED,"A13,A17-A22,B04,B09,D07,D08,D11",CHARGE/DISCHARGE and simulated integer energy cap; no physical trusted meter or controller.
+SPR7,EV identity privacy,NOT_ESTABLISHED,"C04,C22","Ideal quantum marginal is I/3; pseudonym unlinkability, metadata privacy and public-commitment secrecy not established."
+SPR8,Protected CS-to-EV response,PARTIALLY_TESTED,"A03,A10,B13-B19",AES-GCM verifies tested messages; persistent nonce safety and real network interface not established.
+SPR9,Single-signer forgery resistance,PARTIALLY_TESTED,"A09,A11,D01,D03",Invalid second signature rejected under ML-DSA assumptions; no formal quantum-adversary proof.
+SPR10,Conditional pair availability,LIMITATION_DEMONSTRATED,"A14,A15,A16",UC-C outage tolerated in one configuration; complete online service still depends on UC-A and UC-B.
+SPR11,Revocation enforcement,PARTIALLY_TESTED,A04,Boolean revoked flag rejected; no deployed revocation data feed or policy-distribution consistency.
+SPR12,Controlled accountability,NOT_ESTABLISHED,,"UC-A stores mapping in abstract model; lawful disclosure controls, audit and access enforcement not implemented."
+SPR13,Fresh session binding,PARTIALLY_TESTED,"A12,A23,A24,A25,B01-B11,D09",Timestamps/nonces/AC bound in simulator; full state persistence and clock-skew operations not established.

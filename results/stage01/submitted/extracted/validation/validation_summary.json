@@ -1,0 +1,13 @@
+{
+  "protocol": "QSV2G",
+  "stage": "baseline_reproducibility",
+  "test_count": 38,
+  "expected_outcomes_matched": 38,
+  "known_limitations_demonstrated": 4,
+  "qss_ideal_pair_trials": 720,
+  "qss_ideal_correct": 720,
+  "cryptographic_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "source_implementation_sha256": "2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758",
+  "reference_tex_sha256": "4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2",
+  "security_scope": "software behavior; not a proof of malicious-secure QSS or physical quantum deployment"
+}

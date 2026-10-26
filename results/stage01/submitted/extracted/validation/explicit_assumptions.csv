@@ -1,0 +1,9 @@
+assumption,status,reason
+Authenticated confidential UC-to-UC network channels,MODELED,In-process trusted call boundaries; no network stack
+"Physical quantum channels, memory and detector noise",NOT_IMPLEMENTED,27-amplitude simulator + synthetic qutrit-X errors only
+Arbitrary single-authority outage tolerance,NOT_ESTABLISHED,UC-A and UC-B online required by reference flow
+Malicious-secure verifiable QSS,NOT_ESTABLISHED,Stabilizers plus commitments are insufficient
+EV independently verifies quantum reconstruction,NOT_IMPLEMENTED,"EV verifies two ML-DSA attestations, not a quantum proof"
+Crash-persistent nonce counters and resource ledger,NOT_IMPLEMENTED,Reference state exists only in-memory
+Physical power grid hardware and trusted metering,NOT_IMPLEMENTED,Toy energy-controller simulation
+Independent formal cryptographic protocol verification,NOT_PERFORMED,Software tests cannot replace a security proof
