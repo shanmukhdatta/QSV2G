@@ -35,7 +35,7 @@ For `L=162`, the 1% X-error model has an independent one-resource commitment-gat
 
 ## Unresolved and decision
 
-- **P3 extended compromise-aware Tamarin model:** NOT IMPLEMENTED/PROVED in this local run. Existing Stage 05 formal proofs are limited to the prior abstract consent model.
+- **P3 extended compromise-aware Tamarin proof:** NOT EXECUTED/PROVED in this local run (only a candidate model was prepared). Existing Stage 05 formal proofs are limited to the prior abstract consent model.
 - **Physical qutrit channel, dishonest-dealer VQSS, distributed roles/real authority key custody, real retry protocol:** NOT IMPLEMENTED.
 - Next research gate: Decide whether the intended claim requires tolerance against two corrupt signers, and who attests to resource reconstruction. If two signers are already the authorization threshold, their collusion may be an assumed catastrophic compromise. If requiring resistance to it, an independently verifiable proof or independent trust root would be needed; signing a hash of an unverified resource is insufficient. Fairly test any proposed improvement against an equally strengthened classical solution.
 - Do not change or rerun old Stage 05 results before agreeing on a concrete design change.

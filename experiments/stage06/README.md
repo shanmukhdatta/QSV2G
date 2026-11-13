@@ -1,6 +1,6 @@
 # QSV2G Stage 06 — Security Evidence and Reliability Trade-off
 
-**Status (2026-11-13):** P0/P1 software probes completed locally with genuine OpenSSL 3.5.5 ML-KEM-768 and ML-DSA-65; P2 analytical/Monte Carlo retry model completed locally. **P3 extended Tamarin formal verification is NOT implemented or executed in Stage 06 yet.** The earlier four E5 proofs remain limited to the Stage 05 abstract model.
+**Status (2026-11-13):** P0/P1 software probes completed locally with genuine OpenSSL 3.5.5 ML-KEM-768 and ML-DSA-65; P2 analytical/Monte Carlo retry model completed locally. **P3 has an unverified candidate model and runner, but no Stage 06 Tamarin proof has been executed or established.** The earlier four E5 proofs remain limited to the Stage 05 abstract model.
 
 Stage 05 source and results are frozen. Stage 06 adds isolated experiments without editing `src/qsv2g_core.py` or overwriting `results/stage05`.
 
@@ -11,7 +11,7 @@ Stage 05 source and results are frozen. Stage 06 adds isolated experiments witho
 | P0 | Can signer compromise and dishonest-dealer control bypass intended QSS checks? | Matched single-process adversarial traces using actual ML-DSA signatures and normal EV protected response | Two-signature attack gives adversary **both selected authority private keys AND privileged charging-station internal state**; not a demonstrated network-only exploit |
 | P1 | Is there a security distinction from classical 2-of-3 for the tested interface? | Same P0 cases against `ClassicalResource`; exhaustive exact computational-basis laws for 3 secrets × 3 pairs | Does not compare arbitrary quantum measurements, physical quantum-channel interception, no-cloning, VQSS security or hardware deployment |
 | P2 | How much could independent fresh-resource retries improve availability? | Analytical `1-(1-a)^R` and reproducible Monte Carlo, modeled resource cost | **Not** a newly implemented authenticated retry protocol, nor experimental PQC retry latency |
-| P3 | Can we prove stronger compromise-dependent claims? | **Not yet executed**; next Stage 06 work after interpreting P0/P1 | Stage 05 abstract E5 proof is NOT sufficient for malicious signer or quantum VQSS claims |
+| P3 | Can we prove stronger compromise-dependent claims? | Candidate Tamarin model and conservative runner only; **not executed or verified locally** | Stage 05 abstract E5 proof is NOT sufficient for malicious signer or quantum VQSS claims |
 
 ## Run from repository root
 
