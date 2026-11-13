@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from hypothesis import HealthCheck, settings, strategies as st
-from hypothesis.stateful import RuleBasedStateMachine, initialize, invariant, precondition, rule, run_state_machine_as_test
+from hypothesis.stateful import RuleBasedStateMachine, invariant, rule, run_state_machine_as_test
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'src'))
@@ -35,102 +35,114 @@ class TestOnlyPQC:
 
 
 class ProtocolStateMachine(RuleBasedStateMachine):
+    """Protocol-aware generated sequences, without filtering phase-invalid rules.
+
+    A single always-enabled Hypothesis rule advances the *current* state. This is
+    deliberate: the old design had eleven mostly-disabled rules, and Hypothesis
+    failed its filter_too_much health check after discarding 50 inputs. Choices
+    still vary operation, selected authority pair and tampering point/type.
+    """
     def __init__(self):
         super().__init__()
         self.p=QSV2G(crypto=TestOnlyPQC(),L=1)
         self.original_intent=None
-        self.mutated=False
         self.successful_execution=False
         self.stopped=False
+        self.mutated=False
+        self.attack_rejected=False
+        self.steps_executed=0
 
-    @precondition(lambda self:not self.stopped and self.p.stage=='NEW')
-    @rule()
-    def registration(self):self.p.register()
+    def _tamper_and_check(self,change,pair):
+        """Try progressing to endpoint after a station-side mutation.
 
-    @precondition(lambda self:not self.stopped and self.p.stage=='REGISTERED')
-    @rule(op=st.sampled_from(['CHARGE','DISCHARGE']))
-    def authentication(self,op):self.p.authenticate(op=op)
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='AUTHENTICATED')
-    @rule()
-    def session(self):self.p.establish_session()
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='SESSION' and self.original_intent is None)
-    @rule()
-    def freeze_intent(self):
-        self.p.set_ev_intent(op=self.p.op)
-        self.original_intent=self.p.ev_state.intent
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='SESSION' and self.original_intent is not None)
-    @rule()
-    def context(self):self.p.authorization_context(op=self.original_intent.op)
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='CONTEXT')
-    @rule()
-    def approve(self):self.p.authority_verify()
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='APPROVED')
-    @rule(pair=st.sampled_from([('A','B'),('A','C'),('B','C')]))
-    def recover(self,pair):self.p.threshold_reconstruct(pair=pair)
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='RECONSTRUCTED')
-    @rule()
-    def sign(self):self.p.issue_token()
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='TOKEN')
-    @rule()
-    def verify_at_ev(self):
-        try:self.p.protected_response()
-        except ProtocolAbort:
-            # Tampering CS state must not gain EV acceptance.
-            if not self.mutated:raise
-            self.stopped=True
+        A safe intermediate abort is acceptable; a mutated permission reaching
+        EV_ACCEPTED is a failure. Do not simply stop after tampering without
+        exercising the downstream checks.
+        """
+        if change=='op':
+            self.p.op='DISCHARGE' if self.p.op=='CHARGE' else 'CHARGE'
+        elif change=='limit':
+            self.p.limit={'type':'ENERGY','max':99999,'unit':'mWh'}
+        elif change=='vld':
+            self.p.vld=(1,2)
+        elif change=='ac':
+            self.p.ac=b'Z'*32
         else:
-            assert not self.mutated
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='EV_ACCEPTED')
-    @rule()
-    def execute(self):
-        self.p.execute();self.successful_execution=True
-
-    @precondition(lambda self:not self.stopped and self.p.stage=='EXECUTED')
-    @rule()
-    def finish(self):self.p.terminate();self.stopped=True
-
-    @precondition(lambda self:not self.stopped and self.original_intent is not None and self.p.stage in ('CONTEXT','APPROVED','RECONSTRUCTED','TOKEN'))
-    @rule(change=st.sampled_from(['op','limit','vld','ac']))
-    def station_tamper(self,change):
-        if change=='op':self.p.op='DISCHARGE' if self.p.op=='CHARGE' else 'CHARGE'
-        elif change=='limit':self.p.limit={'type':'ENERGY','max':99999,'unit':'mWh'}
-        elif change=='vld':self.p.vld=(1,2)
-        elif change=='ac':self.p.ac=b'Z'*32
+            raise AssertionError(f'unknown mutation: {change}')
         self.mutated=True
-        # Future actions may fail early; do not misclassify safe rejection as a test bug.
         self.stopped=True
         try:
-            if self.p.stage=='TOKEN':self.p.protected_response()
-            elif self.p.stage=='CONTEXT':self.p.authority_verify()
-            elif self.p.stage=='APPROVED':self.p.threshold_reconstruct()
-            elif self.p.stage=='RECONSTRUCTED':self.p.issue_token()
-        except ProtocolAbort:pass
+            # Advance through real protocol checks instead of assuming an attack
+            # is rejected merely because an early check happened to pass.
+            while self.p.stage in ('CONTEXT','APPROVED','RECONSTRUCTED','TOKEN'):
+                if self.p.stage=='CONTEXT':
+                    self.p.authority_verify()
+                elif self.p.stage=='APPROVED':
+                    self.p.threshold_reconstruct(pair=pair)
+                elif self.p.stage=='RECONSTRUCTED':
+                    self.p.issue_token()
+                else:
+                    self.p.protected_response()
+        except ProtocolAbort:
+            self.attack_rejected=True
         else:
-            if self.p.stage=='EV_ACCEPTED':raise AssertionError('tampered station accepted by EV')
+            raise AssertionError('station-side tampering reached EV acceptance')
+        assert self.p.stage != 'EV_ACCEPTED'
 
-    @precondition(lambda self:self.stopped or self.p.stage=='TERMINATED')
-    @rule()
-    def idle_after_terminal_or_attack(self):
-        # Hypothesis requires an enabled rule at terminal states; before that,
-        # force protocol-progress and mutation rules to actually be exercised.
-        pass
+    @rule(op=st.sampled_from(('CHARGE','DISCHARGE')),
+          pair=st.sampled_from((('A','B'),('A','C'),('B','C'))),
+          mutation=st.sampled_from((None,None,None,None,'op','limit','vld','ac')))
+    def next_protocol_action(self,op,pair,mutation):
+        """One enabled rule; variation occurs *inside* valid state transitions."""
+        self.steps_executed+=1
+        if self.stopped or self.p.stage=='TERMINATED':
+            # Deliberate terminal action: no invalid-rule filtering, no
+            # additional authorization or resource reuse after completion.
+            return
+        stage=self.p.stage
+        if stage in ('CONTEXT','APPROVED','RECONSTRUCTED','TOKEN') and mutation is not None:
+            self._tamper_and_check(mutation,pair)
+        elif stage=='NEW':
+            self.p.register()
+        elif stage=='REGISTERED':
+            self.p.authenticate(op=op)
+        elif stage=='AUTHENTICATED':
+            self.p.establish_session()
+        elif stage=='SESSION':
+            if self.original_intent is None:
+                self.p.set_ev_intent(op=self.p.op)
+                self.original_intent=self.p.ev_state.intent
+            else:
+                self.p.authorization_context(op=self.original_intent.op)
+        elif stage=='CONTEXT':
+            self.p.authority_verify()
+        elif stage=='APPROVED':
+            self.p.threshold_reconstruct(pair=pair)
+        elif stage=='RECONSTRUCTED':
+            self.p.issue_token()
+        elif stage=='TOKEN':
+            self.p.protected_response()
+        elif stage=='EV_ACCEPTED':
+            self.p.execute()
+            self.successful_execution=True
+        elif stage=='EXECUTED':
+            self.p.terminate()
+            self.stopped=True
+        else:
+            raise AssertionError(f'unhandled protocol state {stage!r}')
 
     @invariant()
     def original_ev_state_retained(self):
         if self.original_intent is not None:
             assert self.p.ev_state.intent==self.original_intent
+            assert self.p.op==self.original_intent.op or self.mutated
         if self.successful_execution:
+            assert not self.mutated
             assert self.p.stage in ('EXECUTED','TERMINATED')
             assert len(self.p.executed)==1
-
+        if self.mutated:
+            assert self.stopped and self.attack_rejected
+            assert self.p.stage!='EV_ACCEPTED'
 
 def run_campaign(examples=1000,steps=50):
     run_state_machine_as_test(ProtocolStateMachine,settings=settings(

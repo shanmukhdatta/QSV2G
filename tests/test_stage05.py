@@ -147,6 +147,67 @@ def test_hypothesis_legitimate_context_tracks_authenticated_op(op):
     assert p.ev_state.intent.op==op
 
 
-def test_stateful_script_explicitly_uses_ev_intent_in_context():
+def test_stateful_generator_has_one_always_enabled_rule():
+    # Old many-precondition design triggered Hypothesis.filter_too_much on Kaggle.
     script=(ROOT/'experiments/stage05/stateful_hypothesis.py').read_text()
-    assert 'def context(self):self.p.authorization_context(op=self.original_intent.op)' in script
+    assert script.count('@rule(')==1
+    assert '@precondition(' not in script
+    assert 'def next_protocol_action(self,op,pair,mutation)' in script
+    assert 'self.p.authorization_context(op=self.original_intent.op)' in script
+    assert 'HealthCheck.filter_too_much' not in script
+
+
+def _load_stateful_machine_without_hypothesis():
+    """Exercise actual state transitions without claiming Hypothesis was executed.
+
+    The fake decorators only allow a deterministic test of the machine's
+    transition body on machines without Hypothesis installed. Kaggle runs the
+    real Hypothesis campaign separately.
+    """
+    import types
+    from unittest.mock import patch
+    h=types.ModuleType('hypothesis')
+    class HCheck: too_slow='too_slow'
+    h.HealthCheck=HCheck
+    h.settings=lambda **kwargs:kwargs
+    h.strategies=types.SimpleNamespace(sampled_from=lambda x:x)
+    stateful=types.ModuleType('hypothesis.stateful')
+    stateful.RuleBasedStateMachine=object
+    stateful.rule=lambda **kwargs:(lambda f:f)
+    stateful.invariant=lambda **kwargs:(lambda f:f)
+    stateful.run_state_machine_as_test=lambda *args,**kwargs:None
+    spec=importlib.util.spec_from_file_location(
+        'qsv2g_stateful_stub_runtime',ROOT/'experiments/stage05/stateful_hypothesis.py')
+    module=importlib.util.module_from_spec(spec)
+    with patch.dict(sys.modules,{'hypothesis':h,'hypothesis.stateful':stateful}):
+        spec.loader.exec_module(module)
+    return module.ProtocolStateMachine
+
+
+@pytest.mark.parametrize('op',('CHARGE','DISCHARGE'))
+@pytest.mark.parametrize('pair',PAIRS)
+def test_stateful_phase_progress_and_legitimate_completion(op,pair):
+    machine=_load_stateful_machine_without_hypothesis()()
+    for _ in range(15):
+        machine.next_protocol_action(op,pair,None)
+        machine.original_ev_state_retained()
+    assert machine.p.stage=='TERMINATED'
+    assert machine.successful_execution and machine.stopped
+    assert machine.p.ev_state.intent.op==op
+
+
+@pytest.mark.parametrize('op',('CHARGE','DISCHARGE'))
+@pytest.mark.parametrize('stage',('CONTEXT','APPROVED','RECONSTRUCTED','TOKEN'))
+@pytest.mark.parametrize('change',('op','limit','vld','ac'))
+def test_stateful_tampering_rejected_on_path_to_ev(op,stage,change):
+    machine=_load_stateful_machine_without_hypothesis()()
+    for _ in range(20):
+        if machine.p.stage==stage:
+            break
+        machine.next_protocol_action(op,('B','C'),None)
+        machine.original_ev_state_retained()
+    assert machine.p.stage==stage
+    machine.next_protocol_action(op,('B','C'),change)
+    machine.original_ev_state_retained()
+    assert machine.stopped and machine.mutated and machine.attack_rejected
+    assert machine.p.stage!='EV_ACCEPTED'
