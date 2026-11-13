@@ -116,6 +116,11 @@ class ProtocolStateMachine(RuleBasedStateMachine):
         else:
             if self.p.stage=='EV_ACCEPTED':raise AssertionError('tampered station accepted by EV')
 
+    @rule()
+    def idle_after_terminal_or_attack(self):
+        # Hypothesis requires at least one enabled rule after a terminal state.
+        pass
+
     @invariant()
     def original_ev_state_retained(self):
         if self.original_intent is not None:
