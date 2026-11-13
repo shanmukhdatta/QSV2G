@@ -130,3 +130,23 @@ def test_simulated_execution_rejects_negative_power():
     p.issue_token();p.protected_response()
     with pytest.raises(ProtocolAbort,match='invalid simulated power'):
         p.execute(power_w=-100)
+
+
+@pytest.mark.parametrize('op',('CHARGE','DISCHARGE'))
+def test_hypothesis_legitimate_context_tracks_authenticated_op(op):
+    """Regression for Hypothesis-discovered DISCHARGE default-to-CHARGE mismatch."""
+    from test_reviewer_regressions import FakePQC
+    p=QSV2G(crypto=FakePQC(),L=1)
+    p.register(); p.authenticate(op=op); p.establish_session()
+    p.set_ev_intent(op=p.op)
+    p.authorization_context(op=p.ev_state.intent.op)
+    p.authority_verify()
+    p.threshold_reconstruct(pair=('A','C'))
+    p.issue_token(); p.protected_response(); p.execute(); p.terminate()
+    assert p.stage=='TERMINATED'
+    assert p.ev_state.intent.op==op
+
+
+def test_stateful_script_explicitly_uses_ev_intent_in_context():
+    script=(ROOT/'experiments/stage05/stateful_hypothesis.py').read_text()
+    assert 'def context(self):self.p.authorization_context(op=self.original_intent.op)' in script

@@ -63,7 +63,7 @@ class ProtocolStateMachine(RuleBasedStateMachine):
 
     @precondition(lambda self:not self.stopped and self.p.stage=='SESSION' and self.original_intent is not None)
     @rule()
-    def context(self):self.p.authorization_context()
+    def context(self):self.p.authorization_context(op=self.original_intent.op)
 
     @precondition(lambda self:not self.stopped and self.p.stage=='CONTEXT')
     @rule()
