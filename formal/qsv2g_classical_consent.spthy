@@ -1,0 +1,81 @@
+/* E5: bounded symbolic abstraction of classical consent and A/B signatures.
+   Underlying quantum reconstruction is ASSUMED, not proven here.
+   DOES NOT prove ML-KEM/ML-DSA, quantum safety, VQSS, or deployed V2G security.
+   Tool execution/proof status must be recorded separately.
+*/
+theory QSV2G_Classical_Consent
+begin
+builtins: signing
+functions: mac/2
+
+rule Setup:
+    [ Fr(~kEV), Fr(~skA), Fr(~skB), Fr(~sid) ]
+ --[ SetupDone(~sid) ]->
+    [ !EvKey(~kEV), !SignAKey(~skA), !SignBKey(~skB),
+      !PubA(pk(~skA)), !PubB(pk(~skB)), EvBegin(~sid),
+      Out(pk(~skA)), Out(pk(~skB)) ]
+
+rule EV_Consent:
+    [ EvBegin(sid), Fr(~ac), !EvKey(k) ]
+ --[ EVConsented(sid,~ac) ]->
+    [ EVIntent(sid,~ac), Out(<sid,~ac,mac(<sid,~ac>,k)>) ]
+
+rule CS_Check_Consent:
+    [ In(<sid,ac,mac(<sid,ac>,k)>), !EvKey(k) ]
+ --[ CSConsentChecked(sid,ac) ]->
+    [ !CSApproved(sid,ac) ]
+
+rule UC_A_Approves:
+    [ !CSApproved(sid,ac) ]
+ --[ ApprovedA(sid,ac) ]->
+    [ !ApprovalA(sid,ac) ]
+
+rule UC_B_Approves:
+    [ !CSApproved(sid,ac) ]
+ --[ ApprovedB(sid,ac) ]->
+    [ !ApprovalB(sid,ac) ]
+
+rule Assumed_Ideal_QSS_Gate:
+    [ !ApprovalA(sid,ac), !ApprovalB(sid,ac), Fr(~nu) ]
+ --[ IdealRecoveryAssumption(sid,ac,~nu) ]->
+    [ !Ready(sid,ac,~nu), ReadyForEV(sid,ac,~nu) ]
+
+rule UC_A_Signs:
+    [ !Ready(sid,ac,nu), !SignAKey(sk) ]
+ --[ SignedA(sid,ac,nu) ]->
+    [ Out(sign(<sid,ac,nu,'A'>,sk)) ]
+
+rule UC_B_Signs:
+    [ !Ready(sid,ac,nu), !SignBKey(sk) ]
+ --[ SignedB(sid,ac,nu) ]->
+    [ Out(sign(<sid,ac,nu,'B'>,sk)) ]
+
+rule EV_Verifies_And_Executes:
+    [ EVIntent(sid,ac), ReadyForEV(sid,ac,nu),
+      !PubA(pka), !PubB(pkb), In(sigA), In(sigB) ]
+ --[ Eq(verify(sigA,<sid,ac,nu,'A'>,pka),'true'),
+     Eq(verify(sigB,<sid,ac,nu,'B'>,pkb),'true'),
+     Executed(sid,ac,nu) ]->
+    [ ]
+
+restriction Equality:
+    "All x y #i. Eq(x,y) @i ==> x = y"
+
+lemma honest_execution_reachable: exists-trace
+    "Ex sid ac nu #i. Executed(sid,ac,nu) @i"
+
+lemma execution_requires_same_EV_consent:
+    "All sid ac nu #i. Executed(sid,ac,nu) @i
+     ==> (Ex #j. EVConsented(sid,ac) @j & #j < #i)"
+
+lemma execution_requires_both_approval_actions:
+    "All sid ac nu #i. Executed(sid,ac,nu) @i
+     ==> (Ex #j #k. ApprovedA(sid,ac) @j & ApprovedB(sid,ac) @k
+          & #j < #i & #k < #i)"
+
+lemma executed_once_per_session:
+    "All sid ac1 ac2 nu1 nu2 #i #j.
+     Executed(sid,ac1,nu1) @i & Executed(sid,ac2,nu2) @j
+     ==> #i = #j"
+
+end

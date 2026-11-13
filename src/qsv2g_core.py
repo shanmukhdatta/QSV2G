@@ -476,6 +476,7 @@ class QSV2G:
         require(self.stage=='APPROVED','authority approval missing')
         require(len(pair)==2 and pair[0]!=pair[1] and set(pair)<=set(self.accepted),'not an approved distinct authority pair')
         require(self.resource.state=='UNUSED','resource must be unused')
+        require(set(pair)<=self.available,'selected authority offline before reconstruction')
         require(self.resource.nu==self.proposed_nu,'QSS resource proposal changed')
         require(all(self.approval_records[a]==(a,self.ac,self.proposed_nu,True) for a in pair), 'resource not approved by chosen pair')
         self.pair=tuple(pair)
@@ -485,6 +486,7 @@ class QSV2G:
         self.stage='RECONSTRUCTED'; self.mark('qss_threshold',pair=''.join(pair),recovered=True, consumed=self.resource.state)
     def issue_token(self,tamper_signature=False):
         require(self.stage=='RECONSTRUCTED','QSS reconstruction missing')
+        require(set(self.pair)<=self.available,'selected signer offline before token issuance')
         u,v=self.pair
         statement=('QSV2G-AUTHZ',self.ac,self.sid,self.resource.nu,u,v,self.reconstruction_hash,self.vld,'ACCEPT')
         msg=encode(*statement)
