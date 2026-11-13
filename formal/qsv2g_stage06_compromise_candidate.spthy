@@ -1,0 +1,81 @@
+/* STAGE06 CANDIDATE: NOT YET EXECUTED / VERIFIED WITH TAMARIN.
+   Symbolic EV consent, signature and CS MAC verification; assumed honest
+   reconstruction gate; no physical QSS, ML-KEM/ML-DSA computational proof,
+   enrollment PKI, or quantum channels. The intruder may reveal keys.
+   This model addresses only AB, not AC or BC. Do not claim proof until logs.
+*/
+theory QSV2G_Stage06_Compromise_Candidate
+begin
+builtins: signing
+functions: mac/2
+
+rule Setup:
+    [ Fr(~skA), Fr(~skB), Fr(~kCS), Fr(~sid), Fr(~ac), Fr(~nu) ]
+ --[ EVConsented(~sid,~ac,~nu) ]->
+    [ !SignA(~skA), !SignB(~skB), !CSKey(~kCS),
+      !PubA(pk(~skA)), !PubB(pk(~skB)),
+      !Session(~sid,~ac,~nu), PendingEV(~sid,~ac,~nu),
+      Out(pk(~skA)), Out(pk(~skB)), Out(<~sid,~ac,~nu>) ]
+
+rule Assumed_Honest_QSS_Reconstruction:
+    [ !Session(sid,ac,nu), Fr(~reconstruction_hash) ]
+ --[ Reconstructed(sid,ac,nu,~reconstruction_hash) ]->
+    [ !GatePassed(sid,ac,nu,~reconstruction_hash) ]
+
+rule Honest_UC_A_Sign:
+    [ !GatePassed(sid,ac,nu,h), !SignA(sk) ]
+ --[ SignedA(sid,ac,nu,h) ]->
+    [ Out(sign(<sid,ac,nu,h,'A'>,sk)) ]
+
+rule Honest_UC_B_Sign:
+    [ !GatePassed(sid,ac,nu,h), !SignB(sk) ]
+ --[ SignedB(sid,ac,nu,h) ]->
+    [ Out(sign(<sid,ac,nu,h,'B'>,sk)) ]
+
+rule Honest_CS_Auth_Response:
+    [ !GatePassed(sid,ac,nu,h), !CSKey(kCS) ]
+ --[ HonestResponse(sid,ac,nu,h) ]->
+    [ Out(mac(<sid,ac,nu,h>,kCS)) ]
+
+rule Reveal_UC_A:
+    [ !SignA(sk) ] --[ RevealA() ]-> [ Out(sk) ]
+
+rule Reveal_UC_B:
+    [ !SignB(sk) ] --[ RevealB() ]-> [ Out(sk) ]
+
+rule Reveal_CS:
+    [ !CSKey(kCS) ] --[ RevealCS() ]-> [ Out(kCS) ]
+
+rule EV_Verify:
+    [ PendingEV(sid,ac,nu), !PubA(pka), !PubB(pkb), !CSKey(kCS),
+      In(<h,sigA,sigB,tag>) ]
+ --[ Eq(verify(sigA,<sid,ac,nu,h,'A'>,pka),true),
+     Eq(verify(sigB,<sid,ac,nu,h,'B'>,pkb),true),
+     Eq(tag,mac(<sid,ac,nu,h>,kCS)),
+     EVAccepted(sid,ac,nu,h) ]->
+    [ ]
+
+restriction Equality:
+    "All x y #i. Eq(x,y) @i ==> x = y"
+
+lemma honest_accept_reachable: exists-trace
+    "Ex sid ac nu h #i. EVAccepted(sid,ac,nu,h) @i"
+
+lemma single_use_per_session:
+    "All sid ac nu h1 h2 #i #j.
+      EVAccepted(sid,ac,nu,h1) @i & EVAccepted(sid,ac,nu,h2) @j
+      ==> #i = #j"
+
+/* The model should allow a trace without Reconstructed when ALL three
+   keys are revealed, illustrating the distinction between signatures and a
+   quantum reconstruction proof. This lemma is not a factual proof yet. */
+lemma bypass_possible_with_full_compromise: exists-trace
+    "Ex sid ac nu h #i #a #b #c.
+      EVAccepted(sid,ac,nu,h) @i & RevealA() @a & RevealB() @b
+      & RevealCS() @c & #a < #i & #b < #i & #c < #i
+      & not(Ex h2 #r. Reconstructed(sid,ac,nu,h2) @r)"
+
+/* Secrecy and PKI are NOT modeled here. A claimed unconditional 'all
+   acceptances require quantum reconstruction' would be invalid under the
+   triple-compromise adversary model by construction. */
+end
