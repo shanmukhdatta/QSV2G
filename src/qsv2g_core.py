@@ -16,6 +16,7 @@ import secrets
 import shutil
 import subprocess
 import tempfile
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -64,6 +65,22 @@ def encode(*fields):
         chunk=canon(f)
         out += len(chunk).to_bytes(4,'big')+chunk
     return bytes(out)
+
+def decode_fields(payload):
+    """Decode the canonical, length-prefixed wire fields; reject truncation/noncanonical data."""
+    fields=[]; offset=0
+    while offset < len(payload):
+        require(len(payload)-offset >= 4, 'truncated field length')
+        size=int.from_bytes(payload[offset:offset+4], 'big'); offset+=4
+        require(size <= len(payload)-offset, 'truncated field')
+        raw=payload[offset:offset+size]; offset+=size
+        try:
+            field_value=parse_canon(raw)
+            require(canon(field_value)==raw, 'noncanonical field')
+        except (ValueError, UnicodeError, TypeError, KeyError) as e:
+            raise ProtocolAbort('malformed canonical field') from e
+        fields.append(field_value)
+    return tuple(fields)
 
 def H(*fields): return hashlib.sha256(encode(*fields)).digest()
 def mac(k, *fields): return hmac.new(k, encode(*fields), 'sha256').digest()
@@ -228,9 +245,16 @@ class Traffic:
     key:bytes
     send_counter:int=0
     seen:set=field(default_factory=set)
+    sent_nonces:set=field(default_factory=set)
     def encrypt(self,pt:bytes,ad:bytes):
         require(self.send_counter<2**96-1,'AES-GCM counter exhaustion')
-        nonce=self.send_counter.to_bytes(12,'big'); self.send_counter+=1
+        # Random 96-bit nonces avoid deterministic reuse if an in-memory counter
+        # is reset with the same key. Collision risk is negligible, not zero;
+        # deployed systems additionally require rekeying/durable nonce policy.
+        nonce=secrets.token_bytes(12)
+        while nonce in self.sent_nonces:
+            nonce=secrets.token_bytes(12)
+        self.sent_nonces.add(nonce); self.send_counter+=1
         ct=AESGCM(self.key).encrypt(nonce,pt,ad)
         return {'nonce':nonce,'ciphertext':ct}
     def decrypt(self,pkt,ad):
@@ -249,12 +273,16 @@ class QSSResource:
     commitments:dict
     state:str='UNUSED'
     lock:tuple|None=None
+    _mutex:object=field(default_factory=threading.Lock,repr=False,compare=False)
     def reserve(self,ac,pair):
-        require(self.state=='UNUSED','QSS resource already reserved or consumed')
-        require(len(set(pair))==2 and all(a in AUTHORITIES for a in pair),'pair invalid')
-        self.state='RESERVED'; self.lock=(ac,tuple(pair))
+        with self._mutex:
+            require(self.state=='UNUSED','QSS resource already reserved or consumed')
+            require(len(pair)==2 and len(set(pair))==2 and all(a in AUTHORITIES for a in pair),'pair invalid')
+            self.state='RESERVED'; self.lock=(ac,tuple(pair))
     def reconstruct(self,ac,pair,rng,tamper=False):
-        require(self.state=='RESERVED' and self.lock==(ac,tuple(pair)),'QSS reservation mismatch')
+        with self._mutex:
+            require(self.state=='RESERVED' and self.lock==(ac,tuple(pair)),'QSS reservation mismatch')
+            self.state='MEASURING'  # prevent a concurrent second reconstruction
         recovered={a:[] for a in AUTHORITIES}
         try:
             for dealer in AUTHORITIES:
@@ -267,8 +295,36 @@ class QSSResource:
             combined=[sum(recovered[a][k] for a in AUTHORITIES)%3 for k in range(len(recovered['A']))]
             return combined
         finally:
-            self.state='CONSUMED'
-            self.states.clear()  # simulated irreversible measurement / erasure
+            with self._mutex:
+                self.state='CONSUMED'
+                self.states.clear()  # simulated irreversible measurement / erasure
+                self.dealer_secrets.clear()  # no post-use dealer secret retained in resource object
+
+@dataclass(frozen=True)
+class EVIntent:
+    """Immutable EV-side session/transaction intent, set before CS offers context."""
+    pid:str
+    csid:str
+    sid:str
+    op:str
+    ne:bytes
+    nc:bytes
+    ts_e:int
+    ts_c:int
+    limit_mwh:int
+    validity:tuple
+
+    def context(self):
+        return (self.pid,self.csid,self.sid,self.op,self.ne,self.nc,
+                self.ts_e,self.ts_c,
+                {'type':'ENERGY','max':self.limit_mwh,'unit':'mWh'},
+                self.validity)
+
+@dataclass
+class EVState:
+    intent:EVIntent
+    accepted_ac:bytes|None=None
+    seen_tokens:set=field(default_factory=set)
 
 def new_qss_resource(L=162,rng=None):
     rng=rng or np.random.default_rng(2026)
@@ -306,9 +362,11 @@ class QSV2G:
         cs_tag=mac(self.reg_cs,'CSREG',self.csid,rB)
         require(ct_eq(dense_transport_tag(cs_tag),mac(self.reg_cs,'CSREG',self.csid,rB)),'CS Bell verification')
         self.stage='REGISTERED'; self.mark('registration', bell_pairs_per_entity=128)
-    def authenticate(self, tamper_ev=False, tamper_cs=False):
+    def authenticate(self, tamper_ev=False, tamper_cs=False, op='CHARGE'):
         require(self.stage=='REGISTERED','register first')
         require({'A','B'}<=self.available,'UC-A and UC-B required for online participant validation')
+        require(op in ('CHARGE','DISCHARGE'),'invalid requested operation')
+        self.op=op  # authenticate the actual operation, not a default that can change later
         self.ne=secrets.token_bytes(16); self.n_c=secrets.token_bytes(16)
         self.ts_e=self.t0; self.ts_c=self.t0
         self.ev_tag=mac(self.reg_ev,'EV_AUTH',self.pid,self.csid,self.op,self.ne,self.ts_e)
@@ -327,11 +385,13 @@ class QSV2G:
         ua_conf=mac(self.reg_ev,'CS_CONF',self.pid,self.csid,self.op,self.ne,self.n_c,self.ts_c,True)
         require(ct_eq(ua_conf, mac(self.reg_ev,'CS_CONF',self.pid,self.csid,self.op,self.ne,self.n_c,self.ts_c,True)),'EV cannot verify station attestation')
         self.stage='AUTHENTICATED'; self.mark('cross_domain_authentication')
-    def establish_session(self):
+    def establish_session(self,tamper_ev_kem=False):
         require(self.stage=='AUTHENTICATED','authenticate first')
         ek,dk=self.pqc.kem_keygen()
         bind=encode(self.pid,self.csid,self.op,self.ne,self.n_c,self.ts_e,self.ts_c,ek)
         proof=mac(self.reg_ev,'KEM-EV',hashlib.sha256(bind).digest())
+        if tamper_ev_kem:
+            proof=bytes([proof[0]^1])+proof[1:]
         require(ct_eq(proof,mac(self.reg_ev,'KEM-EV',hashlib.sha256(bind).digest())),'KEM public key not authenticated')
         ct,ss_cs=self.pqc.encaps(ek)
         T=encode(self.pid,self.csid,self.op,self.ne,self.n_c,self.ts_e,self.ts_c,ek,ct)
@@ -356,9 +416,22 @@ class QSV2G:
         self.e2c=Traffic(k_e2c); self.c2e=Traffic(k_c2e)
         self.stage='SESSION'; self.mark('session_establishment', backend=self.pqc.kind, kem_ciphertext_bytes=len(ct), sid_bytes=len(bytes.fromhex(self.sid)))
         # Ephemeral key material references are not kept as instance attributes.
+    def set_ev_intent(self,op='CHARGE',limit_mwh=12000,lifetime_sec=600):
+        """Record independent EV consent intent BEFORE the station proposes context."""
+        require(self.stage=='SESSION','EV intent must be fixed before context offer')
+        require(op in ('CHARGE','DISCHARGE'), 'invalid EV intent operation')
+        require(op==self.op,'EV intent operation not authenticated in this session')
+        require(type(limit_mwh) is int and limit_mwh>0,'invalid EV intent energy limit')
+        require(type(lifetime_sec) is int and lifetime_sec>2,'invalid EV intent lifetime')
+        self.ev_state=EVState(EVIntent(
+            self.pid,self.csid,self.sid,op,self.ne,self.n_c,self.ts_e,self.ts_c,
+            limit_mwh,(self.t0-2,self.t0+lifetime_sec)))
     def authorization_context(self, op='CHARGE', limit_mwh=12000, lifetime_sec=600, tamper_ciphertext=False):
         require(self.stage=='SESSION','session not established')
-        require(op in ('CHARGE','DISCHARGE') and limit_mwh>0,'invalid operation or energy limit')
+        require(hasattr(self,'ev_state'),'EV intent not established')
+        require(op in ('CHARGE','DISCHARGE') and type(limit_mwh) is int and limit_mwh>0,'invalid operation or energy limit')
+        require(op==self.op,'station changed authenticated operation')
+        require(type(lifetime_sec) is int and lifetime_sec>2,'invalid validity window')
         self.op=op
         self.limit={'type':'ENERGY','max':int(limit_mwh),'unit':'mWh'}
         self.vld=(self.t0-2,self.t0+int(lifetime_sec))
@@ -370,10 +443,13 @@ class QSV2G:
         if tamper_ciphertext:
             pkt['ciphertext']=bytes([pkt['ciphertext'][0]^1])+pkt['ciphertext'][1:]
         ev_received=self.c2e.decrypt(pkt,ad)
-        require(ct_eq(ev_received,mctx),'EV context disagreement')
-        require(self.vld[0]<=int(time.time())<=self.vld[1],'context expired')
+        ev_fields=decode_fields(ev_received)
+        require(ev_fields==self.ev_state.intent.context(), 'EV intent differs from station context')
+        require(self.ev_state.intent.validity[0]<=int(time.time())<=self.ev_state.intent.validity[1], 'context expired at EV')
+        self.ev_state.accepted_ac=H('QSV2G-AC',ev_received)
         self.ac=H('QSV2G-AC',mctx)
-        self.consent=mac(self.reg_ev,'AUTHZ-CONSENT',self.ac)
+        require(ct_eq(self.ev_state.accepted_ac,self.ac), 'context digest disagreement')
+        self.consent=mac(self.reg_ev,'AUTHZ-CONSENT',self.ev_state.accepted_ac)
         ack={'sid':self.sid,'ac':self.ac,'consent':self.consent}
         ack_pkt=self.e2c.encrypt(canon(ack),encode('QSV2G-CTX-ACK',self.sid))
         self.wire_bytes['context_ack']=len(ack_pkt['nonce'])+len(ack_pkt['ciphertext'])
@@ -387,7 +463,12 @@ class QSV2G:
         require(ct_eq(consent,mac(self.reg_ev,'AUTHZ-CONSENT',self.ac)),'UC-A rejected EV consent')
         require(not revoked,'EV revoked')
         require(ct_eq(H('QSV2G-AC',encode(*self.ctx)),self.ac),'context mismatch')
+        require(self.resource.state=='UNUSED','QSS resource not available for authorization')
+        # Proposal order: coordinator selects unused nu -> authorities approve
+        # (authority, AC, nu, decision) -> approved pair atomically reserves nu.
+        self.proposed_nu=self.resource.nu
         self.decisions={a:(a in approvals and a in self.available) for a in AUTHORITIES}
+        self.approval_records={a:(a,self.ac,self.proposed_nu,self.decisions[a]) for a in AUTHORITIES}
         self.accepted=[a for a in AUTHORITIES if self.decisions[a]]
         require(len(self.accepted)>=2,'fewer than two distinct approvals')
         self.stage='APPROVED'; self.mark('authority_validation', approved=','.join(self.accepted))
@@ -395,6 +476,8 @@ class QSV2G:
         require(self.stage=='APPROVED','authority approval missing')
         require(len(pair)==2 and pair[0]!=pair[1] and set(pair)<=set(self.accepted),'not an approved distinct authority pair')
         require(self.resource.state=='UNUSED','resource must be unused')
+        require(self.resource.nu==self.proposed_nu,'QSS resource proposal changed')
+        require(all(self.approval_records[a]==(a,self.ac,self.proposed_nu,True) for a in pair), 'resource not approved by chosen pair')
         self.pair=tuple(pair)
         self.resource.reserve(self.ac,self.pair)
         recovered=self.resource.reconstruct(self.ac,self.pair,self.rng,tamper=tamper_share)
@@ -414,6 +497,7 @@ class QSV2G:
         self.stage='TOKEN'; self.mark('authorization_token', signer_count=2, signature_bytes=sum(map(len,signatures.values())))
     def protected_response(self,tamper_response=False, tamper_token_after_collector=False):
         require(self.stage=='TOKEN','no accepted authorization proof')
+        require(hasattr(self,'ev_state') and self.ev_state.accepted_ac is not None,'EV has not accepted a context')
         token={'statement':self.token['statement'],'signatures':dict(self.token['signatures'])}
         if tamper_token_after_collector:
             signer=self.pair[0]
@@ -429,21 +513,28 @@ class QSV2G:
             pkt['ciphertext']=pkt['ciphertext'][:-1]+bytes([pkt['ciphertext'][-1]^1])
         received=parse_canon(self.c2e.decrypt(pkt,ad))
         # EV validates independently from received wire bytes, never from a local CS plaintext.
-        require(received['sid']==self.sid and received['pid']==self.pid and received['csid']==self.csid,'identity/session mismatch')
-        require(received['op']==self.op and received['ne']==self.ne and received['nc']==self.n_c,'nonce/op mismatch')
-        require(received['lim']==self.limit and received['vld']==self.vld and ct_eq(received['ac'],self.ac),'transaction context mismatch')
-        require(self.vld[0]<=int(time.time())<=self.vld[1],'authorization expired at EV')
+        intent=self.ev_state.intent
+        require(received['sid']==intent.sid and received['pid']==intent.pid and received['csid']==intent.csid,'identity/session mismatch')
+        require(received['op']==intent.op and received['ne']==intent.ne and received['nc']==intent.nc,'nonce/op mismatch')
+        require(received['lim']==intent.context()[8] and received['vld']==intent.validity
+                and ct_eq(received['ac'],self.ev_state.accepted_ac),'EV transaction intent mismatch')
+        require(intent.validity[0]<=int(time.time())<=intent.validity[1],'authorization expired at EV')
         require(received['decision'] is True,'EV received a reject response')
         wire_token=received['auth_token']
         statement=wire_token['statement']
-        require(statement[1]==self.ac and statement[2]==self.sid and statement[3]==self.resource.nu,'signed statement context mismatch')
+        require(len(statement)==9 and statement[0]=='QSV2G-AUTHZ','malformed signed authorization statement')
+        require(statement[1]==self.ev_state.accepted_ac and statement[2]==intent.sid
+                and isinstance(statement[3],str) and len(statement[3])==24,'signed statement context mismatch')
         # The EV cannot calculate or know h_rec; it can only verify the signed attestation.
-        require(isinstance(statement[6],bytes) and len(statement[6])==32 and statement[7]==self.vld and statement[8]=='ACCEPT','signed statement inconsistency')
+        require(isinstance(statement[6],bytes) and len(statement[6])==32 and statement[7]==intent.validity and statement[8]=='ACCEPT','signed statement inconsistency')
         wire_pair=(statement[4],statement[5])
         require(len(set(wire_pair))==2 and all(a in AUTHORITIES for a in wire_pair),'invalid token signers')
         msg=encode(*statement)
         require(all(self.pqc.verify(self.sigkeys[a][0],msg,wire_token['signatures'][a]) for a in wire_pair),'EV token signature invalid')
-        require((self.sid,self.ac,self.resource.nu) not in self.executed,'token already executed')
+        ev_token_id=(intent.sid,self.ev_state.accepted_ac,statement[3])
+        require(ev_token_id not in self.ev_state.seen_tokens,'EV token replay')
+        self.ev_state.seen_tokens.add(ev_token_id)
+        require(ev_token_id not in self.executed,'token already executed')
         self.stage='EV_ACCEPTED'; self.mark('ev_token_verification', decision='ACCEPT')
     def execute(self,power_w=1200,seconds=30,tick_s=5):
         require(self.stage=='EV_ACCEPTED','EV did not accept token')
@@ -458,7 +549,7 @@ class QSV2G:
         require(self.vld[0]<=int(time.time())<=self.vld[1],'validity expired before execution')
         # Integer micro-Wh units avoid floating-point serialization or rounding ambiguity.
         energy_uwh=0; limit_uwh=self.limit['max']*1000; steps=0
-        logical_time=self.t0
+        logical_time=int(time.time())
         for _ in range(math.ceil(seconds/tick_s)):
             dt=min(tick_s,seconds-steps*tick_s)
             if dt<=0 or logical_time > self.vld[1]: break
@@ -485,8 +576,12 @@ def run_demo(crypto=None, pair=('A','B'), seed=2026,L=162,**fault):
     p=QSV2G(crypto=crypto,seed=seed,L=L,available=fault.get('available'))
     try:
         p.register()
-        p.authenticate(tamper_ev=fault.get('tamper_ev',False),tamper_cs=fault.get('tamper_cs',False))
-        p.establish_session()
+        p.authenticate(tamper_ev=fault.get('tamper_ev',False),tamper_cs=fault.get('tamper_cs',False),
+                       op=fault.get('op','CHARGE'))
+        p.establish_session(tamper_ev_kem=fault.get('tamper_ev_kem',False))
+        p.set_ev_intent(op=fault.get('ev_intent_op',fault.get('op','CHARGE')),
+                        limit_mwh=fault.get('ev_intent_limit_mwh',fault.get('limit_mwh',12000)),
+                        lifetime_sec=fault.get('ev_intent_lifetime_sec',fault.get('lifetime_sec',600)))
         p.authorization_context(op=fault.get('op','CHARGE'),limit_mwh=fault.get('limit_mwh',12000),
                                 lifetime_sec=fault.get('lifetime_sec',600),tamper_ciphertext=fault.get('tamper_context',False))
         p.authority_verify(approvals=fault.get('approvals',AUTHORITIES),revoked=fault.get('revoked',False),bad_consent=fault.get('bad_consent',False))
