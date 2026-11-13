@@ -140,10 +140,14 @@ class QuorumResource:
 
 
 def make_protocol(variant,crypto,L,seed,pair):
-    t0=time.perf_counter();p=QSV2G(crypto=crypto,L=L,seed=seed)
-    if variant=='CLASSICAL_SHARING':p.resource=ClassicalResource.prepare(L)
-    elif variant=='QUORUM':p.resource=QuorumResource()
-    elif variant!='QSS':raise ValueError(variant)
+    # Resource preparation is variant-specific; never build then discard a QSS
+    # resource when benchmarking the classical alternatives.
+    if variant=='CLASSICAL_SHARING': factory=lambda length,rng: ClassicalResource.prepare(length)
+    elif variant=='QUORUM': factory=lambda length,rng: QuorumResource()
+    elif variant=='QSS': factory=None
+    else: raise ValueError(variant)
+    t0=time.perf_counter()
+    p=QSV2G(crypto=crypto,L=L,seed=seed,resource_factory=factory)
     return p,(time.perf_counter()-t0)*1000
 
 
@@ -160,6 +164,7 @@ def full_transaction(variant,crypto,L,pair,seed):
     if p.stage!='TERMINATED':raise AssertionError(p.stage)
     return dict(variant=variant,pair=''.join(pair),L=L,status=p.stage,
         preparation_ms=pre_ms,authorization_ms=online_ms,full_software_ms=total_ms,
+        inclusive_software_ms=pre_ms+total_ms,
         selected_packet_bytes=sum(p.wire_bytes.values()),
         signature_count=2,analytical_qutrit_storage=(9*L if variant=='QSS' else 0),
         analytical_remote_qutrits=(6*L if variant=='QSS' else 0),
@@ -202,6 +207,9 @@ def e1(out,smoke=False,seed=2026):
         with (Path(out)/f'block_{block:02d}.csv').open(newline='',encoding='utf-8') as f:
             rows.extend(csv.DictReader(f))
     dump_rows(Path(out)/'e1_trials.csv',rows)
+    unexpected=[row for row in rows if row.get('status')!='TERMINATED']
+    if unexpected:
+        raise RuntimeError(f'E1 has {len(unexpected)} incomplete transactions; examine e1_trials.csv')
     manifest(out,'E1',dict(smoke=smoke,seed=seed,blocks=blocks,
         repeats_per_pair=(2 if smoke else 100),lengths=((9,) if smoke else (9,27,81,162)),
         backend='Genuine PQCrypto; each block from a separate Python process',
@@ -264,6 +272,9 @@ def e2(out,smoke=False,seed=2026):
                 outcome=outcome,match=(outcome==expected),reason=why,
                 backend=crypto.kind))
     dump_rows(Path(out)/'e2_cases.csv',rows)
+    unexpected=[row for row in rows if not row['match']]
+    if unexpected:
+        raise RuntimeError(f'E2 has {len(unexpected)} mismatched outcomes; examine e2_cases.csv')
     manifest(out,'E2',dict(smoke=smoke,seed=seed,crypto=crypto.kind,scenario_count=len(rows),
         limitation='Hand-selected scenarios; Hypothesis generated sequences in separate test file'))
     return rows
@@ -412,7 +423,8 @@ def e4(out,smoke=False,seed=2026):
     cases=('C_OFFLINE_AT_START','A_OFFLINE_AT_START','B_OFFLINE_AT_START',
            'B_OFFLINE_AFTER_APPROVAL','B_OFFLINE_AFTER_RECONSTRUCTION',
            'C_OFFLINE_AFTER_APPROVAL','DUPLICATE_RESERVATION',
-           'CONCURRENT_RESERVATION','EXPIRED_BEFORE_EXECUTION','REPEATED_EXECUTION')
+           'CONCURRENT_RESERVATION','CONCURRENT_START',
+           'EXPIRED_BEFORE_EXECUTION','REPEATED_EXECUTION')
     for name in cases:
         p=None;resource_state='NA';fault_injected=True
         try:
@@ -432,6 +444,19 @@ def e4(out,smoke=False,seed=2026):
                     attempts=list(pool.map(task,[('A','B'),('B','C')]))
                 outcome='ONE_RESERVATION' if sum(attempts)==1 else 'VIOLATION'
                 reason=f'accepted={sum(attempts)}';resource_state=resource.state
+            elif name=='CONCURRENT_START':
+                from threading import Barrier
+                p=staged_protocol(crypto);p.authority_verify()
+                p.threshold_reconstruct(pair=('A','B'));p.issue_token();p.protected_response()
+                barrier=Barrier(2)
+                def start():
+                    barrier.wait(timeout=5)
+                    try:p.execute(power_w=1200,seconds=2);return 'EXECUTED'
+                    except ProtocolAbort:return 'REJECTED'
+                with ThreadPoolExecutor(max_workers=2) as pool:
+                    results=list(pool.map(lambda _:start(), range(2)))
+                outcome='ONE_EXECUTION' if results.count('EXECUTED')==1 and results.count('REJECTED')==1 else 'VIOLATION'
+                reason=','.join(results);resource_state=p.resource.state
             else:
                 p=staged_protocol(crypto);p.authority_verify()
                 if name=='B_OFFLINE_AFTER_APPROVAL':
@@ -459,6 +484,11 @@ def e4(out,smoke=False,seed=2026):
         rows.append(dict(scenario=name,outcome=outcome,reason=reason,
                          resource_state=resource_state,backend=crypto.kind))
     dump_rows(Path(out)/'e4_failure_matrix.csv',rows)
+    expected={'C_OFFLINE_AT_START':'COMPLETED','C_OFFLINE_AFTER_APPROVAL':'COMPLETED',
+              'CONCURRENT_RESERVATION':'ONE_RESERVATION','CONCURRENT_START':'ONE_EXECUTION'}
+    violations=[r for r in rows if r['outcome'] != expected.get(r['scenario'],'SAFE_ABORT')]
+    if violations:
+        raise RuntimeError(f'E4 has {len(violations)} unsafe or unexpected outcomes; examine e4_failure_matrix.csv')
     manifest(out,'E4',dict(smoke=smoke,seed=seed,scenario_count=len(rows),backend=crypto.kind))
     return rows
 

@@ -336,16 +336,20 @@ def new_qss_resource(L=162,rng=None):
 
 class QSV2G:
     """Single-session strict reference implementation with explicit trusted authority simulation."""
-    def __init__(self,crypto=None, seed=2026,L=162,available=None):
+    def __init__(self,crypto=None, seed=2026,L=162,available=None,resource_factory=None):
         self.pqc=crypto or PQCrypto(); self.rng=np.random.default_rng(seed)
         self.available=set(available if available is not None else AUTHORITIES)
         self.L=L; self.log=[]; self.replay_ev=set(); self.replay_cs=set(); self.executed=set()
+        self._execution_mutex=threading.Lock()  # in-process single-use START guard
         self.wire_bytes={}  # Message sizes include ciphertext/tag and 96-bit GCM nonce; exclude implied AAD.
         self.reg_ev=secrets.token_bytes(32); self.reg_cs=secrets.token_bytes(32)
         self.pid_master=secrets.token_bytes(32); self.id_ev='ev_internal_reference_001'
         self.csid='CS_DEMO_01'; self.op='CHARGE'
         self.sigkeys={a:self.pqc.sig_keygen() for a in AUTHORITIES}
-        self.resource=new_qss_resource(L,self.rng)
+        # Inject a baseline-specific resource without first preparing and discarding a
+        # QSS state. Default behavior is exactly the existing QSS construction.
+        self.resource=(resource_factory(L,self.rng) if resource_factory is not None
+                       else new_qss_resource(L,self.rng))
         self.t0=int(time.time()); self.stage='NEW'; self._last_mark=time.perf_counter()
     def mark(self,phase, status='PASS', **details):
         now=time.perf_counter()
@@ -539,26 +543,37 @@ class QSV2G:
         require(ev_token_id not in self.executed,'token already executed')
         self.stage='EV_ACCEPTED'; self.mark('ev_token_verification', decision='ACCEPT')
     def execute(self,power_w=1200,seconds=30,tick_s=5):
-        require(self.stage=='EV_ACCEPTED','EV did not accept token')
-        tid=(self.sid,self.ac,self.resource.nu)
-        require(tid not in self.executed,'repeat authorization execution')
-        self.executed.add(tid)  # atomic authorization consumption modeled by memory store
+        # Atomically transition out of EV_ACCEPTED before any START is created.
+        # This is only a process-local lock; distributed crash-safe ledgers are
+        # outside the simulation's implemented security boundary.
+        with self._execution_mutex:
+            require(self.stage=='EV_ACCEPTED','EV did not accept token')
+            require(all(type(x) in (int,float) and math.isfinite(x) and x>0
+                        for x in (power_w,seconds,tick_s)),'invalid simulated power or duration')
+            require(self.vld[0]<=int(time.time())<self.vld[1],
+                    'validity expired before execution')
+            tid=(self.sid,self.ac,self.resource.nu)
+            require(tid not in self.executed,'repeat authorization execution')
+            self.executed.add(tid)
+            self.stage='EXECUTING'
         nx=secrets.token_bytes(16)
         req=encode('QSV2G-START',self.sid,self.ac,self.resource.nu,self.op,nx)
         pkt=self.e2c.encrypt(req,encode('QSV2G-START',self.sid))
         self.wire_bytes['execution_start']=len(pkt['nonce'])+len(pkt['ciphertext'])
         require(ct_eq(self.e2c.decrypt(pkt,encode('QSV2G-START',self.sid)),req),'start message rejected')
-        require(self.vld[0]<=int(time.time())<=self.vld[1],'validity expired before execution')
+        require(self.vld[0]<=int(time.time())<self.vld[1],
+                'validity expired before execution')
         # Integer micro-Wh units avoid floating-point serialization or rounding ambiguity.
         energy_uwh=0; limit_uwh=self.limit['max']*1000; steps=0
         logical_time=int(time.time())
-        for _ in range(math.ceil(seconds/tick_s)):
-            dt=min(tick_s,seconds-steps*tick_s)
-            if dt<=0 or logical_time > self.vld[1]: break
+        # A modeled energy tick must not cross the authorization expiry.
+        elapsed=0.0
+        while elapsed<seconds and logical_time<self.vld[1] and energy_uwh<limit_uwh:
+            dt=min(tick_s,seconds-elapsed,self.vld[1]-logical_time)
+            if dt<=0:break
             increment=round(power_w*dt/3600*1_000_000)
             energy_uwh+=min(increment,limit_uwh-energy_uwh)
-            steps+=1; logical_time+=dt
-            if energy_uwh>=limit_uwh: break
+            steps+=1; elapsed+=dt; logical_time+=dt
         require(energy_uwh<=limit_uwh,'energy ceiling exceeded')
         self.energy_mwh=energy_uwh/1000
         self.stage='EXECUTED'; self.mark('energy_execution', energy_mwh=self.energy_mwh, ticks=steps, op=self.op)

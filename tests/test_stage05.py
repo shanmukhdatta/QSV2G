@@ -10,8 +10,9 @@ sys.path.insert(0,str(ROOT/'experiments/stage05'))
 sys.path.insert(0,str(ROOT/'src'))
 from runner import (ClassicalResource, QuorumResource, q_probability,
                     vector_trial, full_transaction, PQCrypto, ProtocolAbort,
-                    PAIRS, CHANNELS, staged_protocol)
+                    PAIRS, CHANNELS, staged_protocol, make_protocol)
 from analyze import wilson
+from qsv2g_core import QSV2G
 
 
 @pytest.mark.parametrize('pair',PAIRS)
@@ -83,3 +84,49 @@ def test_formal_model_has_explicit_assumption():
     assert 'Assumed_Ideal_QSS_Gate' in model
     assert 'honest_execution_reachable' in model
     assert 'executed_once_per_session' in model
+    # Tamarin's signing builtin reduces verify(...) to the nullary function
+    # true, not the unrelated quoted public constant 'true'.
+    assert ",true)" in model
+    assert ",'true')" not in model
+
+
+def test_comparator_preparation_does_not_create_discarded_qss(monkeypatch):
+    import qsv2g_core
+    def forbidden(*args, **kwargs):
+        raise AssertionError('Classical baseline must not prepare QSS resource')
+    monkeypatch.setattr(qsv2g_core,'new_qss_resource',forbidden)
+    from test_reviewer_regressions import FakePQC
+    for variant in ('CLASSICAL_SHARING','QUORUM'):
+        p,pre_ms=make_protocol(variant, FakePQC(),L=3,seed=9,pair=('A','B'))
+        assert pre_ms>=0
+        assert p.resource.state=='UNUSED'
+
+
+def test_inclusive_timing_accounts_for_variant_setup():
+    from test_reviewer_regressions import FakePQC
+    r=full_transaction('CLASSICAL_SHARING',FakePQC(),L=3,pair=('A','B'),seed=44)
+    assert r['inclusive_software_ms']==pytest.approx(r['preparation_ms']+r['full_software_ms'])
+
+
+def test_simulated_expiry_clips_partial_tick():
+    from test_reviewer_regressions import FakePQC
+    from unittest.mock import patch
+    p=QSV2G(crypto=FakePQC(),L=1)
+    p.register();p.authenticate();p.establish_session()
+    p.set_ev_intent(lifetime_sec=6)
+    p.authorization_context(lifetime_sec=6);p.authority_verify()
+    p.threshold_reconstruct();p.issue_token();p.protected_response()
+    with patch('qsv2g_core.time.time',return_value=p.t0):
+        p.execute(power_w=3600,seconds=20,tick_s=5)
+    assert p.energy_mwh==pytest.approx(6000,abs=.01)
+    assert p.log[-1]['ticks']==2
+
+
+def test_simulated_execution_rejects_negative_power():
+    from test_reviewer_regressions import FakePQC
+    p=QSV2G(crypto=FakePQC(),L=1)
+    p.register();p.authenticate();p.establish_session();p.set_ev_intent()
+    p.authorization_context();p.authority_verify();p.threshold_reconstruct()
+    p.issue_token();p.protected_response()
+    with pytest.raises(ProtocolAbort,match='invalid simulated power'):
+        p.execute(power_w=-100)

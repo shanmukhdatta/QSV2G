@@ -26,12 +26,20 @@ def analyze(root):
     summary={}
     e1=root/'e1/e1_trials.csv'
     if e1.exists():
-        df=pd.read_csv(e1);df=df[df.status=='TERMINATED'].copy()
+        df=pd.read_csv(e1)
+        observed=len(df)
+        failures=df[df.status!='TERMINATED']
+        summary['e1_total_observations']=observed
+        summary['e1_rejected_or_incomplete']=len(failures)
+        if len(failures):
+            failures.to_csv(root/'e1/e1_incomplete.csv',index=False)
+            raise RuntimeError(f'E1 cannot be summarized as successful: {len(failures)} incomplete transactions')
         result=df.groupby(['L','variant']).agg(n=('full_software_ms','size'),
             full_median_ms=('full_software_ms','median'),
             full_p95_ms=('full_software_ms',lambda x:float(np.percentile(x,95))),
             online_median_ms=('authorization_ms','median'),
             prep_median_ms=('preparation_ms','median'),
+            inclusive_median_ms=('inclusive_software_ms','median'),
             selected_bytes_median=('selected_packet_bytes','median'),
             blocks=('block','nunique')).reset_index()
         result.to_csv(root/'e1/e1_summary.csv',index=False)
@@ -74,7 +82,13 @@ def analyze(root):
         fig.tight_layout();fig.savefig(root/'e3/e3_gate_plot.pdf');plt.close(fig)
     for experiment,filename in [('e2','e2_cases.csv'),('e4','e4_failure_matrix.csv')]:
         target=root/experiment/filename
-        if target.exists():summary[experiment+'_rows']=len(pd.read_csv(target))
+        if target.exists():
+            table=pd.read_csv(target)
+            summary[experiment+'_rows']=len(table)
+            if experiment=='e2':
+                mismatches=(table['match'].astype(str).str.lower()!='true').sum()
+                summary['e2_mismatches']=int(mismatches)
+                if mismatches:raise RuntimeError(f'E2 has {mismatches} mismatched outcomes')
     (root/'analysis_summary.json').write_text(json.dumps(summary,indent=2))
     return summary
 

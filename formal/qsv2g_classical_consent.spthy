@@ -53,8 +53,8 @@ rule UC_B_Signs:
 rule EV_Verifies_And_Executes:
     [ EVIntent(sid,ac), ReadyForEV(sid,ac,nu),
       !PubA(pka), !PubB(pkb), In(sigA), In(sigB) ]
- --[ Eq(verify(sigA,<sid,ac,nu,'A'>,pka),'true'),
-     Eq(verify(sigB,<sid,ac,nu,'B'>,pkb),'true'),
+ --[ Eq(verify(sigA,<sid,ac,nu,'A'>,pka),true),
+     Eq(verify(sigB,<sid,ac,nu,'B'>,pkb),true),
      Executed(sid,ac,nu) ]->
     [ ]
 
