@@ -395,20 +395,26 @@ def e3(out,smoke=False,seed=2026):
         dump_rows(Path(out)/'e3_vector_trials.csv',rows)
     dump_rows(Path(out)/'e3_vector_trials.csv',rows)
     dump_rows(Path(out)/'e3_summary.csv',summary)
-    # Separate genuine endpoint checks with exact per-condition denominators.
+    # Tier B: real ML-KEM/ML-DSA and EV endpoint verification for EVERY L in full
+    # mode. This corrects the historical hard-coded lengths[0] (L=9) limitation.
+    # Tier B is a software consistency validation, not a high-precision estimate
+    # of rare physical-network events: publish separate denominators by condition.
     crypto=PQCrypto();token_rows=[]
     trial_count=1 if smoke else 20
-    for pair in PAIRS:
-        for channel in CHANNELS:
-            for p in levels:
-                for index in range(trial_count):
-                    outcome=actual_noisy_token_trial(lengths[0],pair,channel,p,crypto,seed+index)
-                    token_rows.append(dict(L=lengths[0],pair=''.join(pair),channel=channel,p=p,
-                        trial=index,outcome=outcome,backend=crypto.kind))
-    dump_rows(Path(out)/'e3_token_trials.csv',token_rows)
+    token_lengths=(lengths[0],) if smoke else lengths
+    for L in token_lengths:
+        for pair in PAIRS:
+            for channel in CHANNELS:
+                for p in levels:
+                    for index in range(trial_count):
+                        outcome=actual_noisy_token_trial(L,pair,channel,p,crypto,seed+index)
+                        token_rows.append(dict(L=L,pair=''.join(pair),channel=channel,p=p,
+                            trial=index,outcome=outcome,backend=crypto.kind))
+        dump_rows(Path(out)/'e3_token_trials.csv',token_rows)
     manifest(out,'E3',dict(smoke=smoke,seed=seed,lengths=lengths,levels=levels,
         trials_per_vector_condition=attempts,token_trials_per_condition=trial_count,
-        token_L=lengths[0],backend=crypto.kind,models=CHANNELS))
+        token_lengths=token_lengths,backend=crypto.kind,models=CHANNELS,
+        token_endpoint='EV verified real ML-DSA authorization response; not physical energy delivery'))
     return summary
 
 

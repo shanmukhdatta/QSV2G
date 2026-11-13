@@ -211,3 +211,62 @@ def test_stateful_tampering_rejected_on_path_to_ev(op,stage,change):
     machine.original_ev_state_retained()
     assert machine.stopped and machine.mutated and machine.attack_rejected
     assert machine.p.stage!='EV_ACCEPTED'
+
+
+def test_e3_real_pqc_endpoint_accepts_default_L162_in_ideal_channel():
+    from runner import actual_noisy_token_trial
+    try:
+        crypto=PQCrypto()
+    except RuntimeError:
+        pytest.skip('real PQC backend unavailable')
+    for pair in PAIRS:
+        outcome=actual_noisy_token_trial(162,pair,'x',0.,crypto,seed=20261113)
+        assert outcome=='ACCEPTED_AT_EV'
+
+
+def test_formal_prover_lemma_parser_requires_explicit_summary():
+    from run_tamarin import LEMMAS,parse_lemma_summary
+    lines='\n'.join(f'{x} (all-traces): verified (3 steps)' for x in LEMMAS)
+    assert len(parse_lemma_summary(lines))==len(LEMMAS)
+    assert all(x=='verified' for x in parse_lemma_summary(lines).values())
+    assert parse_lemma_summary('Some output with success but no lemmas')=={}
+    assert parse_lemma_summary('honest_execution_reachable (exists-trace): falsified (0 steps)')=={
+        'honest_execution_reachable':'falsified'}
+
+
+def test_e5_run_reports_unavailable_without_claimed_proofs(tmp_path,monkeypatch):
+    import run_tamarin
+    monkeypatch.setattr(run_tamarin.shutil,'which',lambda *args,**kw:None)
+    result=run_tamarin.run(tmp_path,timeout=1)
+    assert result['parse_status']=='NOT_EXECUTED'
+    assert result['proof_status']=='UNRESOLVED'
+    assert result['prover_present'] is False
+    assert (tmp_path/'e5_status.json').exists()
+
+
+def test_release_install_rejects_bad_digest(tmp_path,monkeypatch):
+    import install_tamarin
+    import io
+    monkeypatch.setattr(install_tamarin.urllib.request,'urlopen',lambda *a,**k:io.BytesIO(b'tampered'))
+    with pytest.raises(RuntimeError,match='SHA-256 mismatch'):
+        install_tamarin._checked_download('https://example.invalid/fake','0'*64,tmp_path/'bad.tar.gz')
+    assert not (tmp_path/'bad.tar.gz').exists()
+
+
+def test_e3_real_pqc_token_summary_covers_lengths(tmp_path):
+    import json
+    import pandas as pd
+    from analyze import analyze
+    folder=tmp_path/'e3';folder.mkdir()
+    pd.DataFrame([{'L':9,'pair':'AB','channel':'x','p':0.,'trial':0,
+                   'outcome':'ACCEPTED_AT_EV'},
+                  {'L':162,'pair':'AB','channel':'x','p':0.,'trial':0,
+                   'outcome':'ACCEPTED_AT_EV'}]).to_csv(folder/'e3_token_trials.csv',index=False)
+    (folder/'manifest.json').write_text(json.dumps({'params':{'token_lengths':[9,162]}}))
+    s=analyze(tmp_path)
+    assert s['e3_token_lengths']==[9,162]
+    assert s['e3_real_pqc_token_attempts']==2
+    assert (folder/'e3_token_summary_with_ci.csv').exists()
+    (folder/'manifest.json').write_text(json.dumps({'params':{'token_lengths':[9,27,162]}}))
+    with pytest.raises(RuntimeError,match='coverage incomplete'):
+        analyze(tmp_path)

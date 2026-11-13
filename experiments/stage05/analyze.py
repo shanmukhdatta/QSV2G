@@ -80,6 +80,39 @@ def analyze(root):
                ylim=(-.02,1.03),title=f'Modeled full-vector acceptance (L={max(df.L)}, AB)')
         ax.legend(fontsize=8);ax.grid(alpha=.2)
         fig.tight_layout();fig.savefig(root/'e3/e3_gate_plot.pdf');plt.close(fig)
+    # Tier B: genuine ML-KEM/ML-DSA token-acceptance path, disaggregated by L.
+    # Do not mislabel Tier A commitment-gate outcomes as endpoint acceptance.
+    e3_tokens=root/'e3/e3_token_trials.csv'
+    if e3_tokens.exists():
+        tokens=pd.read_csv(e3_tokens)
+        allowed={'ACCEPTED_AT_EV','COMMITMENT_REJECT','ERASURE_ABORT',
+                 'TOKEN_VERIFY_REJECT','OTHER_ABORT'}
+        if not set(tokens.outcome).issubset(allowed):
+            raise RuntimeError('Unexpected E3 genuine-token terminal outcome labels')
+        metrics=[]
+        for (L,pair,channel,p),group in tokens.groupby(['L','pair','channel','p']):
+            n=len(group);ok=int((group.outcome=='ACCEPTED_AT_EV').sum())
+            lo,hi=wilson(ok,n)
+            metrics.append(dict(L=L,pair=pair,channel=channel,p=p,trials=n,
+                endpoint_accepted=ok,commitment_rejected=int((group.outcome=='COMMITMENT_REJECT').sum()),
+                erasure_abort=int((group.outcome=='ERASURE_ABORT').sum()),
+                token_verify_reject=int((group.outcome=='TOKEN_VERIFY_REJECT').sum()),
+                other_abort=int((group.outcome=='OTHER_ABORT').sum()),
+                endpoint_acceptance=ok/n,wilson_low=lo,wilson_high=hi))
+        pd.DataFrame(metrics).to_csv(root/'e3/e3_token_summary_with_ci.csv',index=False)
+        summary['e3_real_pqc_token_attempts']=len(tokens)
+        summary['e3_token_lengths']=sorted(int(x) for x in tokens.L.unique())
+        summary['e3_tokens_accepted_at_ev']=int((tokens.outcome=='ACCEPTED_AT_EV').sum())
+        if (tokens.p==0).any() and (tokens.loc[tokens.p==0,'outcome']!='ACCEPTED_AT_EV').any():
+            raise RuntimeError('E3 p=0 real-PQC token validation failed; inspect token CSV')
+        if (tokens.outcome=='OTHER_ABORT').any() or (tokens.outcome=='TOKEN_VERIFY_REJECT').any():
+            raise RuntimeError('E3 unexpected endpoint/token failure; inspect token CSV')
+        config=root/'e3/manifest.json'
+        if config.exists():
+            param=json.loads(config.read_text()).get('params',{})
+            expected=param.get('token_lengths',[])
+            if expected and sorted(map(int,expected))!=summary['e3_token_lengths']:
+                raise RuntimeError('E3 genuine-token L coverage incomplete')
     for experiment,filename in [('e2','e2_cases.csv'),('e4','e4_failure_matrix.csv')]:
         target=root/experiment/filename
         if target.exists():
