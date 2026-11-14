@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1520" height="800" viewBox="0 0 1520 800" role="img" aria-labelledby="title desc"><title id="title">QSV2G research architecture</title><desc id="desc">Five logical participants; seven transaction phases; genuine software cryptography, simulated QSS and physical deployment boundaries.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#53657e"/></marker></defs>
+<rect width="1520" height="800" rx="22" fill="#f7f9fd"/><rect width="1520" height="120" rx="22" fill="#172b4d"/><rect y="95" width="1520" height="25" fill="#172b4d"/>
+<text x="45" y="50" font-family="Arial,Helvetica,sans-serif" font-size="38" font-weight="700" fill="#ffffff" text-anchor="start">QSV2G</text>
+<text x="45" y="84" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#d7e6fa" text-anchor="start">Quantum-safe, transaction-bound authorization for vehicle-to-grid networks</text>
+<rect x="1198" y="29" width="275" height="52" rx="16" fill="#294667" stroke="#50729a" stroke-width="2"/>
+<text x="1336" y="62" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="700" fill="#ffffff" text-anchor="middle">RESEARCH PROTOTYPE</text>
+<text x="42" y="153" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#3a526f" text-anchor="start">LOGICAL PARTICIPANTS</text>
+<rect x="42" y="167" width="244" height="151" rx="14" fill="#eaf3ff" stroke="#9ab9ed" stroke-width="2"/>
+<text x="164" y="201" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#172b4d" text-anchor="middle">EV</text>
+<text x="164" y="229" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="600" fill="#43536c" text-anchor="middle">Electric vehicle</text>
+<line x1="67" x2="261" y1="244" y2="244" stroke="#9ab9ed" stroke-width="1"/>
+<text x="164" y="271" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Retains transaction intent</text>
+<text x="164" y="295" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Checks final signed token</text>
+<rect x="340" y="167" width="244" height="151" rx="14" fill="#fff1e8" stroke="#efb68e" stroke-width="2"/>
+<text x="462" y="201" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#172b4d" text-anchor="middle">CS</text>
+<text x="462" y="229" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="600" fill="#43536c" text-anchor="middle">Charging station</text>
+<line x1="365" x2="559" y1="244" y2="244" stroke="#efb68e" stroke-width="1"/>
+<text x="462" y="271" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Proposes agreed terms</text>
+<text x="462" y="295" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Relays protected messages</text>
+<rect x="638" y="167" width="244" height="151" rx="14" fill="#eaf9ee" stroke="#9dd5b2" stroke-width="2"/>
+<text x="760" y="201" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#172b4d" text-anchor="middle">UC-A</text>
+<text x="760" y="229" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="600" fill="#43536c" text-anchor="middle">Home authority</text>
+<line x1="663" x2="857" y1="244" y2="244" stroke="#9dd5b2" stroke-width="1"/>
+<text x="760" y="271" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Verifies EV credentials</text>
+<text x="760" y="295" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Consent / policy checks</text>
+<rect x="936" y="167" width="244" height="151" rx="14" fill="#fff8e4" stroke="#ebd18a" stroke-width="2"/>
+<text x="1058" y="201" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#172b4d" text-anchor="middle">UC-B</text>
+<text x="1058" y="229" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="600" fill="#43536c" text-anchor="middle">Visited authority</text>
+<line x1="961" x2="1155" y1="244" y2="244" stroke="#ebd18a" stroke-width="1"/>
+<text x="1058" y="271" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Verifies CS credentials</text>
+<text x="1058" y="295" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Collects signed token</text>
+<rect x="1234" y="167" width="244" height="151" rx="14" fill="#f2edff" stroke="#b7a9e7" stroke-width="2"/>
+<text x="1356" y="201" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#172b4d" text-anchor="middle">UC-C</text>
+<text x="1356" y="229" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="600" fill="#43536c" text-anchor="middle">Policy authority</text>
+<line x1="1259" x2="1453" y1="244" y2="244" stroke="#b7a9e7" stroke-width="1"/>
+<text x="1356" y="271" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Independent policy decision</text>
+<text x="1356" y="295" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2d415b" text-anchor="middle">Also a QSS dealer/holder</text>
+<text x="42" y="359" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#3a526f" text-anchor="start">TRANSACTION LIFECYCLE</text>
+<rect x="34" y="375" width="178" height="158" rx="12" fill="#edf4ff" stroke="#9db9e9" stroke-width="2"/>
+<text x="49" y="399" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" fill="#63738c" text-anchor="start">01</text>
+<text x="123" y="430" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#172b4d" text-anchor="middle">Register</text>
+<text x="123" y="470" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">HMAC and simulated</text>
+<text x="123" y="494" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">Bell-tag validation</text>
+<line x1="215" y1="452" x2="242" y2="452" stroke="#53657e" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="246" y="375" width="178" height="158" rx="12" fill="#eaf9ee" stroke="#9dd5b2" stroke-width="2"/>
+<text x="261" y="399" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" fill="#63738c" text-anchor="start">02</text>
+<text x="335" y="430" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#172b4d" text-anchor="middle">Authenticate</text>
+<text x="335" y="470" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">UC-A checks EV</text>
+<text x="335" y="494" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">UC-B checks CS</text>
+<line x1="427" y1="452" x2="454" y2="452" stroke="#53657e" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="458" y="375" width="178" height="158" rx="12" fill="#edf4ff" stroke="#9db9e9" stroke-width="2"/>
+<text x="473" y="399" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" fill="#63738c" text-anchor="start">03</text>
+<text x="547" y="430" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#172b4d" text-anchor="middle">Establish keys</text>
+<text x="547" y="470" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">ML-KEM-768</text>
+<text x="547" y="494" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">HKDF / Finished</text>
+<line x1="639" y1="452" x2="666" y2="452" stroke="#53657e" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="670" y="375" width="178" height="158" rx="12" fill="#fff8e4" stroke="#ebd18a" stroke-width="2"/>
+<text x="685" y="399" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" fill="#63738c" text-anchor="start">04</text>
+<text x="759" y="430" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#172b4d" text-anchor="middle">Record consent</text>
+<text x="759" y="470" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">EV checks own terms</text>
+<text x="759" y="494" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">Binds context AC</text>
+<line x1="851" y1="452" x2="878" y2="452" stroke="#53657e" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="882" y="375" width="178" height="158" rx="12" fill="#f2edff" stroke="#b7a9e7" stroke-width="2"/>
+<text x="897" y="399" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" fill="#63738c" text-anchor="start">05</text>
+<text x="971" y="430" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#172b4d" text-anchor="middle">Authorize</text>
+<text x="971" y="470" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">2 of 3 approvals</text>
+<text x="971" y="494" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">QSS / commitments</text>
+<line x1="1063" y1="452" x2="1090" y2="452" stroke="#53657e" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="1094" y="375" width="178" height="158" rx="12" fill="#eaf9ee" stroke="#9dd5b2" stroke-width="2"/>
+<text x="1109" y="399" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" fill="#63738c" text-anchor="start">06</text>
+<text x="1183" y="430" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#172b4d" text-anchor="middle">Sign token</text>
+<text x="1183" y="470" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">Two distinct ML-DSA-65</text>
+<text x="1183" y="494" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">authority signatures</text>
+<line x1="1275" y1="452" x2="1302" y2="452" stroke="#53657e" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="1306" y="375" width="178" height="158" rx="12" fill="#fff1e8" stroke="#efb68e" stroke-width="2"/>
+<text x="1321" y="399" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="700" fill="#63738c" text-anchor="start">07</text>
+<text x="1395" y="430" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#172b4d" text-anchor="middle">Execute</text>
+<text x="1395" y="470" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">EV verifies attestation</text>
+<text x="1395" y="494" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="400" fill="#394b64" text-anchor="middle">Simulated energy ticks</text>
+<text x="42" y="570" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" fill="#3a526f" text-anchor="start">IMPLEMENTATION BOUNDARIES</text>
+<rect x="42" y="584" width="450" height="121" rx="14" fill="#eaf3ff" stroke="#9ab9ed" stroke-width="2"/>
+<text x="267" y="615" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#172b4d" text-anchor="middle">Genuine software cryptography</text>
+<text x="267" y="647" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#394b64" text-anchor="middle">ML-KEM-768 / ML-DSA-65</text>
+<text x="267" y="674" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#394b64" text-anchor="middle">HMAC / HKDF / AES-GCM</text>
+<rect x="535" y="584" width="450" height="121" rx="14" fill="#f2edff" stroke="#b7a9e7" stroke-width="2"/>
+<text x="760" y="615" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#172b4d" text-anchor="middle">Mathematical quantum model</text>
+<text x="760" y="647" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#394b64" text-anchor="middle">Bell states / three-qutrit QSS</text>
+<text x="760" y="674" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#394b64" text-anchor="middle">No physical quantum transmission</text>
+<rect x="1028" y="584" width="450" height="121" rx="14" fill="#fff8e4" stroke="#ebd18a" stroke-width="2"/>
+<text x="1253" y="615" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#172b4d" text-anchor="middle">Logical V2G execution</text>
+<text x="1253" y="647" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#394b64" text-anchor="middle">One Python process / resource state</text>
+<text x="1253" y="674" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#394b64" text-anchor="middle">No charger, grid, or physical energy</text>
+<line x1="42" y1="736" x2="1478" y2="736" stroke="#dce4ee" stroke-width="2"/>
+<text x="760" y="765" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#4c617d" text-anchor="middle">All three UCs deal and hold shares; AB/AC/BC can recover, but UC-A and UC-B remain required online.</text>
+</svg>
