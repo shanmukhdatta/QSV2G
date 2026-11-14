@@ -21,6 +21,50 @@ QSV2G is a software research prototype for pseudonymous, cross-domain EV/chargin
 
 **Scope:** No real EV, charger, electrical grid, quantum communication network, quantum hardware, distributed authority deployment or physical energy-transfer measurement was used. The EV verifies signed reconstruction **attestations**, not an independently checkable proof of physical quantum reconstruction. Software acceptance results are not a blanket security proof.
 
+## Start here: QSV2G in plain English
+
+Imagine an electric vehicle (EV) requesting permission to **charge or discharge** through a charging station (CS). QSV2G tries to ensure that the EV and station are authenticated, the EV agreed to the exact transaction, and **two distinct utility authorities** approved it. The selected authorities reconstruct a simulated quantum-shared secret before issuing digitally signed authorization.
+
+**Who is involved?** `EV` = electric vehicle; `CS` = charging station; `UC-A`, `UC-B`, and `UC-C` = three logical utility authorities. All are represented inside **one Python process**. `QSS` = quantum secret sharing; `PQC` = post-quantum cryptography. Neither real vehicles nor physical quantum links are used.
+
+### Protocol flowchart
+
+```mermaid
+flowchart TD
+    A["EV and CS register: simulated Bell-tag validation and HMAC"] --> B["Mutual authentication: pseudonym, nonce and timestamp checks"]
+    B --> C["Protected session: ML-KEM-768, HKDF and AES-GCM"]
+    C --> D["EV fixes its transaction intent; CS presents matching context"]
+    D --> E{"Consent, context and at least two distinct approvals valid?"}
+    E -->|No| R["Reject or abort; do not execute"]
+    E -->|Yes| F["Select an approved authority pair: AB, AC or BC"]
+    F --> G{"Simulated QSS reconstruction matches commitments?"}
+    G -->|No| R
+    G -->|Yes| H["Two authorities sign a transaction-bound token with ML-DSA-65"]
+    H --> I{"EV verifies signatures, context, validity and replay status?"}
+    I -->|No| R
+    I -->|Yes| J["Simulated energy-accounting execution and termination"]
+```
+
+**How to read the diagram:** The green path is not automatic: each verification must pass. A failed check stops the modeled transaction. Although **any approved pair** can perform the later 2-of-3 reconstruction, the present registration and initial participant-validation code specifically requires **UC-A and UC-B online**; it does *not* implement full one-authority-outage tolerance for the entire lifecycle.
+
+**Where this happens in code:** [`src/qsv2g/protocol.py`](src/qsv2g/protocol.py) is the protocol state machine; [`src/qsv2g/crypto.py`](src/qsv2g/crypto.py) implements real classical/PQC software operations; [`src/qsv2g/quantum.py`](src/qsv2g/quantum.py) and [`src/qsv2g/resources.py`](src/qsv2g/resources.py) model quantum states, share reconstruction and single-use resources. The EV verifies **authority signatures on a reconstruction attestation**, not an independent cryptographic proof that physical quantum reconstruction took place.
+
+### What is real, and what is simulated?
+
+| Component | In this repository |
+|---|---|
+| ML-KEM-768 key establishment and ML-DSA-65 signatures | **Real software cryptography**, using `pqcrypto` or an appropriate OpenSSL backend |
+| HMAC, HKDF and AES-GCM | **Real software cryptography** |
+| Bell-state operations and three-qutrit QSS | **Mathematical NumPy simulation**, not a quantum-network experiment |
+| Charging/discharging and utility authorities | **Logical software workflow**, not live grid control or physically separated services |
+| Quantum noise, resource use and independent retries | **Modeled scenarios**; retry analysis is not a deployed retry mechanism |
+
+### One transaction in practice
+
+After installation, run `python scripts/run_protocol.py --pair AB --operation CHARGE --length 9`. It prints a JSON **trace** containing each protocol phase, the real PQC backend used, the final state, and simulated energy accounting. `TERMINATED` means this modeled workflow completed; `REJECTED` means a guard stopped it. A successful example is **not** proof of general protocol security.
+
+---
+
 ## Repository organization
 
 The **five main research directories** are organized by scientific purpose rather than the chronology of notebook development.
@@ -78,6 +122,23 @@ Default experimental runs are **bounded smoke tests**. Add `--full` to `scripts/
 | Full matched software and endpoint evaluation | [`qsv2g_stage05_final_20261113T092554Z.zip`](results/archives/qsv2g_stage05_final_20261113T092554Z.zip) | 18,000 software transactions; 36 scripted attack outcomes; 300,000 modeled vector attempts; 6,000 real-PQC endpoint attempts; 11 failure scenarios; **4 limited abstract Tamarin lemmas** |
 | Adversarial comparison, retries & extended formal model | [`qsv2g_stage06_full_20261113T111031Z_results.zip`](results/archives/qsv2g_stage06_full_20261113T111031Z_results.zip) | 96 QSS/classical attack cases; nine exact measurement-basis comparisons; 400 retry configurations; **3 abstract Tamarin lemmas, including a compromise-induced bypass trace** |
 
+### Which results should a new reader open first?
+
+Begin with the [claim-to-evidence map](docs/PAPER_EVIDENCE_MAP.md), then consult the [archive guide](results/archives/README.md). You do **not** need to unpack every ZIP to understand the main findings.
+
+| Question | Evidence to inspect | Interpretation |
+|---|---|---|
+| Does ideal 2-of-3 reconstruction work? | `ideal_validation_historical.zip` → `validation/qss_pair_ideal.csv` | Ideal simulated correctness, not security against arbitrary attackers |
+| What attacks were tried? | `security_scenarios_historical.zip` → `security_attack_results.csv`; Stage 05 ZIP → `e2/e2_cases.csv` | Expected outcomes include rejected attacks **and known vulnerabilities** |
+| How does software latency compare? | `performance_historical.zip` → `end_to_end_raw.csv`; Stage 05 ZIP → `e1/e1_trials.csv` | Measured **software** workloads; no network, charging hardware or quantum link timing |
+| What happens under noise? | `quantum_noise_historical.zip` → `noise_trial_aggregates.csv`; Stage 05 ZIP → `e3/e3_vector_trials.csv` | The first is sampled **single-trit** behavior; the second is **full-vector** gate behavior; do not mix denominators |
+| What happens when authorities are compromised? | Stage 06 ZIP → `p0_p1/p0_p1_attack_matrix.csv` | Includes a conditional bypass requiring **two selected signing keys plus privileged CS state** |
+| What can retries improve? | Stage 06 ZIP → `p2/p2_retries.csv` | Analytical/Monte Carlo availability and qutrit-cost trade-off; **retries are not implemented** in the live state machine |
+
+**ZIP integrity versus scientific validity:** The SHA-256 manifest records the exact archived ZIP bytes, and `python scripts/verify_archived_evidence.py` checks checksums, CRCs and relevant internal file manifests. Passing that check establishes file integrity against recorded hashes; it does **not** independently validate Kaggle execution, replicate historical numbers, prove security or verify the manuscript's interpretation. The historical archives were generated from **different source revisions**. Please keep them unchanged and label any fresh reruns separately.
+
+**How to reproduce a small test:** `python scripts/run_experiment.py --study security` writes new CSVs under `results/generated/security/`. Other study names include `validation`, `noise`, `performance`, `availability`, `security-adversarial` and `reliability`. These default to **smoke budgets**; `--full` requests much larger experiments. A new run is not automatically a numerical reproduction of a historical archive.
+
 **Critical interpretation:** A test matching an *expected* outcome may deliberately demonstrate a security limitation; it is not automatically a successful defense. The signature/charging-station compromise case in the final archive requires both selected authority signing keys **and privileged station-state control**; it is not evidence of a remote-only attack. The full-vector noise and retry outcomes are *models*, not deployed network availability. The formal verification establishes only the stated properties of limited symbolic abstractions. No experimentally established QSS security advantage over matched classical two-of-three sharing is claimed.
 
 - **Archive directory:** [`results/archives/`](results/archives/) — original ZIPs, provenance, file hashes and instructions.
@@ -93,6 +154,6 @@ All original notebooks, audit notes and development history are recoverable from
 
 ## Paper submission and citation
 
-This repository is prepared as a **supporting reproducibility artifact** for a planned submission to PPT-PQC 2027. It is **not** itself the workshop manuscript or an upload to the paper submission system. The workshop's current instructions (page limit, reviewing/anonymity, paper-format requirements and official submission link) must be followed separately. **Check whether an author-identifying public repository is permissible during review before linking it in the submitted PDF.** See [`docs/SUBMISSION_READINESS.md`](docs/SUBMISSION_READINESS.md).
+This repository is prepared as a **supporting reproducibility artifact** for a planned submission to PPT-PQC 2027. It is **not** itself the workshop manuscript or an upload to the paper submission system. The workshop's current instructions (page limit, reviewing/anonymity, paper-format requirements and official submission link) must be followed separately. **Before putting this author-identifying public repository URL in a submitted PDF, verify the workshop's own anonymity and conflict-of-interest policies.** The main PerCom call describes double-blind review, while the workshop page should be treated as the authority on workshop-specific rules. Do not assume the policies are interchangeable. See [`docs/SUBMISSION_READINESS.md`](docs/SUBMISSION_READINESS.md).
 
 For attribution, see [`CITATION.cff`](CITATION.cff). There is no claimed DOI or acceptance notice. Copyright/license permissions must be agreed by the authors before a public reuse license is added.
