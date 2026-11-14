@@ -63,6 +63,23 @@ flowchart TD
 
 After installation, run `python scripts/run_protocol.py --pair AB --operation CHARGE --length 9`. It prints a JSON **trace** containing each protocol phase, the real PQC backend used, the final state, and simulated energy accounting. `TERMINATED` means this modeled workflow completed; `REJECTED` means a guard stopped it. A successful example is **not** proof of general protocol security.
 
+### Implementation and technology stack
+
+The prototype is written in **Python**. Instead of networking physical EVs, charging stations, and utility companies, the protocol uses **one in-process state machine** (`QSV2G`) and data structures that stand for their messages, keys, authorization decisions and resource states. Calling the methods in sequence advances a simulated transaction; a failed security check raises `ProtocolAbort` and prevents the modeled workflow from continuing.
+
+| Layer | Actual implementation and libraries | Where to look |
+|---|---|---|
+| Protocol and logical participants | Python `QSV2G` class implements registration, mutual authentication, session setup, EV consent, approval, reconstruction, token verification, simulated energy accounting and termination; `threading.Lock` protects selected one-time operations **within this process only**. | [`src/qsv2g/protocol.py`](src/qsv2g/protocol.py), [`src/qsv2g/state.py`](src/qsv2g/state.py) |
+| Post-quantum cryptography | **Real** ML-KEM-768 key establishment and ML-DSA-65 signatures from `pqcrypto`, with an OpenSSL 3.5+ subprocess alternative if supported. A missing real backend causes failure rather than a silent classical substitute. | [`src/qsv2g/crypto.py`](src/qsv2g/crypto.py) |
+| Classical cryptography | Python `hashlib`, `hmac` and `secrets` support hashes, HMAC authentication, HKDF-SHA256 derivation, nonces and random secrets; `cryptography` provides AES-GCM authenticated encryption. | [`src/qsv2g/crypto.py`](src/qsv2g/crypto.py) |
+| Quantum mathematical simulation | `numpy` complex-valued vectors/matrices model Bell-state operations, three-qutrit QSS, pair measurements and modular secret recovery. `QSSResource` checks commitments and consumes simulated shares. **No Qiskit backend or quantum device is used.** | [`src/qsv2g/quantum.py`](src/qsv2g/quantum.py), [`src/qsv2g/resources.py`](src/qsv2g/resources.py) |
+| Experiments and comparisons | Python runners create controlled security-fault scenarios, five modeled noise-channel conditions, QSS/classical-sharing/quorum software baselines, authority-availability probes and analytical/Monte Carlo retry outcomes; `numpy`, `csv`, `json`, `pandas` and `matplotlib` support data generation, storage and analysis/plots. | [`src/qsv2g/evaluation/`](src/qsv2g/evaluation/), [`scripts/run_experiment.py`](scripts/run_experiment.py) |
+| Testing and formal models | `pytest` runs regression tests; `hypothesis` explores generated state transitions (**with an explicitly test-only cryptographic stub** in that campaign). Separately installed **Tamarin/Maude** execute limited symbolic models, not the complete Python or quantum implementation. GitHub Actions runs CI checks. | [`tests/`](tests/), [`src/qsv2g/evaluation/stateful.py`](src/qsv2g/evaluation/stateful.py), [`docs/formal/`](docs/formal/), [CI workflow](.github/workflows/refactor-ci.yml) |
+
+**Execution environment:** The project declares Python **>=3.10** in `pyproject.toml`, recommends **3.11+** in the setup instructions and runs GitHub CI on **3.13**. Dependency declarations use lower bounds rather than a full frozen lockfile; individual archived experiments may use different environments and source revisions. The code can run locally or in a Kaggle notebook; Kaggle is an execution environment, **not** a protocol dependency or a physical testbed.
+
+**Boundary of implementation:** Digital signatures, encapsulation and authenticated encryption run in software, while quantum communication and electrical energy transfer are mathematical/logical models. Authority keys and states are co-resident in the simulator. This is a research reference implementation, not a distributed charging deployment or an independently verified reconstruction proof.
+
 ---
 
 ## Repository organization
