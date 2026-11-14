@@ -45,7 +45,7 @@ flowchart TD
     I -->|Yes| J["Simulated energy-accounting execution and termination"]
 ```
 
-**How to read the diagram:** The green path is not automatic: each verification must pass. A failed check stops the modeled transaction. Although **any approved pair** can perform the later 2-of-3 reconstruction, the present registration and initial participant-validation code specifically requires **UC-A and UC-B online**; it does *not* implement full one-authority-outage tolerance for the entire lifecycle.
+**How to read the diagram:** The successful path is not automatic: each verification must pass. A failed check stops the modeled transaction. Although **any approved pair** can perform the later 2-of-3 reconstruction, the present registration and initial participant-validation code specifically requires **UC-A and UC-B online**; it does *not* implement full one-authority-outage tolerance for the entire lifecycle.
 
 **Where this happens in code:** [`src/qsv2g/protocol.py`](src/qsv2g/protocol.py) is the protocol state machine; [`src/qsv2g/crypto.py`](src/qsv2g/crypto.py) implements real classical/PQC software operations; [`src/qsv2g/quantum.py`](src/qsv2g/quantum.py) and [`src/qsv2g/resources.py`](src/qsv2g/resources.py) model quantum states, share reconstruction and single-use resources. The EV verifies **authority signatures on a reconstruction attestation**, not an independent cryptographic proof that physical quantum reconstruction took place.
 
