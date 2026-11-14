@@ -20,10 +20,10 @@ def main():
  p=argparse.ArgumentParser(description=__doc__)
  p.add_argument('--study',choices=list(COMMANDS)+['all'],default='validation')
  p.add_argument('--full',action='store_true',help='run large original trial budgets')
- p.add_argument('--out',type=Path,default=Path('results/raw'))
+ p.add_argument('--out',type=Path,default=Path('results/generated'))
  p.add_argument('--seed',type=int,default=2026)
  a=p.parse_args()
- tasks=[a.study] if a.study!='all' else ['validation','security','performance','noise','availability','security-adversarial','reliability']
+ tasks=[a.study] if a.study!='all' else ['validation','security','security-stateful','performance','noise','noise-vector','availability','security-adversarial','reliability']
  for task in tasks:
   dest=a.out/task;dest.mkdir(parents=True,exist_ok=True)
   cmd=[sys.executable,'-m',*COMMANDS[task]]

@@ -32,5 +32,7 @@ jobs:
           python scripts/run_experiment.py --study security
           python scripts/run_experiment.py --study noise
           python scripts/run_experiment.py --study availability
+          python scripts/run_experiment.py --study security-stateful
+          python scripts/run_experiment.py --study noise-vector
           python scripts/run_experiment.py --study security-adversarial
           python scripts/run_experiment.py --study reliability

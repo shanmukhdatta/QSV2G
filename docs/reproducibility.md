@@ -48,6 +48,4 @@ on the archival Git branch. Their original results are copied byte-for-byte to `
 where applicable; never substitute the newer 36-case scripted campaign for the earlier 80
 cases or present the two as equivalent. A full historical notebook re-execution is not asserted.
 
-The modular Kaggle runner pins the complete source SHA `0034712a9509affa1c3c17aa0f6b39a679aa740a`
- rather than a moving branch name; this SHA contains the validated modular Python code and
-experiment routines. Newer commits may correct documentation or metadata independently.
+The modular Kaggle runner pins the tested source revision `f66f026ffbe7abf5157728c6d47d43346d849732` rather than a moving branch name. The notebook writes **new results** to /kaggle/working/qsv2g_new_results and exports only these files; archived historical evidence under results/raw is never mixed into a fresh trial set. Notebook-side execution remains unverified until an actual Kaggle run is provided.
