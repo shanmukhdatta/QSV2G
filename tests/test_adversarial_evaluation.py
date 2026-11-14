@@ -87,7 +87,7 @@ def test_real_pqc_conditional_trust_boundary(variant):
 
 
 def test_p3_wrapper_does_not_invent_proofs_when_missing(tmp_path):
-    from run_formal import run
+    from qsv2g.evaluation.compromise_formal import run
     status=run(tmp_path,bin_path=tmp_path/'intentionally_missing_tamarin')
     assert status['status']=='NOT_EXECUTED'
     assert status['proof_status']=='UNRESOLVED'

@@ -224,7 +224,7 @@ def test_e3_real_pqc_endpoint_accepts_default_L162_in_ideal_channel():
 
 
 def test_formal_prover_lemma_parser_requires_explicit_summary():
-    from run_tamarin import LEMMAS,parse_lemma_summary
+    from qsv2g.evaluation.consent_formal import LEMMAS,parse_lemma_summary
     lines='\n'.join(f'{x} (all-traces): verified (3 steps)' for x in LEMMAS)
     assert len(parse_lemma_summary(lines))==len(LEMMAS)
     assert all(x=='verified' for x in parse_lemma_summary(lines).values())
@@ -234,7 +234,7 @@ def test_formal_prover_lemma_parser_requires_explicit_summary():
 
 
 def test_e5_run_reports_unavailable_without_claimed_proofs(tmp_path,monkeypatch):
-    import run_tamarin
+    from qsv2g.evaluation import consent_formal as run_tamarin
     monkeypatch.setattr(run_tamarin.shutil,'which',lambda *args,**kw:None)
     result=run_tamarin.run(tmp_path,timeout=1)
     assert result['parse_status']=='NOT_EXECUTED'
@@ -244,7 +244,7 @@ def test_e5_run_reports_unavailable_without_claimed_proofs(tmp_path,monkeypatch)
 
 
 def test_release_install_rejects_bad_digest(tmp_path,monkeypatch):
-    import install_tamarin
+    from scripts import install_formal_tools as install_tamarin
     import io
     monkeypatch.setattr(install_tamarin.urllib.request,'urlopen',lambda *a,**k:io.BytesIO(b'tampered'))
     with pytest.raises(RuntimeError,match='SHA-256 mismatch'):
