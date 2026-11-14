@@ -1,10 +1,24 @@
-# Verification scripts
+# Reproduce the simulation
 
-Run `python scripts/verify_artifacts.py` from the repository root to check SHA-256-linked reference implementation, attached LaTeX revision, ZIP integrity, summary counts and extracted-file equivalence. This is an **artifact consistency check**, not a fresh notebook rerun or security proof.
-## Stage 01 / 02 verifier
+Install from the repository root: `python -m pip install -e ".[dev]"`.
+The post-quantum crypto backend requires compatible `pqcrypto` or OpenSSL >=3.5.
 
-Run `python scripts/verify_stage01_stage02.py` from the repository root for ZIP checksum, member integrity, raw-extract byte matching, and test-count consistency. It does not run the cryptographic protocol or verify Kaggle identity.
+Examples:
 
-## Stage 03 / 04 verification
+```bash
+python scripts/run_protocol.py --pair AC --operation CHARGE --length 9
+python scripts/run_experiment.py --study validation
+python scripts/run_experiment.py --study security
+python scripts/run_experiment.py --study noise
+python scripts/run_experiment.py --study performance
+python scripts/run_experiment.py --study availability
+python scripts/run_experiment.py --study security-adversarial
+python scripts/run_experiment.py --study reliability
+python scripts/run_formal.py --model consent
+python scripts/run_formal.py --model compromise
+python scripts/reproduce_all.py
+```
 
-Run `python scripts/verify_stage03_stage04.py` from repository root. It checks 19/19 Stage 03 and 27/27 Stage 04 internal SHA-256 members, all extracted-file/log byte matches, and 315,000 / 120+120+270 raw record counts. Standard library only. This is artifact verification, not a cloud-execution attestation or cryptographic security proof.
+Default runs are *smoke* budgets; opt into the expensive datasets with `--full`.
+Consecutive executions have different crypto randomness and platform timings.
+Old archived result files must not be merged with new experiments as if the same protocol revision were tested.

@@ -1,0 +1,27 @@
+{
+  "utc": "2026-11-13T09:57:37.563479+00:00",
+  "model": "/kaggle/working/QSV2G/formal/qsv2g_classical_consent.spthy",
+  "scope": "abstract classical A/B consent and signatures; QSS gate ASSUMED, not proven",
+  "prover": "Tamarin",
+  "parse_status": "PASSED",
+  "proof_status": "ALL_LISTED_LEMMAS_VERIFIED_IN_ABSTRACT_MODEL",
+  "expected_lemmas": [
+    "honest_execution_reachable",
+    "execution_requires_same_EV_consent",
+    "execution_requires_both_approval_actions",
+    "executed_once_per_session"
+  ],
+  "prover_present": true,
+  "maude_present": true,
+  "binary_path": "/kaggle/working/qsv2g_stage05_e5_tools/bin/tamarin-prover",
+  "maude_path": "/kaggle/working/qsv2g_stage05_e5_tools/bin/maude",
+  "version": "tamarin-prover 1.12.0, (C) David Basin, Cas Cremers, Jannik Dreier, Simon Meier, Ralf Sasse, Benedikt Schmidt, 2010-2023\n\nThis program comes with ABSOLUTELY NO WARRANTY. It is free software, and you\nare welcome to redistribute it according to its LICENSE, see\n'https://github.com/tamarin-prover/tamarin-prover/blob/master/LICENSE'.\n\nGenerated from:\nTamarin version 1.12.0\nMaude version 3.5.1\nGit revision: 82780bbaf3328a45f624ddb41e51bf75425f851c (with uncommited changes), branch: master\nCompiled at: 2026-03-07 14:22:39.174278293 UTC",
+  "parse_returncode": 0,
+  "prover_returncode": 0,
+  "lemma_status": {
+    "honest_execution_reachable": "verified",
+    "execution_requires_same_EV_consent": "verified",
+    "execution_requires_both_approval_actions": "verified",
+    "executed_once_per_session": "verified"
+  }
+}

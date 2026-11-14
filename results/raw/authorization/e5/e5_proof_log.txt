@@ -1,0 +1,313 @@
+theory QSV2G_Classical_Consent
+
+begin
+
+// Function signature and definition of the equational theory E
+
+functions: fst/1, mac/2, pair/2, pk/1, sign/2, snd/1, true/0, verify/3
+equations:
+    fst(<x.1, x.2>) = x.1,
+    snd(<x.1, x.2>) = x.2,
+    verify(sign(x.1, x.2), x.1, pk(x.2)) = true
+
+rule (modulo E) Setup:
+   [ Fr( ~kEV ), Fr( ~skA ), Fr( ~skB ), Fr( ~sid ) ]
+  --[ SetupDone( ~sid ) ]->
+   [
+   !EvKey( ~kEV ), !SignAKey( ~skA ), !SignBKey( ~skB ), !PubA( pk(~skA) ),
+   !PubB( pk(~skB) ), EvBegin( ~sid ), Out( pk(~skA) ), Out( pk(~skB) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) EV_Consent:
+   [ EvBegin( sid ), Fr( ~ac ), !EvKey( k ) ]
+  --[ EVConsented( sid, ~ac ) ]->
+   [ EVIntent( sid, ~ac ), Out( <sid, ~ac, mac(<sid, ~ac>, k)> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) CS_Check_Consent:
+   [ In( <sid, ac, mac(<sid, ac>, k)> ), !EvKey( k ) ]
+  --[ CSConsentChecked( sid, ac ) ]->
+   [ !CSApproved( sid, ac ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) UC_A_Approves:
+   [ !CSApproved( sid, ac ) ]
+  --[ ApprovedA( sid, ac ) ]->
+   [ !ApprovalA( sid, ac ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) UC_B_Approves:
+   [ !CSApproved( sid, ac ) ]
+  --[ ApprovedB( sid, ac ) ]->
+   [ !ApprovalB( sid, ac ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Assumed_Ideal_QSS_Gate:
+   [ !ApprovalA( sid, ac ), !ApprovalB( sid, ac ), Fr( ~nu ) ]
+  --[ IdealRecoveryAssumption( sid, ac, ~nu ) ]->
+   [ !Ready( sid, ac, ~nu ), ReadyForEV( sid, ac, ~nu ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) UC_A_Signs:
+   [ !Ready( sid, ac, nu ), !SignAKey( sk ) ]
+  --[ SignedA( sid, ac, nu ) ]->
+   [ Out( sign(<sid, ac, nu, 'A'>, sk) ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) UC_B_Signs:
+   [ !Ready( sid, ac, nu ), !SignBKey( sk ) ]
+  --[ SignedB( sid, ac, nu ) ]->
+   [ Out( sign(<sid, ac, nu, 'B'>, sk) ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) EV_Verifies_And_Executes:
+   [
+   EVIntent( sid, ac ), ReadyForEV( sid, ac, nu ), !PubA( pka ),
+   !PubB( pkb ), In( sigA ), In( sigB )
+   ]
+  --[
+  Eq( verify(sigA, <sid, ac, nu, 'A'>, pka), true ),
+  Eq( verify(sigB, <sid, ac, nu, 'B'>, pkb), true ),
+  Executed( sid, ac, nu )
+  ]->
+   [ ]
+
+  /*
+  rule (modulo AC) EV_Verifies_And_Executes:
+     [
+     EVIntent( sid, ac ), ReadyForEV( sid, ac, nu ), !PubA( pka ),
+     !PubB( pkb ), In( sigA ), In( sigB )
+     ]
+    --[ Eq( z, true ), Eq( z.1, true ), Executed( sid, ac, nu ) ]->
+     [ ]
+    variants (modulo AC)
+    1. ac    = ac.10
+       nu    = nu.10
+       pka   = pka.10
+       pkb   = pkb.10
+       sid   = sid.10
+       sigA  = sigA.10
+       sigB  = sigB.10
+       z     = verify(sigA.10, <sid.10, ac.10, nu.10, 'A'>, pka.10)
+       z.1   = verify(sigB.10, <sid.10, ac.10, nu.10, 'B'>, pkb.10)
+    
+    2. ac    = x.10
+       nu    = x.11
+       pka   = pka.15
+       pkb   = pk(x.13)
+       sid   = x.14
+       sigA  = sigA.15
+       sigB  = sign(<x.14, x.10, x.11, 'B'>, x.13)
+       z     = verify(sigA.15, <x.14, x.10, x.11, 'A'>, pka.15)
+       z.1   = true
+    
+    3. ac    = x.10
+       nu    = x.11
+       pka   = pk(x.12)
+       pkb   = pkb.15
+       sid   = x.14
+       sigA  = sign(<x.14, x.10, x.11, 'A'>, x.12)
+       sigB  = sigB.15
+       z     = true
+       z.1   = verify(sigB.15, <x.14, x.10, x.11, 'B'>, pkb.15)
+    
+    4. ac    = x.10
+       nu    = x.11
+       pka   = pk(x.12)
+       pkb   = pk(x.13)
+       sid   = x.14
+       sigA  = sign(<x.14, x.10, x.11, 'A'>, x.12)
+       sigB  = sign(<x.14, x.10, x.11, 'B'>, x.13)
+       z     = true
+       z.1   = true
+  */
+
+restriction Equality:
+  "∀ x y #i. (Eq( x, y ) @ #i) ⇒ (x = y)"
+  // safety formula
+
+  /*
+  expanded formula:
+  "∀ x y #i. (Eq( x, y ) @ #i) ⇒ (x = y)"
+  */
+
+lemma honest_execution_reachable:
+  exists-trace "∃ sid ac nu #i. Executed( sid, ac, nu ) @ #i"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ sid ac nu #i. (Executed( sid, ac, nu ) @ #i)"
+*/
+simplify
+solve( EVIntent( sid, ac ) ▶₀ #i )
+  case EV_Consent
+  solve( ReadyForEV( ~sid, ~ac, nu ) ▶₁ #i )
+    case Assumed_Ideal_QSS_Gate
+    solve( !PubA( pk(x) ) ▶₂ #i )
+      case Setup
+      solve( !PubB( pk(x) ) ▶₃ #i )
+        case Setup
+        solve( !KU( sign(<~sid, ~ac, ~nu, 'A'>, ~skA) ) @ #vk )
+          case UC_A_Signs
+          solve( !KU( sign(<~sid, ~ac, ~nu, 'B'>, ~skB) ) @ #vk.1 )
+            case UC_B_Signs
+            solve( !KU( mac(<~sid, ~ac>, ~kEV.2) ) @ #vk.8 )
+              case EV_Consent
+              solve( !KU( mac(<~sid, ~ac>, ~kEV.2) ) @ #vk.9 )
+                case EV_Consent
+                solve( !KU( ~sid ) @ #vk.5 )
+                  case EV_Consent
+                  solve( !KU( ~ac ) @ #vk.6 )
+                    case EV_Consent
+                    SOLVED // trace found
+                  qed
+                qed
+              qed
+            qed
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+lemma execution_requires_same_EV_consent:
+  all-traces
+  "∀ sid ac nu #i.
+    (Executed( sid, ac, nu ) @ #i) ⇒
+    (∃ #j. (EVConsented( sid, ac ) @ #j) ∧ (#j < #i))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ sid ac nu #i.
+  (Executed( sid, ac, nu ) @ #i)
+ ∧
+  ∀ #j. (EVConsented( sid, ac ) @ #j) ⇒ ¬(#j < #i)"
+*/
+simplify
+solve( EVIntent( sid, ac ) ▶₀ #i )
+  case EV_Consent
+  by contradiction /* from formulas */
+qed
+
+lemma execution_requires_both_approval_actions:
+  all-traces
+  "∀ sid ac nu #i.
+    (Executed( sid, ac, nu ) @ #i) ⇒
+    (∃ #j #k.
+      (((ApprovedA( sid, ac ) @ #j) ∧ (ApprovedB( sid, ac ) @ #k)) ∧
+       (#j < #i)) ∧
+      (#k < #i))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ sid ac nu #i.
+  (Executed( sid, ac, nu ) @ #i)
+ ∧
+  ∀ #j #k.
+   (ApprovedA( sid, ac ) @ #j) ∧ (ApprovedB( sid, ac ) @ #k)
+  ⇒
+   ((¬(#j < #i)) ∨ (¬(#k < #i)))"
+*/
+simplify
+solve( EVIntent( sid, ac ) ▶₀ #i )
+  case EV_Consent
+  solve( ReadyForEV( ~sid, ~ac, nu ) ▶₁ #i )
+    case Assumed_Ideal_QSS_Gate
+    by contradiction /* from formulas */
+  qed
+qed
+
+lemma executed_once_per_session:
+  all-traces
+  "∀ sid ac1 ac2 nu1 nu2 #i #j.
+    ((Executed( sid, ac1, nu1 ) @ #i) ∧ (Executed( sid, ac2, nu2 ) @ #j)) ⇒
+    (#i = #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ sid ac1 ac2 nu1 nu2 #i #j.
+  (Executed( sid, ac1, nu1 ) @ #i) ∧ (Executed( sid, ac2, nu2 ) @ #j)
+ ∧
+  ¬(#i = #j)"
+*/
+simplify
+solve( (#i < #j)  ∥ (#j < #i) )
+  case case_1
+  solve( EVIntent( sid, ac1 ) ▶₀ #i )
+    case EV_Consent
+    solve( ReadyForEV( ~sid, ~ac, nu1 ) ▶₁ #i )
+      case Assumed_Ideal_QSS_Gate
+      solve( !PubA( pk(x) ) ▶₂ #i )
+        case Setup
+        solve( !PubB( pk(x) ) ▶₃ #i )
+          case Setup
+          solve( EVIntent( ~sid, ac2 ) ▶₀ #j )
+            case EV_Consent
+            by contradiction /* cyclic */
+          qed
+        qed
+      qed
+    qed
+  qed
+next
+  case case_2
+  solve( EVIntent( sid, ac1 ) ▶₀ #i )
+    case EV_Consent
+    solve( ReadyForEV( ~sid, ~ac, nu1 ) ▶₁ #i )
+      case Assumed_Ideal_QSS_Gate
+      solve( !PubA( pk(x) ) ▶₂ #i )
+        case Setup
+        solve( !PubB( pk(x) ) ▶₃ #i )
+          case Setup
+          solve( EVIntent( ~sid, ac2 ) ▶₀ #j )
+            case EV_Consent
+            by contradiction /* cyclic */
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.12.0
+Maude version 3.5.1
+Git revision: 82780bbaf3328a45f624ddb41e51bf75425f851c (with uncommited changes), branch: master
+Compiled at: 2026-03-07 14:22:39.174278293 UTC
+*/
+
+end
+
+==============================================================================
+summary of summaries:
+
+analyzed: /kaggle/working/QSV2G/formal/qsv2g_classical_consent.spthy
+
+  processing time: 1.22s
+  
+  honest_execution_reachable (exists-trace): verified (12 steps)
+  execution_requires_same_EV_consent (all-traces): verified (3 steps)
+  execution_requires_both_approval_actions (all-traces): verified (4 steps)
+  executed_once_per_session (all-traces): verified (14 steps)
+
+==============================================================================
+
+maude tool: 'maude'
+ checking version: 3.5.1. OK.
+ checking installation: OK.
+[Theory QSV2G_Classical_Consent] Theory loaded
+[Theory QSV2G_Classical_Consent] Theory translated
+[Theory QSV2G_Classical_Consent] Derivation checks started
+[Theory QSV2G_Classical_Consent] Derivation checks ended
+[Theory QSV2G_Classical_Consent] Theory closed
+[Saturating Sources] Step 1 (Max 5)
+[Saturating Sources] Done

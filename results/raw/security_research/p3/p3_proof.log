@@ -1,0 +1,355 @@
+theory QSV2G_Stage06_Compromise_Candidate
+
+begin
+
+// Function signature and definition of the equational theory E
+
+functions: fst/1, mac/2, pair/2, pk/1, sign/2, snd/1, true/0, verify/3
+equations:
+    fst(<x.1, x.2>) = x.1,
+    snd(<x.1, x.2>) = x.2,
+    verify(sign(x.1, x.2), x.1, pk(x.2)) = true
+
+rule (modulo E) Setup:
+   [ Fr( ~skA ), Fr( ~skB ), Fr( ~kCS ), Fr( ~sid ), Fr( ~ac ), Fr( ~nu ) ]
+  --[ EVConsented( ~sid, ~ac, ~nu ) ]->
+   [
+   !SignA( ~skA ), !SignB( ~skB ), !CSKey( ~kCS ), !PubA( pk(~skA) ),
+   !PubB( pk(~skB) ), !Session( ~sid, ~ac, ~nu ),
+   PendingEV( ~sid, ~ac, ~nu ), Out( pk(~skA) ), Out( pk(~skB) ),
+   Out( <~sid, ~ac, ~nu> )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Assumed_Honest_QSS_Reconstruction:
+   [ !Session( sid, ac, nu ), Fr( ~reconstruction_hash ) ]
+  --[ Reconstructed( sid, ac, nu, ~reconstruction_hash ) ]->
+   [ !GatePassed( sid, ac, nu, ~reconstruction_hash ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Honest_UC_A_Sign:
+   [ !GatePassed( sid, ac, nu, h ), !SignA( sk ) ]
+  --[ SignedA( sid, ac, nu, h ) ]->
+   [ Out( sign(<sid, ac, nu, h, 'A'>, sk) ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Honest_UC_B_Sign:
+   [ !GatePassed( sid, ac, nu, h ), !SignB( sk ) ]
+  --[ SignedB( sid, ac, nu, h ) ]->
+   [ Out( sign(<sid, ac, nu, h, 'B'>, sk) ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Honest_CS_Auth_Response:
+   [ !GatePassed( sid, ac, nu, h ), !CSKey( kCS ) ]
+  --[ HonestResponse( sid, ac, nu, h ) ]->
+   [ Out( mac(<sid, ac, nu, h>, kCS) ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Reveal_UC_A:
+   [ !SignA( sk ) ] --[ RevealA( ) ]-> [ Out( sk ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Reveal_UC_B:
+   [ !SignB( sk ) ] --[ RevealB( ) ]-> [ Out( sk ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Reveal_CS:
+   [ !CSKey( kCS ) ] --[ RevealCS( ) ]-> [ Out( kCS ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) EV_Verify:
+   [
+   PendingEV( sid, ac, nu ), !PubA( pka ), !PubB( pkb ), !CSKey( kCS ),
+   In( <h, sigA, sigB, tag> )
+   ]
+  --[
+  Eq( verify(sigA, <sid, ac, nu, h, 'A'>, pka), true ),
+  Eq( verify(sigB, <sid, ac, nu, h, 'B'>, pkb), true ),
+  Eq( tag, mac(<sid, ac, nu, h>, kCS) ), EVAccepted( sid, ac, nu, h )
+  ]->
+   [ ]
+
+  /*
+  rule (modulo AC) EV_Verify:
+     [
+     PendingEV( sid, ac, nu ), !PubA( pka ), !PubB( pkb ), !CSKey( kCS ),
+     In( <h, sigA, sigB, tag> )
+     ]
+    --[
+    Eq( z, true ), Eq( z.1, true ), Eq( tag, mac(<sid, ac, nu, h>, kCS) ),
+    EVAccepted( sid, ac, nu, h )
+    ]->
+     [ ]
+    variants (modulo AC)
+    1. ac    = ac.13
+       h     = h.13
+       nu    = nu.13
+       pka   = pka.13
+       pkb   = pkb.13
+       sid   = sid.13
+       sigA  = sigA.13
+       sigB  = sigB.13
+       z     = verify(sigA.13, <sid.13, ac.13, nu.13, h.13, 'A'>, pka.13)
+       z.1   = verify(sigB.13, <sid.13, ac.13, nu.13, h.13, 'B'>, pkb.13)
+    
+    2. ac    = x.13
+       h     = x.14
+       nu    = x.16
+       pka   = pka.20
+       pkb   = pk(x.18)
+       sid   = x.19
+       sigA  = sigA.20
+       sigB  = sign(<x.19, x.13, x.16, x.14, 'B'>, x.18)
+       z     = verify(sigA.20, <x.19, x.13, x.16, x.14, 'A'>, pka.20)
+       z.1   = true
+    
+    3. ac    = x.13
+       h     = x.14
+       nu    = x.16
+       pka   = pk(x.17)
+       pkb   = pkb.20
+       sid   = x.19
+       sigA  = sign(<x.19, x.13, x.16, x.14, 'A'>, x.17)
+       sigB  = sigB.20
+       z     = true
+       z.1   = verify(sigB.20, <x.19, x.13, x.16, x.14, 'B'>, pkb.20)
+    
+    4. ac    = x.13
+       h     = x.14
+       nu    = x.16
+       pka   = pk(x.17)
+       pkb   = pk(x.18)
+       sid   = x.19
+       sigA  = sign(<x.19, x.13, x.16, x.14, 'A'>, x.17)
+       sigB  = sign(<x.19, x.13, x.16, x.14, 'B'>, x.18)
+       z     = true
+       z.1   = true
+  */
+
+restriction Equality:
+  "∀ x y #i. (Eq( x, y ) @ #i) ⇒ (x = y)"
+  // safety formula
+
+  /*
+  expanded formula:
+  "∀ x y #i. (Eq( x, y ) @ #i) ⇒ (x = y)"
+  */
+
+lemma honest_accept_reachable:
+  exists-trace "∃ sid ac nu h #i. EVAccepted( sid, ac, nu, h ) @ #i"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ sid ac nu h #i. (EVAccepted( sid, ac, nu, h ) @ #i)"
+*/
+simplify
+solve( PendingEV( sid, ac, nu ) ▶₀ #i )
+  case Setup
+  solve( !PubA( pk(x) ) ▶₁ #i )
+    case Setup
+    solve( !PubB( pk(x) ) ▶₂ #i )
+      case Setup
+      solve( !CSKey( kCS ) ▶₃ #i )
+        case Setup
+        solve( !KU( sign(<~sid, ~ac, ~nu, h, 'A'>, ~skA) ) @ #vk.3 )
+          case c_sign
+          solve( !KU( ~skA ) @ #vk.9 )
+            case Reveal_UC_A
+            solve( !KU( sign(<~sid, ~ac, ~nu, h, 'B'>, ~skB) ) @ #vk.8 )
+              case c_sign
+              solve( !KU( ~skB ) @ #vk.20 )
+                case Reveal_UC_B
+                solve( !KU( mac(<~sid, ~ac, ~nu, h>, ~kCS) ) @ #vk.14 )
+                  case c_mac
+                  solve( !KU( ~kCS ) @ #vk.25 )
+                    case Reveal_CS
+                    solve( !KU( ~sid ) @ #vk.20 )
+                      case Setup
+                      solve( !KU( ~ac ) @ #vk.22 )
+                        case Setup
+                        solve( !KU( ~nu ) @ #vk.23 )
+                          case Setup
+                          SOLVED // trace found
+                        qed
+                      qed
+                    qed
+                  qed
+                qed
+              qed
+            qed
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+lemma single_use_per_session:
+  all-traces
+  "∀ sid ac nu h1 h2 #i #j.
+    ((EVAccepted( sid, ac, nu, h1 ) @ #i) ∧
+     (EVAccepted( sid, ac, nu, h2 ) @ #j)) ⇒
+    (#i = #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ sid ac nu h1 h2 #i #j.
+  (EVAccepted( sid, ac, nu, h1 ) @ #i) ∧
+  (EVAccepted( sid, ac, nu, h2 ) @ #j)
+ ∧
+  ¬(#i = #j)"
+*/
+simplify
+solve( (#i < #j)  ∥ (#j < #i) )
+  case case_1
+  solve( PendingEV( sid, ac, nu ) ▶₀ #i )
+    case Setup
+    solve( !PubA( pk(x) ) ▶₁ #i )
+      case Setup
+      solve( !PubB( pk(x) ) ▶₂ #i )
+        case Setup
+        solve( !CSKey( kCS ) ▶₃ #i )
+          case Setup
+          solve( PendingEV( ~sid, ~ac, ~nu ) ▶₀ #j )
+            case Setup
+            by contradiction /* cyclic */
+          qed
+        qed
+      qed
+    qed
+  qed
+next
+  case case_2
+  solve( PendingEV( sid, ac, nu ) ▶₀ #i )
+    case Setup
+    solve( !PubA( pk(x) ) ▶₁ #i )
+      case Setup
+      solve( !PubB( pk(x) ) ▶₂ #i )
+        case Setup
+        solve( !CSKey( kCS ) ▶₃ #i )
+          case Setup
+          solve( PendingEV( ~sid, ~ac, ~nu ) ▶₀ #j )
+            case Setup
+            by contradiction /* cyclic */
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+lemma bypass_possible_with_full_compromise:
+  exists-trace
+  "∃ sid ac nu h #i #a #b #c.
+    (((((((EVAccepted( sid, ac, nu, h ) @ #i) ∧ (RevealA( ) @ #a)) ∧
+         (RevealB( ) @ #b)) ∧
+        (RevealCS( ) @ #c)) ∧
+       (#a < #i)) ∧
+      (#b < #i)) ∧
+     (#c < #i)) ∧
+    (¬(∃ h2 #r. Reconstructed( sid, ac, nu, h2 ) @ #r))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ sid ac nu h #i #a #b #c.
+  (EVAccepted( sid, ac, nu, h ) @ #i) ∧
+  (RevealA( ) @ #a) ∧
+  (RevealB( ) @ #b) ∧
+  (RevealCS( ) @ #c)
+ ∧
+  (#a < #i) ∧
+  (#b < #i) ∧
+  (#c < #i) ∧
+  (∀ h2 #r. (Reconstructed( sid, ac, nu, h2 ) @ #r) ⇒ ⊥)"
+*/
+simplify
+solve( PendingEV( sid, ac, nu ) ▶₀ #i )
+  case Setup
+  solve( !PubA( pk(x) ) ▶₁ #i )
+    case Setup
+    solve( !PubB( pk(x) ) ▶₂ #i )
+      case Setup
+      solve( !CSKey( kCS.1 ) ▶₃ #i )
+        case Setup
+        solve( !SignA( sk ) ▶₀ #a )
+          case Setup
+          solve( !SignB( sk ) ▶₀ #b )
+            case Setup
+            solve( !CSKey( kCS ) ▶₀ #c )
+              case Setup
+              solve( !KU( sign(<~sid, ~ac, ~nu, h, 'A'>, ~skA.1) ) @ #vk.3 )
+                case c_sign
+                solve( !KU( ~skA.1 ) @ #vk.9 )
+                  case Reveal_UC_A
+                  solve( !KU( sign(<~sid, ~ac, ~nu, h, 'B'>, ~skB.1) ) @ #vk.8 )
+                    case c_sign
+                    solve( !KU( ~skB.1 ) @ #vk.20 )
+                      case Reveal_UC_B
+                      solve( !KU( mac(<~sid, ~ac, ~nu, h>, ~kCS.1) ) @ #vk.14 )
+                        case c_mac
+                        solve( !KU( ~kCS.1 ) @ #vk.25 )
+                          case Reveal_CS
+                          solve( !KU( ~sid ) @ #vk.20 )
+                            case Setup
+                            solve( !KU( ~ac ) @ #vk.22 )
+                              case Setup
+                              solve( !KU( ~nu ) @ #vk.23 )
+                                case Setup
+                                SOLVED // trace found
+                              qed
+                            qed
+                          qed
+                        qed
+                      qed
+                    qed
+                  qed
+                qed
+              qed
+            qed
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.12.0
+Maude version 3.5.1
+Git revision: 82780bbaf3328a45f624ddb41e51bf75425f851c (with uncommited changes), branch: master
+Compiled at: 2026-03-07 14:22:39.174278293 UTC
+*/
+
+end
+
+==============================================================================
+summary of summaries:
+
+analyzed: /kaggle/working/QSV2G_stage06_source/formal/qsv2g_stage06_compromise_candidate.spthy
+
+  processing time: 2.68s
+  
+  honest_accept_reachable (exists-trace): verified (15 steps)
+  single_use_per_session (all-traces): verified (14 steps)
+  bypass_possible_with_full_compromise (exists-trace): verified (18 steps)
+
+==============================================================================
+
+maude tool: 'maude'
+ checking version: 3.5.1. OK.
+ checking installation: OK.
+[Theory QSV2G_Stage06_Compromise_Candidate] Theory loaded
+[Theory QSV2G_Stage06_Compromise_Candidate] Theory translated
+[Theory QSV2G_Stage06_Compromise_Candidate] Derivation checks started
+[Theory QSV2G_Stage06_Compromise_Candidate] Derivation checks ended
+[Theory QSV2G_Stage06_Compromise_Candidate] Theory closed
+[Saturating Sources] Step 1 (Max 5)
+[Saturating Sources] Done

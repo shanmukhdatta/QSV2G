@@ -1,0 +1,42 @@
+{
+  "source_zip": "qsv2g_stage06_full_20261113T111031Z_results.zip",
+  "zip_sha256": "5272eee4505b6c7b3be5fe50cca651c8ff4b8a42b36d38685be1983c335b9708",
+  "imported": [
+    {
+      "path": "results/raw/security_research/p0_p1/p0_p1_attack_matrix.csv",
+      "sha256": "32074bd89983dcc604031eea66af58e4651c5eb58c7dec444abd571bd4d9b66c",
+      "bytes": 22975
+    },
+    {
+      "path": "results/raw/security_research/p0_p1/p0_p1_summary.json",
+      "sha256": "19e3da9d4c935100e658fbc9a67f72ad923db54e60f9045e4cd7e4ab77e80a38",
+      "bytes": 2036
+    },
+    {
+      "path": "results/raw/security_research/p0_p1/p1_exact_distributions.csv",
+      "sha256": "bf97c2717c993876780973e662d96d63eb8406a51dd589acc4fdf1ddd74d6d4c",
+      "bytes": 1096
+    },
+    {
+      "path": "results/raw/security_research/p2/p2_retries.csv",
+      "sha256": "21d68be04e21e53ee4b989c0260f7661165053e556f12ccb45499d836604b9ac",
+      "bytes": 46147
+    },
+    {
+      "path": "results/raw/security_research/p3/p3_status.json",
+      "sha256": "7d60b74a3d91a16a74f21c8a07d12e73735e689b4bc7ee9e91d0a5cf561441f0",
+      "bytes": 1709
+    },
+    {
+      "path": "results/raw/security_research/p3/p3_proof.log",
+      "sha256": "0c55241b643e199a44ab03a3f68227b5a910ec80ba5a4a236456c167b2e8b1aa",
+      "bytes": 10376
+    },
+    {
+      "path": "results/raw/security_research/stage06_pytest.log",
+      "sha256": "d86c7642429aa56763e6ecf2d5049237155eff8e025322aff2c87ce6c8e6b69a",
+      "bytes": 100
+    }
+  ],
+  "note": "Selected immutable evidence copied from user-submitted full Kaggle archive. Complete original ZIP must remain available separately."
+}

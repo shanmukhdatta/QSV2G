@@ -1,4 +1,0 @@
-numpy>=1.26
-cryptography>=42
-pandas>=2
-pytest>=8

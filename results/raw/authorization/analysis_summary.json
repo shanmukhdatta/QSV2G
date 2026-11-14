@@ -1,0 +1,17 @@
+{
+  "e1_total_observations": 18000,
+  "e1_rejected_or_incomplete": 0,
+  "e1_successful_observations": 18000,
+  "e3_total_vector_attempts": 300000,
+  "e3_real_pqc_token_attempts": 6000,
+  "e3_token_lengths": [
+    9,
+    27,
+    81,
+    162
+  ],
+  "e3_tokens_accepted_at_ev": 3854,
+  "e2_rows": 36,
+  "e2_mismatches": 0,
+  "e4_rows": 11
+}

@@ -1,6 +1,0 @@
-numpy>=1.26
-cryptography>=42
-pandas>=2
-matplotlib>=3.8
-pytest>=8
-hypothesis>=6

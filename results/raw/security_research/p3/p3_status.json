@@ -1,0 +1,29 @@
+{
+  "utc": "2026-11-13T11:10:55.580983+00:00",
+  "theory": "/kaggle/working/QSV2G_stage06_source/formal/qsv2g_stage06_compromise_candidate.spthy",
+  "theory_sha256": "89fe42faa9859b3f51faf7acfc64ea4620210556b5e869cc85a005f8ffed57ff",
+  "expected_lemmas": [
+    "honest_accept_reachable",
+    "single_use_per_session",
+    "bypass_possible_with_full_compromise"
+  ],
+  "status": "PROVED_ABSTRACT_MODEL",
+  "proof_status": "REPORTED_VERIFIED_BY_TAMARIN",
+  "scope": "two-authority AB symbolic signature and CS-MAC compromise boundary; assumed honest QSS gate",
+  "limitations": [
+    "not the full QSV2G protocol",
+    "no physical QSS",
+    "no computational proof for ML-DSA/ML-KEM",
+    "only AB pair",
+    "not linked formally to Python state transitions"
+  ],
+  "tamarin_path": "/kaggle/working/qsv2g_stage06_tamarin_tools/bin/tamarin-prover",
+  "tamarin_version": "tamarin-prover 1.12.0, (C) David Basin, Cas Cremers, Jannik Dreier, Simon Meier, Ralf Sasse, Benedikt Schmidt, 2010-2023\n\nThis program comes with ABSOLUTELY NO WARRANTY. It is free software, and you\nare welcome to redistribute it according to its LICENSE, see\n'https://github.com/tamarin-prover/tamarin-prover/blob/master/LICENSE'.\n\nGenerated from:\nTamarin version 1.12.0\nMaude version 3.5.1\nGit revision: 82780bbaf3328a45f624ddb41e51bf75425f851c (with uncommited changes), branch: master\nCompiled at: 2026-03-07 14:22:39.174278293 UTC\nmaude tool: 'maude'\n checking version: 3.5.1. OK.\n checking installation: OK.\n",
+  "parse_returncode": 0,
+  "prove_returncode": 0,
+  "lemmas": {
+    "honest_accept_reachable": "verified",
+    "single_use_per_session": "verified",
+    "bypass_possible_with_full_compromise": "verified"
+  }
+}

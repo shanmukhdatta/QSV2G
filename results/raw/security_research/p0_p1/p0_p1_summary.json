@@ -1,0 +1,61 @@
+{
+  "total_cases": 96,
+  "unexpected_outcomes": 0,
+  "conditional_ev_acceptance_of_fake_signed_digest": 12,
+  "conditional_ev_acceptance_without_reconstruction": 12,
+  "signed_forgery_requires": [
+    "two exposed signing keys",
+    "CS internal/token-stage control"
+  ],
+  "interpretation": "conditional trust-boundary exposure, NOT a proven network-only exploit",
+  "backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "examples": [
+    {
+      "variant": "QSS",
+      "scenario": "honest_control",
+      "pair": "AB",
+      "op": "CHARGE",
+      "L": 9,
+      "outcome": "EV_ACCEPTED",
+      "expected": "EV_ACCEPTED",
+      "match": true,
+      "qss_or_classical_resource_state": "CONSUMED",
+      "reconstructed_before_ev_response": true,
+      "compromised_signer_keys": 0,
+      "compromised_cs_in_test_harness": false,
+      "pure_network_adversary": null,
+      "actual_ev_operation_changed": false,
+      "note": "",
+      "detail": "",
+      "elapsed_ms": 76.332,
+      "crypto_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65"
+    },
+    {
+      "variant": "QSS",
+      "scenario": "one_approval",
+      "pair": "AB",
+      "op": "CHARGE",
+      "L": 9,
+      "outcome": "REJECTED",
+      "expected": "REJECTED",
+      "match": true,
+      "qss_or_classical_resource_state": "ABORT_BEFORE_APPROVAL",
+      "reconstructed_before_ev_response": false,
+      "compromised_signer_keys": 0,
+      "compromised_cs_in_test_harness": false,
+      "pure_network_adversary": null,
+      "actual_ev_operation_changed": false,
+      "note": "",
+      "detail": "fewer than two distinct approvals",
+      "elapsed_ms": 30.898,
+      "crypto_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65"
+    }
+  ],
+  "limitations": [
+    "Single process, simulated roles",
+    "Signing keys co-resident in CS simulator; deployed key custody unspecified",
+    "No physical QSS channels",
+    "Compromised authority scenarios may be outside original threshold trust model",
+    "Attack stages modeled by explicit privileged experiment harness"
+  ]
+}

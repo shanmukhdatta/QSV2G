@@ -1,59 +1,47 @@
-# QSV2G — Research simulation and reproducibility archive
+# QSV2G — Quantum-assisted V2G authorization research prototype
 
-QSV2G studies cross-domain electric-vehicle/charging-station authentication and transaction-bound **2-of-3 quantum-secret-sharing (QSS)** based authorization. This repository contains the reference software simulation, quantum correctness checks, validation notebooks, and accompanying result archives.
+**Research software, not a deployed EV/charger system or physical quantum network.**
 
-> **Scope:** Research prototype only. Idealized qutrit quantum-state simulation, not an experimentally demonstrated quantum V2G network or a proof of malicious-secure verifiable QSS. Two distinct authority signatures attest to reconstruction; they do not independently prove to the EV that quantum reconstruction occurred.
+This repository provides a modular **Python** implementation, executable software studies,
+formal symbolic abstractions, and preserved result evidence. It includes genuine
+ML-KEM-768 / ML-DSA-65 operations, while Bell-state and three-qutrit operations
+are simulated mathematically. **A signature over a reconstruction digest is not
+an independently verifiable quantum-reconstruction proof.**
 
-## Contents
+## Five-folder layout
 
-- `src/qsv2g_core.py`: exact reference implementation extracted from the full protocol notebook.
-- `notebooks/`: three source notebooks (complete protocol, independent quantum validation, final 38-case validation).
-- `notebooks/local_executed/`: executed notebook snapshots from a **local** runtime; these are not independent proof of a Kaggle run.
-- `results/archives/`: original result ZIPs, preserved without modification.
-- `results/final_validation/`: extracted 38-case outputs, including 720 ideal QSS reconstruction trials.
-- `results/full_protocol_*/`: separate result sets for the reported OpenSSL and native `pqcrypto` backends. **Do not combine cross-environment timing results.**
-- `results/quantum_validation/`: quantum state checks and reconstruction results.
-- `logs/local_executed/`: stdout/text saved from the local executed notebook files (not original cloud runtime logs).
-- `protocol/`: Section IV LaTeX source associated with the manifest hashes, plus a clearly marked earlier Markdown draft.
-- `docs/`: provenance, limitations, and verification guide.
-- `scripts/verify_artifacts.py`: local integrity/summary consistency checks (not a security proof).
+- [`src/qsv2g`](src/qsv2g/) — protocol, cryptography, quantum math, resources and evaluation APIs.
+- [`scripts`](scripts/) — one-transaction and task-oriented reproducibility commands.
+- [`tests`](tests/) — regression, model, integration and parity checks.
+- [`results`](results/) — original raw evidence, summary outputs, logs and figures.
+- [`docs`](docs/) — methodology, protocol specification, formal theories and limitations.
 
-## Reproduction
+## Quick start
 
-1. Create a fresh Python environment or use a Kaggle notebook with the packages required in its first setup cell. **Review the dependencies before executing.**
-2. Run `notebooks/QSV2G_Kaggle_Full_Protocol_Implementation.ipynb` for the protocol and benchmark scenarios.
-3. Run `notebooks/QSV2G_Kaggle_Quantum_Qiskit_PennyLane_Validation.ipynb` for independently implemented ideal quantum-state checks.
-4. Run `notebooks/QSV2G_Final_Protocol_Validation_Kaggle.ipynb` for the 38-case test suite.
-5. Inspect each run's exported ZIP, `manifest.json` or `validation_summary.json`, and its raw CSVs.
-6. Run `python scripts/verify_artifacts.py` from the repository root to check archived-file integrity and expected result-summary counts.
+```bash
+python -m pip install -e ".[dev]"
+python scripts/run_protocol.py --pair AB --operation CHARGE --length 9
+python scripts/run_experiment.py --study validation
+python scripts/run_experiment.py --study security --full
+python -m pytest -q tests
+```
 
-The notebooks select standardized ML-KEM-768 / ML-DSA-65 implementations from the available `pqcrypto` or OpenSSL 3.5+ backend. Their actual installed versions are recorded in the supplied manifest files. Hardware cryptography, authenticated quantum networking, secret provisioning, crash-persistent state, physical energy metering, and formal security proofs are **not** established here.
+All scripts fail rather than silently replacing ML-KEM/ML-DSA with a classical stub.
+The separate hypothesis test uses a clearly labeled TEST-ONLY surrogate and is
+**not** a cryptographic-security benchmark.
 
-## Main findings reported by supplied results
+## Reproducibility and scope
 
-- Final suite: **38/38 observed outcomes matched the specified expected outcomes**; this includes tests demonstrating unresolved limitations.
-- Ideal quantum secret reconstruction: **720/720 successful trials** (three authorized authority pairs).
-- The standalone quantum result archive reports 500/500 samples for each symbol–pair combination (9 combinations).
-- The simulation tests CHARGE and DISCHARGE workflows and selected replay/authorization rejection conditions.
+See [`docs/methodology.md`](docs/methodology.md) for experiment definitions and
+[`docs/reproducibility.md`](docs/reproducibility.md) for environment/provenance.
+See [`docs/threat_model.md`](docs/threat_model.md) and
+[`docs/limitations.md`](docs/limitations.md) before making security claims.
 
-Do not interpret these tests as cryptographic security guarantees. See `docs/LIMITATIONS.md`.
+Historical development revisions and original notebooks are preserved on
+[`archive/pre-modularization-2026-11-14`](https://github.com/shanmukhdatta/QSV2G/tree/archive/pre-modularization-2026-11-14).
+The active interface groups experiments by *scientific question*, not chronological notebook stages.
 
-## Artifact navigation and provenance
-
-- [Notebook guide](notebooks/README.md) | [Available logs](logs/README.md) | [Results guide](results/README.md) | [Extracted plots](figures/README.md)
-- [Experiment-to-evidence lookup](docs/RESULTS_INDEX.md) | [Provenance](docs/PROVENANCE.md) | [Known limitations](docs/LIMITATIONS.md)
-- [Reference protocol source](protocol/README.md) | [Environment](environment/README.md) | [Verification scripts](scripts/README.md)
-
-**Disclosure:** The supplied archives do not include independently authenticated Kaggle run history or cloud execution identifiers. Their environment fields are *reported metadata*. Locally executed notebooks are labelled accordingly. The QSKA PDF and full unpublished manuscript are not included. No LICENSE file is provided pending authors' choice of terms.
-## Staged experimental evaluations
-
-- **Stage 01 baseline reproducibility:** [notebook](notebooks/stage01/) · [raw submitted results](results/stage01/) · [audit](docs/stages/STAGE01_AUDIT.md). Uploaded outcomes: 38/38 expected; ideal QSS 720/720.
-- **Stage 02 security analysis:** [corrected notebook](notebooks/stage02/) · [raw submitted results](results/stage02/) · [audit](docs/stages/STAGE02_AUDIT.md). Uploaded outcomes: 80/80 expected with 7 *demonstrated limitations*.
-- [Stage-to-evidence index](docs/STAGE_EVIDENCE_INDEX.md) records the exact source versions and evidence provenance. Original Kaggle console logs and revision URLs for these two stages were not supplied; local preflight logs are labelled explicitly.
-
-## Stage 03 and Stage 04 evaluations
-- [Stage 03 notebook](notebooks/stage03/) · [submitted ZIP and extracted results](results/stage03/) · [original figures](figures/experimental/stage03/) · [notebook log](logs/stage03/) · [audit](docs/stages/STAGE03_AUDIT.md). 315 modeled configurations and 315,000 trials.
-- [Stage 04 notebook](notebooks/stage04/) · [submitted ZIP and extracted results](results/stage04/) · [original figures](figures/experimental/stage04/) · [notebook log](logs/stage04/) · [audit](docs/stages/STAGE04_AUDIT.md). 120 workflows, 120 scaling runs and 270 authorization microbenchmarks.
-- [Four-stage evidence index](docs/STAGE_EVIDENCE_INDEX.md) · [Read-only verifier](scripts/verify_stage03_stage04.py).
-
-The result archives are preserved unchanged. Notebook-generated logs are not complete Kaggle job histories; immutable Kaggle run URLs and executed cloud notebook revisions were not supplied. Local preflights are distinct.
+This code has no physical charger, quantum transmission channel, distributed persistence,
+malicious-secure VQSS verification, or demonstrated quantum security advantage over
+classical threshold sharing. Formal Tamarin results are scoped to the mathematical
+models and assumptions stated in the theory files.

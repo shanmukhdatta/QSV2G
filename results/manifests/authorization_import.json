@@ -1,0 +1,62 @@
+{
+  "source_zip": "qsv2g_stage05_final_20261113T092554Z.zip",
+  "zip_sha256": "87418c800c96537b143b7df594eaa79ee4015a05c867303f6239b40097316ee6",
+  "imported": [
+    {
+      "path": "results/raw/authorization/analysis_summary.json",
+      "sha256": "5a610377fe49940d444f01194da23b39c117f71ce6d18fb15b3a76605f6c00f1",
+      "bytes": 337
+    },
+    {
+      "path": "results/raw/authorization/e1/e1_summary.csv",
+      "sha256": "9487ce3f2cd491207851ff581e845514d8fbb08e20bae9cab03d946963d27af2",
+      "bytes": 1551
+    },
+    {
+      "path": "results/raw/authorization/e1/e1_block_bootstrap.csv",
+      "sha256": "16a6fc85fed9cf42ece6f9ae1aed2dc6c382b2e2be7213da0742544c2160cf3e",
+      "bytes": 685
+    },
+    {
+      "path": "results/raw/authorization/e2/e2_cases.csv",
+      "sha256": "c11bf9de8e2c40ab8947f51e0b8d974aa521d7248e25489d9c4e9850fa10563f",
+      "bytes": 3983
+    },
+    {
+      "path": "results/raw/authorization/e2/hypothesis.json",
+      "sha256": "33b9030eaf316b83886ca88432ed612eaab3bfcb8264cbb8d6ba0e0e38583f88",
+      "bytes": 205
+    },
+    {
+      "path": "results/raw/authorization/e3/e3_summary.csv",
+      "sha256": "f4fe2671b9670dd51bdc39ab3fa159854ef8f3b02605f9eb4e5356713bfca91e",
+      "bytes": 14529
+    },
+    {
+      "path": "results/raw/authorization/e3/e3_summary_with_ci.csv",
+      "sha256": "6553d2f0f1331ee8d1f1cf9c31042f0346145d625fda9be495e07ca17931000d",
+      "bytes": 25632
+    },
+    {
+      "path": "results/raw/authorization/e3/e3_token_summary_with_ci.csv",
+      "sha256": "4b68454e3dc7fbbab4e95f6f0d80ebe916f6c3be9ffed683189210173486812b",
+      "bytes": 20387
+    },
+    {
+      "path": "results/raw/authorization/e4/e4_failure_matrix.csv",
+      "sha256": "8292e76cbacab3447b8e124dcb860ebfc7392588dafe0f80af1ecc8d57352228",
+      "bytes": 1274
+    },
+    {
+      "path": "results/raw/authorization/e5/e5_status.json",
+      "sha256": "14d4294b6979ec1f8d725ab69fe6d6ee851c737b1a316ef6993d8d5a28fd0474",
+      "bytes": 1550
+    },
+    {
+      "path": "results/raw/authorization/e5/e5_proof_log.txt",
+      "sha256": "99d8a3de846ba973cb5c8a7f725cf21b0e6ed71d871f62c1ab951caa1d1e7d4a",
+      "bytes": 8695
+    }
+  ],
+  "note": "Selected immutable evidence copied from user-submitted full Kaggle archive. Complete original ZIP must remain available separately."
+}

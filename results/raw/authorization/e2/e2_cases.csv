@@ -1,0 +1,39 @@
+<PARSED TEXT FOR SHEET: 1 / 1 TABS
+TAB NAME: dataA_3_e2_cases.csv>
+index,pair,scenario,expected,outcome,match,reason,backend
+0,AB,consent_operation,REJECTED,REJECTED,True,EV intent operation not authenticated in this session,pqcrypto native ML-KEM-768 + ML-DSA-65
+1,AB,consent_limit,REJECTED,REJECTED,True,EV intent differs from station context,pqcrypto native ML-KEM-768 + ML-DSA-65
+2,AB,consent_expiry,REJECTED,REJECTED,True,EV intent differs from station context,pqcrypto native ML-KEM-768 + ML-DSA-65
+3,AB,token_ac,REJECTED,REJECTED,True,EV transaction intent mismatch,pqcrypto native ML-KEM-768 + ML-DSA-65
+4,AB,token_signature,REJECTED,REJECTED,True,EV token signature invalid,pqcrypto native ML-KEM-768 + ML-DSA-65
+5,AB,token_replay,REJECTED,REJECTED,True,EV token replay,pqcrypto native ML-KEM-768 + ML-DSA-65
+6,AB,invalid_pair,REJECTED,REJECTED,True,not an approved distinct authority pair,pqcrypto native ML-KEM-768 + ML-DSA-65
+7,AB,wrong_resource,REJECTED,REJECTED,True,QSS resource proposal changed,pqcrypto native ML-KEM-768 + ML-DSA-65
+8,AB,expired_token,REJECTED,REJECTED,True,authorization expired at EV,pqcrypto native ML-KEM-768 + ML-DSA-65
+9,AB,tampered_kem,REJECTED,REJECTED,True,KEM public key not authenticated,pqcrypto native ML-KEM-768 + ML-DSA-65
+10,AB,legitimate_charge,ACCEPTED,ACCEPTED,True,,pqcrypto native ML-KEM-768 + ML-DSA-65
+11,AB,legitimate_discharge,ACCEPTED,ACCEPTED,True,,pqcrypto native ML-KEM-768 + ML-DSA-65
+12,AC,consent_operation,REJECTED,REJECTED,True,EV intent operation not authenticated in this session,pqcrypto native ML-KEM-768 + ML-DSA-65
+13,AC,consent_limit,REJECTED,REJECTED,True,EV intent differs from station context,pqcrypto native ML-KEM-768 + ML-DSA-65
+14,AC,consent_expiry,REJECTED,REJECTED,True,EV intent differs from station context,pqcrypto native ML-KEM-768 + ML-DSA-65
+15,AC,token_ac,REJECTED,REJECTED,True,EV transaction intent mismatch,pqcrypto native ML-KEM-768 + ML-DSA-65
+16,AC,token_signature,REJECTED,REJECTED,True,EV token signature invalid,pqcrypto native ML-KEM-768 + ML-DSA-65
+17,AC,token_replay,REJECTED,REJECTED,True,EV token replay,pqcrypto native ML-KEM-768 + ML-DSA-65
+18,AC,invalid_pair,REJECTED,REJECTED,True,not an approved distinct authority pair,pqcrypto native ML-KEM-768 + ML-DSA-65
+19,AC,wrong_resource,REJECTED,REJECTED,True,QSS resource proposal changed,pqcrypto native ML-KEM-768 + ML-DSA-65
+20,AC,expired_token,REJECTED,REJECTED,True,authorization expired at EV,pqcrypto native ML-KEM-768 + ML-DSA-65
+21,AC,tampered_kem,REJECTED,REJECTED,True,KEM public key not authenticated,pqcrypto native ML-KEM-768 + ML-DSA-65
+22,AC,legitimate_charge,ACCEPTED,ACCEPTED,True,,pqcrypto native ML-KEM-768 + ML-DSA-65
+23,AC,legitimate_discharge,ACCEPTED,ACCEPTED,True,,pqcrypto native ML-KEM-768 + ML-DSA-65
+24,BC,consent_operation,REJECTED,REJECTED,True,EV intent operation not authenticated in this session,pqcrypto native ML-KEM-768 + ML-DSA-65
+25,BC,consent_limit,REJECTED,REJECTED,True,EV intent differs from station context,pqcrypto native ML-KEM-768 + ML-DSA-65
+26,BC,consent_expiry,REJECTED,REJECTED,True,EV intent differs from station context,pqcrypto native ML-KEM-768 + ML-DSA-65
+27,BC,token_ac,REJECTED,REJECTED,True,EV transaction intent mismatch,pqcrypto native ML-KEM-768 + ML-DSA-65
+28,BC,token_signature,REJECTED,REJECTED,True,EV token signature invalid,pqcrypto native ML-KEM-768 + ML-DSA-65
+29,BC,token_replay,REJECTED,REJECTED,True,EV token replay,pqcrypto native ML-KEM-768 + ML-DSA-65
+30,BC,invalid_pair,REJECTED,REJECTED,True,not an approved distinct authority pair,pqcrypto native ML-KEM-768 + ML-DSA-65
+31,BC,wrong_resource,REJECTED,REJECTED,True,QSS resource proposal changed,pqcrypto native ML-KEM-768 + ML-DSA-65
+32,BC,expired_token,REJECTED,REJECTED,True,authorization expired at EV,pqcrypto native ML-KEM-768 + ML-DSA-65
+33,BC,tampered_kem,REJECTED,REJECTED,True,KEM public key not authenticated,pqcrypto native ML-KEM-768 + ML-DSA-65
+34,BC,legitimate_charge,ACCEPTED,ACCEPTED,True,,pqcrypto native ML-KEM-768 + ML-DSA-65
+35,BC,legitimate_discharge,ACCEPTED,ACCEPTED,True,,pqcrypto native ML-KEM-768 + ML-DSA-65

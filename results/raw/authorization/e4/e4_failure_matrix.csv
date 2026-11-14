@@ -1,0 +1,14 @@
+<PARSED TEXT FOR SHEET: 1 / 1 TABS
+TAB NAME: dataA_8_e4_failure_matrix.csv>
+index,scenario,outcome,reason,resource_state,backend
+0,C_OFFLINE_AT_START,COMPLETED,,CONSUMED,pqcrypto native ML-KEM-768 + ML-DSA-65
+1,A_OFFLINE_AT_START,SAFE_ABORT,UC-A and UC-B required for online registration,UNUSED,pqcrypto native ML-KEM-768 + ML-DSA-65
+2,B_OFFLINE_AT_START,SAFE_ABORT,UC-A and UC-B required for online registration,UNUSED,pqcrypto native ML-KEM-768 + ML-DSA-65
+3,B_OFFLINE_AFTER_APPROVAL,SAFE_ABORT,selected authority offline before reconstruction,UNUSED,pqcrypto native ML-KEM-768 + ML-DSA-65
+4,B_OFFLINE_AFTER_RECONSTRUCTION,SAFE_ABORT,selected signer offline before token issuance,CONSUMED,pqcrypto native ML-KEM-768 + ML-DSA-65
+5,C_OFFLINE_AFTER_APPROVAL,COMPLETED,,CONSUMED,pqcrypto native ML-KEM-768 + ML-DSA-65
+6,DUPLICATE_RESERVATION,SAFE_ABORT,QSS resource already reserved or consumed,RESERVED,pqcrypto native ML-KEM-768 + ML-DSA-65
+7,CONCURRENT_RESERVATION,ONE_RESERVATION,accepted=1,RESERVED,pqcrypto native ML-KEM-768 + ML-DSA-65
+8,CONCURRENT_START,ONE_EXECUTION,"REJECTED,EXECUTED",CONSUMED,pqcrypto native ML-KEM-768 + ML-DSA-65
+9,EXPIRED_BEFORE_EXECUTION,SAFE_ABORT,validity expired before execution,CONSUMED,pqcrypto native ML-KEM-768 + ML-DSA-65
+10,REPEATED_EXECUTION,SAFE_ABORT,EV did not accept token,CONSUMED,pqcrypto native ML-KEM-768 + ML-DSA-65

@@ -1,0 +1,12 @@
+<PARSED TEXT FOR SHEET: 1 / 1 TABS
+TAB NAME: dataB_4_p1_exact_distributions.csv>
+index,secret,pair,computational_basis_total_variation,qss_single_share_distance_to_uniform,exact_classical_secrecy,tested_interface,no_quantum_advantage_established
+0,0,AB,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
+1,0,AC,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
+2,0,BC,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
+3,1,AB,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
+4,1,AC,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
+5,1,BC,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
+6,2,AB,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
+7,2,AC,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
+8,2,BC,1.6653345369377348e-16,1.9229626863835638e-16,True,classical computational-basis measurement,True
