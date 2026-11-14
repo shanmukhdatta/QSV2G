@@ -1,7 +1,7 @@
 # Reproducible research evidence
 
 - `raw/`: preserved original CSV/JSON observations, indexed by scientific task.
-- `summaries/`: condensed statistics and interpretation, not substitutes for raw data.
+- `archives/`: original experiment ZIPs, with SHA-256 verification manifests.
 - `figures/`: previously reported figures and selected derived plots.
 - `logs/`: recorded terminal and Tamarin proof outputs.
 - `manifests/`: source SHA-256, environment and artifact-provenance evidence.

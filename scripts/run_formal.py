@@ -15,5 +15,9 @@ def main():
   from qsv2g.evaluation.compromise_formal import run
   result=run(a.out/a.model,timeout=a.timeout)
  print(json.dumps(result,indent=2))
- if result.get('proof_status') not in ('PROVED_ABSTRACT_MODEL','VERIFIED'):raise SystemExit(2)
+ if a.model=='consent':
+  verified=result.get('proof_status')=='ALL_LISTED_LEMMAS_VERIFIED_IN_ABSTRACT_MODEL'
+ else:
+  verified=(result.get('status')=='PROVED_ABSTRACT_MODEL' and result.get('proof_status')=='REPORTED_VERIFIED_BY_TAMARIN')
+ if not verified:raise SystemExit(2)
 if __name__=='__main__':main()

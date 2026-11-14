@@ -8,3 +8,13 @@ dist/
 .venv/
 .ipynb_checkpoints/
 results/generated/
+
+# Keep unpublished manuscript source out of the public research tree.
+*.tex
+*.bib
+*.aux
+*.bbl
+*.blg
+*.synctex.gz
+/manuscript/
+/paper/

@@ -95,7 +95,7 @@ def test_p3_wrapper_does_not_invent_proofs_when_missing(tmp_path):
 
 
 def test_p3_candidate_explicitly_models_compromise_not_quantum_security():
-    theory=(ROOT/'docs/formal/compromise_analysis.spthy').read_text()
+    theory=(ROOT/'formal/compromise_analysis.spthy').read_text()
     assert all(name in theory for name in ('Reveal_UC_A','Reveal_UC_B','Reveal_CS',
                  'Assumed_Honest_QSS_Reconstruction','bypass_possible_with_full_compromise'))
     assert 'NOT YET EXECUTED' in theory

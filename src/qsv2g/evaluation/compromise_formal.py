@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[3]
-THEORY=ROOT/'docs/formal/compromise_analysis.spthy'
+THEORY=ROOT/'formal/compromise_analysis.spthy'
 LEMMAS=('honest_accept_reachable','single_use_per_session','bypass_possible_with_full_compromise')
 
 

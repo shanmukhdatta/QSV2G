@@ -1,6 +1,6 @@
 # Reproduce the simulation
 
-Install from the repository root: `python -m pip install -e ".[dev]"`.
+Install from the repository root: `python -m pip install -e ".[dev,pqc]"`.
 The post-quantum crypto backend requires compatible `pqcrypto` or OpenSSL >=3.5.
 
 Examples:

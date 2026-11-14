@@ -11,7 +11,7 @@ These ZIPs are research evidence, not generated on the fly from the modular pack
 | Matched software evaluation, attacks, vector noise and symbolic consent | [`qsv2g_stage05_final_20261113T092554Z.zip`](qsv2g_stage05_final_20261113T092554Z.zip) | `87418c800c96537b143b7df594eaa79ee4015a05c867303f6239b40097316ee6` | `b463fc758fa28f1853fe06c4130ee2f25173ac0c`; full E1–E5 original Kaggle output, 32 members, 31 manifested |
 | Authority-compromise boundary, classical parity, modeled retries and extended symbolic model | [`qsv2g_stage06_full_20261113T111031Z_results.zip`](qsv2g_stage06_full_20261113T111031Z_results.zip) | `5272eee4505b6c7b3be5fe50cca651c8ff4b8a42b36d38685be1983c335b9708` | `2860ab3b0137c68e58fe1195a4c71a82a60ce183`; full P0–P3 original Kaggle output, 17 members, 16 manifested |
 
-Additional pre-existing historical ZIPs (full-protocol backend variants, independent quantum-validation variants and final validation) are retained untouched in this folder. The original notebook sources and independent per-experiment audits remain available through the [historical Git branch](../../tree/archive/pre-modularization-2026-11-14) or [GitHub archive branch](https://github.com/shanmukhdatta/QSV2G/tree/archive/pre-modularization-2026-11-14).
+Additional pre-existing historical ZIPs (full-protocol backend variants, independent quantum-validation variants and final validation) are retained untouched in this folder. The original notebook sources and independent per-experiment audits remain available through the [GitHub archive branch](https://github.com/shanmukhdatta/QSV2G/tree/archive/pre-modularization-2026-11-14).
 
 ## Validate the archive bytes
 
@@ -23,4 +23,4 @@ This script checks exact SHA-256 hashes, ZIP CRCs, and the internal file-level S
 
 ## What to cite
 
-See [`docs/PAPER_EVIDENCE_MAP.md`](../../docs/PAPER_EVIDENCE_MAP.md) for scope-specific descriptions of evidence suitable for the methods, experimental evaluation and security analysis. Do not report historical timing values as measurements of the newer modular software version. For Stage 06, the Tamarin lemma `bypass_possible_with_full_compromise` establishes the **existence of an accepted trace under the modeled compromise**, not a protective security theorem.
+See the [repository README](../../README.md) for scope-specific interpretation and the [formal model guide](../../formal/README.md) for proof assumptions. Do not report historical timing values as measurements of the newer modular software version. For Stage 06, the Tamarin lemma `bypass_possible_with_full_compromise` establishes the **existence of an accepted trace under the modeled compromise**, not a protective security theorem.

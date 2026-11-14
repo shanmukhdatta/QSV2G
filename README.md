@@ -74,7 +74,7 @@ The prototype is written in **Python**. Instead of networking physical EVs, char
 | Classical cryptography | Python `hashlib`, `hmac` and `secrets` support hashes, HMAC authentication, HKDF-SHA256 derivation, nonces and random secrets; `cryptography` provides AES-GCM authenticated encryption. | [`src/qsv2g/crypto.py`](src/qsv2g/crypto.py) |
 | Quantum mathematical simulation | `numpy` complex-valued vectors/matrices model Bell-state operations, three-qutrit QSS, pair measurements and modular secret recovery. `QSSResource` checks commitments and consumes simulated shares. **No Qiskit backend or quantum device is used.** | [`src/qsv2g/quantum.py`](src/qsv2g/quantum.py), [`src/qsv2g/resources.py`](src/qsv2g/resources.py) |
 | Experiments and comparisons | Python runners create controlled security-fault scenarios, five modeled noise-channel conditions, QSS/classical-sharing/quorum software baselines, authority-availability probes and analytical/Monte Carlo retry outcomes; `numpy`, `csv`, `json`, `pandas` and `matplotlib` support data generation, storage and analysis/plots. | [`src/qsv2g/evaluation/`](src/qsv2g/evaluation/), [`scripts/run_experiment.py`](scripts/run_experiment.py) |
-| Testing and formal models | `pytest` runs regression tests; `hypothesis` explores generated state transitions (**with an explicitly test-only cryptographic stub** in that campaign). Separately installed **Tamarin/Maude** execute limited symbolic models, not the complete Python or quantum implementation. GitHub Actions runs CI checks. | [`tests/`](tests/), [`src/qsv2g/evaluation/stateful.py`](src/qsv2g/evaluation/stateful.py), [`docs/formal/`](docs/formal/), [CI workflow](.github/workflows/refactor-ci.yml) |
+| Testing and formal models | `pytest` runs regression tests; `hypothesis` explores generated state transitions (**with an explicitly test-only cryptographic stub** in that campaign). Separately installed **Tamarin/Maude** execute limited symbolic models, not the complete Python or quantum implementation. GitHub Actions runs CI checks. | [`tests/`](tests/), [`src/qsv2g/evaluation/stateful.py`](src/qsv2g/evaluation/stateful.py), [`formal/`](formal/), [CI workflow](.github/workflows/refactor-ci.yml) |
 
 **Execution environment:** The project declares Python **>=3.10** in `pyproject.toml`, recommends **3.11+** in the setup instructions and runs GitHub CI on **3.13**. Dependency declarations use lower bounds rather than a full frozen lockfile; individual archived experiments may use different environments and source revisions. The code can run locally or in a Kaggle notebook; Kaggle is an execution environment, **not** a protocol dependency or a physical testbed.
 
@@ -92,7 +92,7 @@ The **five main research directories** are organized by scientific purpose rathe
 | [`scripts/`](scripts/) | One-session runner, configurable experiments, source-parity checks, archive-integrity verifier, Kaggle notebook and formal model wrappers |
 | [`tests/`](tests/) | Unit, regression, genuine-PQC, model-property and experiment checks |
 | [`results/`](results/) | Original submitted ZIP archives, preserved raw results, plots, prover logs and verification manifests |
-| [`docs/`](docs/) | Methodology, trust/threat assumptions, limitations, reproducibility and manuscript-evidence mapping |
+| [`formal/`](formal/) | Limited Tamarin symbolic theories for consent and authority-compromise boundaries; not a proof of the full protocol |
 
 `pyproject.toml`, `CITATION.cff` and `.github/workflows/` provide package/repository metadata and continuous verification.
 
@@ -124,7 +124,7 @@ python scripts/run_experiment.py --study reliability
 python scripts/reproduce_all.py
 ```
 
-Default experimental runs are **bounded smoke tests**. Add `--full` to `scripts/run_experiment.py` for much larger workloads. New outputs are written under the ignored `results/generated/` directory, **separate from** the preserved original Kaggle outputs. Run the same modular package on Kaggle using [`scripts/kaggle_runner.ipynb`](scripts/kaggle_runner.ipynb). Formal models additionally require separately installed Tamarin and Maude executables. Successful Python tests do not replace a formal security proof.
+Default experimental runs are **bounded smoke tests**. Add `--full` to `scripts/run_experiment.py` for much larger workloads. New outputs are written under the ignored `results/generated/` directory, **separate from** the preserved original Kaggle outputs. Run the same modular package on Kaggle using [`scripts/kaggle_runner.ipynb`](scripts/kaggle_runner.ipynb). Formal models additionally require separately installed Tamarin and Maude executables; see [`formal/README.md`](formal/README.md). Their runners report only results of limited symbolic abstractions. Successful Python tests do not replace a formal security proof.
 
 ## Original experimental evidence
 
@@ -141,7 +141,7 @@ Default experimental runs are **bounded smoke tests**. Add `--full` to `scripts/
 
 ### Which results should a new reader open first?
 
-Begin with the [claim-to-evidence map](docs/PAPER_EVIDENCE_MAP.md), then consult the [archive guide](results/archives/README.md). You do **not** need to unpack every ZIP to understand the main findings.
+Begin with the [archive guide](results/archives/README.md), the [validation results](results/raw/validation/README.md), and the [security report](results/raw/security_earlier/security_report.md). You do **not** need to unpack every ZIP to understand the main findings.
 
 | Question | Evidence to inspect | Interpretation |
 |---|---|---|
@@ -159,18 +159,22 @@ Begin with the [claim-to-evidence map](docs/PAPER_EVIDENCE_MAP.md), then consult
 **Critical interpretation:** A test matching an *expected* outcome may deliberately demonstrate a security limitation; it is not automatically a successful defense. The signature/charging-station compromise case in the final archive requires both selected authority signing keys **and privileged station-state control**; it is not evidence of a remote-only attack. The full-vector noise and retry outcomes are *models*, not deployed network availability. The formal verification establishes only the stated properties of limited symbolic abstractions. No experimentally established QSS security advantage over matched classical two-of-three sharing is claimed.
 
 - **Archive directory:** [`results/archives/`](results/archives/) — original ZIPs, provenance, file hashes and instructions.
-- **Paper claim-to-evidence map:** [`docs/PAPER_EVIDENCE_MAP.md`](docs/PAPER_EVIDENCE_MAP.md) — which CSV or prover log supports each reported result and its caveats.
+- **Validation records:** [`results/raw/validation/`](results/raw/validation/) — the protocol trace, control cases and ideal QSS results.
 - **Machine-readable checksums:** [`results/manifests/kaggle_archive_sha256.json`](results/manifests/kaggle_archive_sha256.json) — complete SHA-256 hashes for the six principal experimental ZIPs.
-- **Methodology:** [`docs/methodology.md`](docs/methodology.md); **threat model:** [`docs/threat_model.md`](docs/threat_model.md); **limitations:** [`docs/limitations.md`](docs/limitations.md).
+- **Formal model assumptions:** [`formal/README.md`](formal/README.md); **security limitations:** [`results/raw/security_earlier/security_report.md`](results/raw/security_earlier/security_report.md); **source/run provenance:** [`results/archives/README.md`](results/archives/README.md).
 
 ## Source versions and reproducibility boundaries
 
 Historical results were collected with *different protocol revisions*. The older validation/noise/performance notebooks used an earlier source snapshot; the full software evaluation records Git revision `b463fc758fa28f1853fe06c4130ee2f25173ac0c`; the later adversarial study records `2860ab3b0137c68e58fe1195a4c71a82a60ce183`. **Do not assign measurements from these ZIPs to the present modular code without a matched rerun.** The present core refactor preserves the original functions/classes structurally and is exercised by GitHub CI, but full historical numerical reruns are not asserted.
 
-All original notebooks, audit notes and development history are recoverable from the [`archive/pre-modularization-2026-11-14`](https://github.com/shanmukhdatta/QSV2G/tree/archive/pre-modularization-2026-11-14) branch. Environment fields within submitted ZIPs indicate reported Kaggle execution, but original immutable Kaggle run URLs/version IDs are not all independently available. Consult [`docs/reproducibility.md`](docs/reproducibility.md) for details.
+All original notebooks, audit notes and development history are recoverable from the [`archive/pre-modularization-2026-11-14`](https://github.com/shanmukhdatta/QSV2G/tree/archive/pre-modularization-2026-11-14) branch. Environment fields within submitted ZIPs indicate reported Kaggle execution, but original immutable Kaggle run URLs/version IDs are not all independently available. Refer to [archive provenance and checksums](results/archives/README.md) for the documented environment and source-snapshot limitations.
+
+## Manuscript handling and submission
+
+The manuscript LaTeX source is maintained separately from the current `main` tree. **This public Git repository is not a confidential location:** historical branches and Git commits can retain earlier manuscript drafts even after those paths are removed from `main`. The preserved experimental ZIP archives have not been modified or repacked; review their contents before sharing them where unpublished manuscript material is prohibited. If the manuscript must remain confidential, make the repository private and assess the existing public history rather than relying on file deletion.
 
 ## Paper submission and citation
 
-This repository is prepared as a **supporting reproducibility artifact** for a planned submission to PPT-PQC 2027. It is **not** itself the workshop manuscript or an upload to the paper submission system. The workshop's current instructions (page limit, reviewing/anonymity, paper-format requirements and official submission link) must be followed separately. **Before putting this author-identifying public repository URL in a submitted PDF, verify the workshop's own anonymity and conflict-of-interest policies.** The main PerCom call describes double-blind review, while the workshop page should be treated as the authority on workshop-specific rules. Do not assume the policies are interchangeable. See [`docs/SUBMISSION_READINESS.md`](docs/SUBMISSION_READINESS.md).
+This repository is prepared as a **supporting reproducibility artifact** for a planned submission to PPT-PQC 2027. It is **not** itself the workshop manuscript or an upload to the paper submission system. The workshop's current instructions (page limit, reviewing/anonymity, paper-format requirements and official submission link) must be followed separately. **Before putting this author-identifying public repository URL in a submitted PDF, verify the workshop's own anonymity and conflict-of-interest policies.** The main PerCom call describes double-blind review, while the workshop page should be treated as the authority on workshop-specific rules. Do not assume the policies are interchangeable. Refer directly to the [official workshop call for papers](https://sites.google.com/nitj.ac.in/ppt-pqc2027/call-for-papers) before submission.
 
 For attribution, see [`CITATION.cff`](CITATION.cff). There is no claimed DOI or acceptance notice. Copyright/license permissions must be agreed by the authors before a public reuse license is added.

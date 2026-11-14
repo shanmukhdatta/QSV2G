@@ -79,7 +79,7 @@ def test_real_crypto_comparators_complete(variant):
 
 
 def test_formal_model_has_explicit_assumption():
-    model=(ROOT/'docs/formal/classical_consent.spthy').read_text()
+    model=(ROOT/'formal/classical_consent.spthy').read_text()
     assert 'Assumed_Ideal_QSS_Gate' in model
     assert 'honest_execution_reachable' in model
     assert 'executed_once_per_session' in model

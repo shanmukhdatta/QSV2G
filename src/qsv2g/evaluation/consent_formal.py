@@ -14,7 +14,7 @@ from datetime import datetime,timezone
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[3]
-MODEL=ROOT/'docs/formal/classical_consent.spthy'
+MODEL=ROOT/'formal/classical_consent.spthy'
 LEMMAS=('honest_execution_reachable','execution_requires_same_EV_consent',
         'execution_requires_both_approval_actions','executed_once_per_session')
 
