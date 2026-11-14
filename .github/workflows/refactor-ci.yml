@@ -1,7 +1,9 @@
-name: Temporary refactor verification
+name: QSV2G modular research CI
 on:
   push:
-    branches: ["refactor/modular-research-package"]
+    branches: ["main", "refactor/modular-research-package"]
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 permissions:
   contents: read

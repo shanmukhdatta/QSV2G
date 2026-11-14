@@ -28,7 +28,7 @@ def main():
   dest=a.out/task;dest.mkdir(parents=True,exist_ok=True)
   cmd=[sys.executable,'-m',*COMMANDS[task]]
   if task=='noise-vector':
-   cmd+=['--lengths','9','27' if a.full else '9','--p','0','0.01','--trials',str(1000 if a.full else 10),'--seed',str(a.seed),'--output',str(dest/'trials.csv')]
+   cmd+=['--lengths']+(['9','27'] if a.full else ['9'])+['--p','0','0.01','--trials',str(1000 if a.full else 10),'--seed',str(a.seed),'--output',str(dest/'trials.csv')]
   elif task=='security-stateful':
    cmd+=['--examples',str(1000 if a.full else 20),'--steps',str(50 if a.full else 15),'--output',str(dest/'hypothesis.json')]
   elif task=='validation':
