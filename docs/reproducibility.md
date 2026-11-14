@@ -33,11 +33,14 @@ quantum information, or full implementation security.
 - `results/logs/formal/` — parser/prover logs.
 - `results/manifests/` — source and environment version mapping.
 
-Original Stage 01–04 ZIP evidence is preserved in the archive branch; Stages
-05/06 full Kaggle ZIPs were independently audited as user-uploaded archives.
-The notebooks and their version pinning remain in historical Git. The result
-ZIPs do not independently authenticate a Kaggle account job URL or immutable
-cloud execution revision. Do not invent those identifiers.
+All six principal original experimental ZIPs are now preserved under
+`results/archives/`, including the **complete original uploaded** full software
+and adversarial/reliability ZIPs. Their unmodified SHA-256 hashes are registered
+in `results/manifests/kaggle_archive_sha256.json` and checked by
+`python scripts/verify_archived_evidence.py`. Older source notebooks and development
+history remain on the protected archival branch. The ZIP-internal environment
+fields and manifests do **not** independently authenticate a Kaggle account job URL
+or immutable cloud execution revision; such identifiers must never be invented.
 
 ## Migration boundary
 

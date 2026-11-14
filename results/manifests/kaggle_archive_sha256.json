@@ -1,0 +1,55 @@
+{
+  "schema": "qsv2g.original-kaggle-evidence.v1",
+  "manifest_created_utc_date": "2026-11-14",
+  "meaning": "Original user-uploaded results ZIP SHA-256 identity; source runtime metadata is not independently authenticated Kaggle job evidence",
+  "archives": [
+    {
+      "study": "baseline_validation",
+      "path": "results/archives/ideal_validation_historical.zip",
+      "sha256": "1f6ae90f215ae5f74518d4b007a6cca469e8dbdde0ea1ac8d82956d2aaddf202",
+      "reported_implementation": "historical_reference",
+      "internal_manifest": "artifact_manifest.csv"
+    },
+    {
+      "study": "security_scenarios",
+      "path": "results/archives/security_scenarios_historical.zip",
+      "sha256": "be4f42ff39a999e246a54e7e68c75ec16992a1d83dcdcc690e03ac195c2fd7af",
+      "reported_implementation": "historical_reference",
+      "internal_manifest": "artifact_manifest.json"
+    },
+    {
+      "study": "single_trit_noise",
+      "path": "results/archives/quantum_noise_historical.zip",
+      "sha256": "b76f05afca3d872ce3bc7b4ea043ec7e10ef3d555e042cdadc0eda8e5f0b0d95",
+      "reported_implementation": "historical_reference",
+      "internal_manifest": "stage03_artifact_manifest.json"
+    },
+    {
+      "study": "performance",
+      "path": "results/archives/performance_historical.zip",
+      "sha256": "9a60827099be191398931b8ddf036c5664b4f19410c0761de54031ad869f11e0",
+      "reported_implementation": "historical_reference",
+      "internal_manifest": "manifest.json"
+    },
+    {
+      "study": "full_software_and_formal",
+      "path": "results/archives/qsv2g_stage05_final_20261113T092554Z.zip",
+      "sha256": "87418c800c96537b143b7df594eaa79ee4015a05c867303f6239b40097316ee6",
+      "git_blob_sha": "a1920e523e93544d228459f51f6d015c04b78775",
+      "source_revision": "b463fc758fa28f1853fe06c4130ee2f25173ac0c",
+      "members": 32,
+      "internal_manifest": "20261113T092554Z/artifact_manifest.json",
+      "manifest_entries": 31
+    },
+    {
+      "study": "adversarial_reliability_formal",
+      "path": "results/archives/qsv2g_stage06_full_20261113T111031Z_results.zip",
+      "sha256": "5272eee4505b6c7b3be5fe50cca651c8ff4b8a42b36d38685be1983c335b9708",
+      "git_blob_sha": "e0b753795c6a9e2477cb5499611db824303d2aba",
+      "source_revision": "2860ab3b0137c68e58fe1195a4c71a82a60ce183",
+      "members": 17,
+      "internal_manifest": "file_hashes.json",
+      "manifest_entries": 16
+    }
+  ]
+}

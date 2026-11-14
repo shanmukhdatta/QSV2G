@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this QSV2G software or its experimental evidence, cite this repository and the corresponding manuscript when available."
+title: "QSV2G: Pseudonymous Cross-Domain Authentication and Quantum Secret Sharing-Based Authorization for Vehicle-to-Grid Networks"
+type: software
+authors:
+  - family-names: Prateek
+    given-names: Kumar
+  - family-names: Datta
+    given-names: Shanmukh
+repository-code: "https://github.com/shanmukhdatta/QSV2G"
+version: 0.1.0
+abstract: "Research prototype and original experimental evidence for quantum-assisted, transaction-bound authorization in vehicle-to-grid networks, using standardized post-quantum cryptography and modeled quantum secret sharing."
