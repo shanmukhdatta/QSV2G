@@ -33,7 +33,7 @@ This verifies pinned archive SHA-256 values, reads the archived CSVs directly an
 - 300,000 vector outcomes: 191,736 eligible, 81,400 commitment rejection, 26,864 erasure abort.
 - 6,000 genuine-PQC endpoint outcomes: 3,854 accepted, 1,606 commitment rejection, 540 erasure abort.
 
-These are **reaggregations of preserved observations**, not newly executed trials. Historical timings must not be assigned to current code. The timing archive records its own code revision/environment; the emitted report retains them. The plotted signature quorum omits reconstruction. No synthetic uncertainty bands are added.
+The evidence command performs **reaggregation of preserved observations**, not newly executed trials. Separately, this review replayed all ten original Stage03 notebook code cells and reproduced the 315,000 decompressed event rows byte-for-byte; its source identity, replay script and logs are in the review results bundle. Historical timings must not be assigned to current code. The timing archive records its own code revision/environment; the emitted report retains them. The plotted signature quorum omits reconstruction. No synthetic uncertainty bands are added.
 
 Unlike the earlier manuscript-only audit, repository inspection has recovered raw noise events, timing trials and formal models/logs. Statements in that earlier audit that these files were unavailable describe its supplied-file scope; they no longer describe this repository. Before submission, update any manuscript caption or sentence saying raw records/models are unavailable. Keep the approved paper structure, and distinguish recovered historical evidence from new reruns.
 
@@ -49,7 +49,7 @@ Choose a new output directory for each run. The runner claims each study directo
 | `--study` | Smoke workload | `--full` workload / interpretation |
 |---|---|---|
 | validation | 90 ideal pair trials + 6 workflows | 720 ideal pair trials + 6 workflows; does not replace historical 38-case validation |
-| performance | 18 transactions, L=9, one process block | 18,000 transactions, four lengths, five process blocks; timings depend on machine/backend |
+| performance | 18 transactions, L=9, one process block | 18,000 CHARGE transactions, four lengths, five process blocks; DISCHARGE is checked separately in validation; timings depend on machine/backend |
 | security | 36 genuine-PQC expected controls | 36 controls; same fixed suite, not historical 80-case suite |
 | noise | 120 vector trials + 30 endpoint trials | 300,000 vector + 6,000 endpoint trials; five channels/four lengths; distinct from 315k single-trit study |
 | availability | 11 state/availability controls | Same 11 controls |

@@ -1,0 +1,212 @@
+[
+  {
+    "path": "notebooks/QSV2G_Final_Protocol_Validation_Kaggle.ipynb",
+    "code_cells": 8,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Final Protocol Validation for Faculty Review",
+      "## 0 \u00b7 Dependencies and environment",
+      "## 1 \u00b7 Unmodified QSV2G reference implementation",
+      "## 2 \u00b7 Test harness and real post-quantum backend"
+    ]
+  },
+  {
+    "path": "notebooks/QSV2G_Kaggle_Full_Protocol_Implementation.ipynb",
+    "code_cells": 11,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Complete Reference Prototype & Experiments",
+      "## 0. Environment and standardized crypto backend",
+      "## 1. Complete protocol implementation",
+      "## 2. Cryptographic and quantum primitive self-tests"
+    ]
+  },
+  {
+    "path": "notebooks/QSV2G_Kaggle_Quantum_Qiskit_PennyLane_Validation.ipynb",
+    "code_cells": 7,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Independent Quantum QSS Validation (Kaggle)",
+      "## Dependencies",
+      "## Exact Bell and qutrit mathematical functions",
+      "## Density-matrix and stabilizer correctness"
+    ]
+  },
+  {
+    "path": "notebooks/QSV2G_Stage05_Experimental_Evaluation.ipynb",
+    "code_cells": 11,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G Stage 05 \u2014 FULL Kaggle evaluation (E1\u2013E5)",
+      "## 00. Settings and pinned Git revision",
+      "## 01. Clone the approved source commit and record environment",
+      "## 02. Dependencies and real-cryptography preflight"
+    ]
+  },
+  {
+    "path": "notebooks/QSV2G_Stage06_Experimental_Evaluation.ipynb",
+    "code_cells": 8,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G Stage 06 \u2014 Malicious-authority security, QSS/classical comparison, retry model, and formal-candidate check",
+      "## 0. Experiment configuration",
+      "## 1. Check out exact source and dependencies",
+      "## 2. Run dedicated Stage 06 regression tests"
+    ]
+  },
+  {
+    "path": "notebooks/local_executed/QSV2G_Final_Protocol_Validation_Local_Executed.ipynb",
+    "code_cells": 8,
+    "executed_cells": 8,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Final Protocol Validation for Faculty Review",
+      "## 0 \u00b7 Dependencies and environment",
+      "## 1 \u00b7 Unmodified QSV2G reference implementation",
+      "## 2 \u00b7 Test harness and real post-quantum backend"
+    ]
+  },
+  {
+    "path": "notebooks/local_executed/QSV2G_Kaggle_Local_Executed.ipynb",
+    "code_cells": 11,
+    "executed_cells": 11,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Complete Reference Prototype & Experiments",
+      "## 0. Environment and standardized crypto backend",
+      "## 1. Complete protocol implementation",
+      "## 2. Cryptographic and quantum primitive self-tests"
+    ]
+  },
+  {
+    "path": "notebooks/local_executed/QSV2G_Quantum_Local_Executed.ipynb",
+    "code_cells": 7,
+    "executed_cells": 7,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Independent Quantum QSS Validation (Kaggle)",
+      "## Dependencies",
+      "## Exact Bell and qutrit mathematical functions",
+      "## Density-matrix and stabilizer correctness"
+    ]
+  },
+  {
+    "path": "notebooks/stage01/QSV2G_Stage01_Baseline_Reproducibility_Kaggle.ipynb",
+    "code_cells": 10,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Stage 01: Reproducibility Baseline",
+      "## 0 \u2014 Environment setup and reproducibility configuration",
+      "## 1 \u2014 Reference materials and SHA-256 checks",
+      "## 2 \u2014 Unmodified reference implementation, cryptographically pinned"
+    ]
+  },
+  {
+    "path": "notebooks/stage01/local_preflight/QSV2G_Stage01_Baseline_Local_Executed.ipynb",
+    "code_cells": 10,
+    "executed_cells": 10,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Stage 01: Reproducibility Baseline",
+      "## 0 \u2014 Environment setup and reproducibility configuration",
+      "## 1 \u2014 Reference materials and SHA-256 checks",
+      "## 2 \u2014 Unmodified reference implementation, cryptographically pinned"
+    ]
+  },
+  {
+    "path": "notebooks/stage02/QSV2G_Stage02_Security_Analysis_Kaggle_Fixed.ipynb",
+    "code_cells": 9,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Stage 02: Security Analysis and Attack Evaluation",
+      "## 0. Kaggle dependencies, environment, and real PQC provider",
+      "## 1. Exact unmodified QSV2G reference implementation",
+      "## 2. Evidence harness"
+    ]
+  },
+  {
+    "path": "notebooks/stage02/local_preflight/QSV2G_Stage02_Fixed_Local_Executed.ipynb",
+    "code_cells": 9,
+    "executed_cells": 9,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Stage 02: Security Analysis and Attack Evaluation",
+      "## 0. Kaggle dependencies, environment, and real PQC provider",
+      "## 1. Exact unmodified QSV2G reference implementation",
+      "## 2. Evidence harness"
+    ]
+  },
+  {
+    "path": "notebooks/stage03/QSV2G_Stage03_Quantum_Noise_and_Reliability_Kaggle.ipynb",
+    "code_cells": 10,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Stage 03: Quantum Noise and QSS Reliability",
+      "## 1. Model and limitations",
+      "## 2. Verify embedded original source and baseline files (offline-capable)",
+      "## 3. Extract QSS encoding/decoder from the exact reference implementation"
+    ]
+  },
+  {
+    "path": "notebooks/stage03/local_preflight/QSV2G_Stage03_Quantum_Noise_and_Reliability_Local_Executed.ipynb",
+    "code_cells": 10,
+    "executed_cells": 10,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Stage 03: Quantum Noise and QSS Reliability",
+      "## 1. Model and limitations",
+      "## 2. Verify embedded original source and baseline files (offline-capable)",
+      "## 3. Extract QSS encoding/decoder from the exact reference implementation"
+    ]
+  },
+  {
+    "path": "notebooks/stage04/QSV2G_Stage04_Performance_and_Baselines_Kaggle.ipynb",
+    "code_cells": 12,
+    "executed_cells": 0,
+    "stored_errors": [],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Stage 04: Performance, Scaling & Classical Authorization Baselines",
+      "## 1. Benchmark design",
+      "## 2. Cryptographic-backend preflight (never substitute fake PQC)",
+      "## 3. Verify and extract immutable QSV2G reference sources"
+    ]
+  },
+  {
+    "path": "notebooks/stage04/local_preflight/UNFINISHED_QSV2G_Stage04_Local_Attempt.ipynb",
+    "code_cells": 12,
+    "executed_cells": 7,
+    "stored_errors": [
+      "KeyboardInterrupt"
+    ],
+    "static_syntax_errors": [],
+    "headings": [
+      "# QSV2G \u2014 Stage 04: Performance, Scaling & Classical Authorization Baselines",
+      "## 1. Benchmark design",
+      "## 2. Cryptographic-backend preflight (never substitute fake PQC)",
+      "## 3. Verify and extract immutable QSV2G reference sources"
+    ]
+  }
+]

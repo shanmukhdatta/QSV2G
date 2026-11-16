@@ -1,0 +1,2 @@
+Legacy classes/functions: 28 migrated: 28 missing: [] changed: []
+PASS: all source functions/classes preserve exact AST bodies

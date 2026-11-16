@@ -1,0 +1,1 @@
+Figures are regenerated from verified historical raw records. Noise is single-trit recovery with erasures counted as failures; no interval is inferred. Latency includes preparation. *Signature quorum omits reconstruction and is weaker-function. These are reaggregations, not new experiment measurements. See claim_verification.json for archive hashes and historical revision.

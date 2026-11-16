@@ -1,0 +1,7 @@
+{
+  "examples_requested": 1000,
+  "steps_requested": 50,
+  "status": "PASS",
+  "backend": "TEST_ONLY_HMAC_STUB_NOT_PQC",
+  "caveat": "Hypothesis generated state sequences do not prove unbounded security"
+}

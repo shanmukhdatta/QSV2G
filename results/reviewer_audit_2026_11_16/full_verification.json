@@ -1,0 +1,167 @@
+{
+  "all_nine_smoke_and_full_passed": true,
+  "records": [
+    {
+      "group": "reviewer-smoke",
+      "study": "availability",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:26.959851+00:00",
+      "finished": "2026-11-16T02:52:27.691751+00:00",
+      "checked_output_hashes": 3
+    },
+    {
+      "group": "reviewer-smoke",
+      "study": "noise",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:25.230831+00:00",
+      "finished": "2026-11-16T02:52:26.937411+00:00",
+      "checked_output_hashes": 5
+    },
+    {
+      "group": "reviewer-smoke",
+      "study": "noise-vector",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:27.715767+00:00",
+      "finished": "2026-11-16T02:52:27.923176+00:00",
+      "checked_output_hashes": 2
+    },
+    {
+      "group": "reviewer-smoke",
+      "study": "performance",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:21.550911+00:00",
+      "finished": "2026-11-16T02:52:23.333279+00:00",
+      "checked_output_hashes": 4
+    },
+    {
+      "group": "reviewer-smoke",
+      "study": "reliability",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:30.471895+00:00",
+      "finished": "2026-11-16T02:52:30.661882+00:00",
+      "checked_output_hashes": 3
+    },
+    {
+      "group": "reviewer-smoke",
+      "study": "security",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:23.364199+00:00",
+      "finished": "2026-11-16T02:52:25.206801+00:00",
+      "checked_output_hashes": 3
+    },
+    {
+      "group": "reviewer-smoke",
+      "study": "security-adversarial",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:29.084151+00:00",
+      "finished": "2026-11-16T02:52:30.443458+00:00",
+      "checked_output_hashes": 5
+    },
+    {
+      "group": "reviewer-smoke",
+      "study": "security-stateful",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:27.945574+00:00",
+      "finished": "2026-11-16T02:52:29.053248+00:00",
+      "checked_output_hashes": 2
+    },
+    {
+      "group": "reviewer-smoke",
+      "study": "validation",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:20.802959+00:00",
+      "finished": "2026-11-16T02:52:21.529347+00:00",
+      "checked_output_hashes": 4
+    },
+    {
+      "group": "reviewer-full",
+      "study": "availability",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T03:19:42.501321+00:00",
+      "finished": "2026-11-16T03:19:43.404101+00:00",
+      "checked_output_hashes": 3
+    },
+    {
+      "group": "reviewer-full",
+      "study": "noise",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T03:18:51.434280+00:00",
+      "finished": "2026-11-16T03:29:18.983020+00:00",
+      "checked_output_hashes": 5
+    },
+    {
+      "group": "reviewer-full",
+      "study": "noise-vector",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T03:30:01.007791+00:00",
+      "finished": "2026-11-16T03:30:17.035392+00:00",
+      "checked_output_hashes": 2
+    },
+    {
+      "group": "reviewer-full",
+      "study": "performance",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:59:58.078182+00:00",
+      "finished": "2026-11-16T03:18:51.300951+00:00",
+      "checked_output_hashes": 8
+    },
+    {
+      "group": "reviewer-full",
+      "study": "reliability",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:53:01.030811+00:00",
+      "finished": "2026-11-16T02:53:01.273989+00:00",
+      "checked_output_hashes": 3
+    },
+    {
+      "group": "reviewer-full",
+      "study": "security",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T03:19:40.089851+00:00",
+      "finished": "2026-11-16T03:19:42.359947+00:00",
+      "checked_output_hashes": 3
+    },
+    {
+      "group": "reviewer-full",
+      "study": "security-adversarial",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T02:52:53.683628+00:00",
+      "finished": "2026-11-16T02:53:00.876128+00:00",
+      "checked_output_hashes": 5
+    },
+    {
+      "group": "reviewer-full",
+      "study": "security-stateful",
+      "returncode": 0,
+      "seed": 2026,
+      "started": "2026-11-16T03:29:19.139563+00:00",
+      "finished": "2026-11-16T03:30:00.845362+00:00",
+      "checked_output_hashes": 2
+    },
+    {
+      "group": "reviewer-full",
+      "study": "validation",
+      "returncode": 0,
+      "seed": 73,
+      "started": "2026-11-16T02:52:52.916001+00:00",
+      "finished": "2026-11-16T02:52:53.559714+00:00",
+      "checked_output_hashes": 4
+    }
+  ]
+}

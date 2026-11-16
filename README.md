@@ -68,6 +68,8 @@ QSV2G/
 
 ## Reproducibility
 
+The [dated repository audit](REPOSITORY_AUDIT.md) records the fresh checks, implementation inventory, corrections and remaining submission limitations. Read [PAPER_EVIDENCE_NOTES.md](PAPER_EVIDENCE_NOTES.md) before reusing earlier manuscript statements about missing raw evidence.
+
 Start with [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for exact budgets, provenance and the difference between archived evidence and fresh runs. [IMPLEMENTATIONS.md](IMPLEMENTATIONS.md) maps the nine original notebooks, their execution copies, current study commands and four protocol phases.
 
 ```bash
@@ -87,6 +89,8 @@ python -m qsv2g.evaluation.analysis results/generated/my-smoke
 The evidence command recalculates the paper's key results and generates vector figures **directly from archived raw records**. The nine current-code runs default to bounded smoke budgets. `--full` selects each study's documented larger budget, not every historical notebook. Every run records source hashes, packages, command, seed and output hashes; nonempty output directories are protected. Historical observations remain immutable and separate from new measurements.
 
 The tested reviewer environment is Python 3.12 on Linux with the pinned packages above. Genuine-PQC runs never silently substitute classical cryptography. Both restricted formal models have separate commands; see [formal/README.md](formal/README.md). Passing a suite is evidence within its scope, not a guarantee of conference acceptance or complete security.
+
+See [PAPER_EVIDENCE_NOTES.md](PAPER_EVIDENCE_NOTES.md) for corrections to the earlier manuscript-only evidence-availability statements.
 
 ## Research evidence
 

@@ -1,0 +1,18 @@
+[
+  {
+    "model": "formal/classical_consent.spthy",
+    "historical_commit": "b463fc758fa28f1853fe06c4130ee2f25173ac0c",
+    "historical_path": "formal/qsv2g_classical_consent.spthy",
+    "available": true,
+    "bytes_identical": true,
+    "current_sha256": "d880149603f23c3d22f960f4884fddfcc3074e128cadd943df3bdca8d1bf34ee"
+  },
+  {
+    "model": "formal/compromise_analysis.spthy",
+    "historical_commit": "2860ab3b0137c68e58fe1195a4c71a82a60ce183",
+    "historical_path": "formal/qsv2g_stage06_compromise_candidate.spthy",
+    "available": true,
+    "bytes_identical": true,
+    "current_sha256": "89fe42faa9859b3f51faf7acfc64ea4620210556b5e869cc85a005f8ffed57ff"
+  }
+]

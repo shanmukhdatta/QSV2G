@@ -1,0 +1,34 @@
+Executing original notebook cell 2
+QSV2G Stage 03 / Kaggle runtime: False / output: /workspace/scratch/cb34cf619fa1/qsv2g-repro-review/results/generated/reviewer-stage03/qsv2g_stage03_outputs
+Executing original notebook cell 4
+Core SHA256: 2c86ca9eecbc5925100722119f061e640df03f993e14909b3078b23406330758
+Section IV SHA256: 4ca43b1f6debd2e2bf314ff9adf74f0ad08ba1702e1055eca1943b9533290ef2
+Legacy X CSV SHA256: b55b31f50c15b8cf3d9dea2336bbaef873947041042163763ca9a77fd053bfaa
+Legacy X rows: 21 with 900 shots each
+Executing original notebook cell 6
+Statevector and decoder: verified against exact reference AST, three logical symbols and three authorized pairs.
+Executing original notebook cell 8
+Analytical probability checks: PASS (X, dephasing, depolarizing, flagged erasure, combined, all pairs).
+Executing original notebook cell 10
+Executed: 315 configurations, 315000 trials, 3.35 seconds
+Per-channel total correct/wrong/abort:
+              correct  wrong  abort
+model                              
+combined        53839   9161      0
+dephasing       63000      0      0
+depolarizing    58948   4052      0
+erasure         56840      0   6160
+x               56738   6262      0
+Executing original notebook cell 12
+Historical X comparison: 42 rows, no historical CSV modified.
+Executing original notebook cell 14
+Saved: five publication-candidate figures and all underlying CSVs.
+Executing original notebook cell 16
+Availability: QSS threshold reconstruction and QSV2G full workflow distinguished.
+Executing original notebook cell 18
+Monte Carlo Wilson95 coverage: 307 / 315 | max abs difference from exact probability: 0.029
+STAGE RESULT: PASS_WITH_MODEL_LIMITATIONS
+Executing original notebook cell 20
+STAGE03 ARCHIVE: /workspace/scratch/cb34cf619fa1/qsv2g-repro-review/results/generated/reviewer-stage03/fresh_stage03_results.zip 
+FILES: 20
+STAGE RESULT: PASS_WITH_MODEL_LIMITATIONS

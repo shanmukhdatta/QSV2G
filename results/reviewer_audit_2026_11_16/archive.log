@@ -1,0 +1,7 @@
+PASS results/archives/ideal_validation_historical.zip [SHA-256, CRC, 0 full-run member hashes]
+PASS results/archives/security_scenarios_historical.zip [SHA-256, CRC, 0 full-run member hashes]
+PASS results/archives/quantum_noise_historical.zip [SHA-256, CRC, 0 full-run member hashes]
+PASS results/archives/performance_historical.zip [SHA-256, CRC, 0 full-run member hashes]
+PASS results/archives/qsv2g_stage05_final_20261113T092554Z.zip [SHA-256, CRC, 31 full-run member hashes]
+PASS results/archives/qsv2g_stage06_full_20261113T111031Z_results.zip [SHA-256, CRC, 16 full-run member hashes]
+PASS: 6 original experimental archives verified
