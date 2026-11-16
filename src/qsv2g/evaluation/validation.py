@@ -39,6 +39,7 @@ def validate(out,shots=10,seed=2026,L=3):
 
 def main():
  p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True)
+ p.add_argument('--seed',type=int,default=2026)
  p.add_argument('--shots',type=int,default=10);p.add_argument('--L',type=int,default=3)
- a=p.parse_args();print(json.dumps(validate(a.out,a.shots,L=a.L),indent=2))
+ a=p.parse_args();print(json.dumps(validate(a.out,a.shots,seed=a.seed,L=a.L),indent=2))
 if __name__=='__main__':main()

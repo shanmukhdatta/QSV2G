@@ -13,6 +13,10 @@ dependencies = ["numpy>=1.24", "cryptography>=42", "pandas>=2.0", "matplotlib>=3
 dev = ["pytest>=8", "hypothesis>=6", "nbformat>=5"]
 pqc = ["pqcrypto>=0.3"]
 
+[tool.setuptools]
+py-modules = ["qsv2g_core"]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

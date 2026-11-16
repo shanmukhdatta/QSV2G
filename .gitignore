@@ -18,3 +18,5 @@ results/generated/
 *.synctex.gz
 /manuscript/
 /paper/
+
+.tools/

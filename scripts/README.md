@@ -22,3 +22,5 @@ python scripts/reproduce_all.py
 Default runs are *smoke* budgets; opt into the expensive datasets with `--full`.
 Consecutive executions have different crypto randomness and platform timings.
 Old archived result files must not be merged with new experiments as if the same protocol revision were tested.
+
+For the tested dependency pins, per-study budgets, failure records, fresh output directories and raw-data figure regeneration, use [the reproducibility guide](../REPRODUCIBILITY.md). `python -m qsv2g.evaluation.evidence --out results/generated/paper-evidence` checks the key archived paper claims. `python -m qsv2g.evaluation.analysis RUN_ROOT` accepts the current runner's directory layout and fails if there are no supported trial files.
