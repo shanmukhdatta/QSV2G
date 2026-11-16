@@ -1,6 +1,6 @@
 # QSV2G repository verification — 16 November 2026
 
-## Outcome and scope
+> **Repository integration update (17 November 2026):** The verified reviewer-audit pull request [#1](https://github.com/shanmukhdatta/QSV2G/pull/1) was merged into `main` at commit [`392b7fa03f45bf63ca5d7076e587206af580feb7`](https://github.com/shanmukhdatta/QSV2G/commit/392b7fa03f45bf63ca5d7076e587206af580feb7). The original text below describes the audit state before the merge. This integration does not correct the separate manuscript PDF or imply full security verification.\n\n## Outcome and scope
 
 The repository now provides a tested route from preserved raw observations to the paper's principal plots, and from the maintained implementation to fresh experiments. This is reproducibility engineering and bounded scientific verification, not certification of protocol security or conference acceptance. The approved seven-page manuscript and its structure were preserved. Its evidence-availability wording needs the corrections in [PAPER_EVIDENCE_NOTES.md](PAPER_EVIDENCE_NOTES.md).
 
