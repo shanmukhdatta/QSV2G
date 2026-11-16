@@ -17,9 +17,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
       - name: Install
-        run: python -m pip install -e ".[dev,pqc]"
+        run: |
+          python -m pip install -r requirements-repro.txt
+          python -m pip install -e . --no-deps
       - name: Guard against tracking unpublished LaTeX manuscripts
         run: |
           if git ls-files -- '*.tex' '*.bib' | grep -q .; then
@@ -33,15 +35,17 @@ jobs:
           python scripts/check_parity.py
       - name: Verify original experimental ZIP archives
         run: python scripts/verify_archived_evidence.py
-      - name: Real-PQC simulated protocol and research smoke runs
+      - name: Recalculate archived paper claims and figures
+        run: python -m qsv2g.evaluation.evidence --out results/generated/paper-evidence
+      - name: Real-PQC protocol and all nine bounded studies
         run: |
           python scripts/run_protocol.py --pair AC --operation DISCHARGE --length 9 >/dev/null
-          python scripts/run_experiment.py --study validation
-          python scripts/run_experiment.py --study performance
-          python scripts/run_experiment.py --study security
-          python scripts/run_experiment.py --study noise
-          python scripts/run_experiment.py --study availability
-          python scripts/run_experiment.py --study security-stateful
-          python scripts/run_experiment.py --study noise-vector
-          python scripts/run_experiment.py --study security-adversarial
-          python scripts/run_experiment.py --study reliability
+          python scripts/reproduce_all.py --out results/generated/ci-smoke
+          python -m qsv2g.evaluation.analysis results/generated/ci-smoke
+      - name: Preserve execution evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qsv2g-reviewer-evidence
+          path: results/generated/
+          if-no-files-found: warn

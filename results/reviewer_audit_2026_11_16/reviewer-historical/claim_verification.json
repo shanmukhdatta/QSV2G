@@ -1,0 +1,87 @@
+{
+  "status": "PASS",
+  "scope": "Reaggregation of preserved historical observations, not independent rerun or authenticated cloud provenance",
+  "archive_sha256": {
+    "quantum_noise_historical.zip": "b76f05afca3d872ce3bc7b4ea043ec7e10ef3d555e042cdadc0eda8e5f0b0d95",
+    "qsv2g_stage05_final_20261113T092554Z.zip": "87418c800c96537b143b7df594eaa79ee4015a05c867303f6239b40097316ee6"
+  },
+  "historical_stage05_revision": "b463fc758fa28f1853fe06c4130ee2f25173ac0c",
+  "historical_e1_manifest": {
+    "utc": "2026-11-13T09:46:02.768136+00:00",
+    "experiment": "E1",
+    "git_revision": "b463fc758fa28f1853fe06c4130ee2f25173ac0c",
+    "core_sha256": "7e26cb959a071c0cb519cda7490ae27abd02e4fed8406d9746f948d454bb9cd8",
+    "python": "3.13.18 (main, Oct 26 2026, 15:28:15) [GCC 13.3.0]",
+    "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "cpu_count": 4,
+    "params": {
+      "smoke": false,
+      "seed": 2026,
+      "blocks": 5,
+      "repeats_per_pair": 100,
+      "lengths": [
+        9,
+        27,
+        81,
+        162
+      ],
+      "backend": "Genuine PQCrypto; each block from a separate Python process",
+      "variants": [
+        "QUORUM",
+        "CLASSICAL_SHARING",
+        "QSS"
+      ]
+    },
+    "limitations": [
+      "single Python process",
+      "ideal statevector/analytical channel model",
+      "no real quantum network or EV hardware",
+      "no cryptographic security proof"
+    ]
+  },
+  "single_trit_rows": 315000,
+  "timing_rows": 18000,
+  "vector_outcomes": {
+    "COMMITMENT_GATE_ELIGIBLE": 191736,
+    "COMMITMENT_REJECT": 81400,
+    "ERASURE_ABORT": 26864
+  },
+  "endpoint_outcomes": {
+    "ACCEPTED_AT_EV": 3854,
+    "COMMITMENT_REJECT": 1606,
+    "ERASURE_ABORT": 540
+  },
+  "medians_ms": {
+    "CLASSICAL_SHARING": {
+      "9": 61.27308850005875,
+      "27": 61.617654999992055,
+      "81": 62.872713999979624,
+      "162": 64.80867200002649
+    },
+    "QSS": {
+      "9": 62.763543000073696,
+      "27": 65.67193349997069,
+      "81": 74.82961349995776,
+      "162": 88.40520399996876
+    },
+    "QUORUM": {
+      "9": 60.95848849997765,
+      "27": 60.78985850007257,
+      "81": 60.82954900011828,
+      "162": 60.8895729999972
+    }
+  },
+  "QSS_excess_percent": {
+    "9": 2.4324781670072237,
+    "27": 6.579735142434684,
+    "81": 19.017629014681958,
+    "162": 36.409528650629696
+  },
+  "limitations": [
+    "Historical source versions differ from current modular code",
+    "Timing is environment-dependent",
+    "No quantum deployment or full security proof",
+    "No confidence intervals invented"
+  ]
+}

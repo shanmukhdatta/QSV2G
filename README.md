@@ -68,29 +68,29 @@ QSV2G/
 
 ## Reproducibility
 
-Python **3.10+** is declared; Python 3.11+ is recommended. Install the optional `pqc` dependency for a genuine `pqcrypto` backend. An appropriate supported OpenSSL backend is an alternative; genuine-PQC experiments do not silently substitute classical cryptography.
+The [dated repository audit](REPOSITORY_AUDIT.md) records the fresh checks, implementation inventory, corrections and remaining submission limitations. Read [PAPER_EVIDENCE_NOTES.md](PAPER_EVIDENCE_NOTES.md) before reusing earlier manuscript statements about missing raw evidence.
+
+Start with [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for exact budgets, provenance and the difference between archived evidence and fresh runs. [IMPLEMENTATIONS.md](IMPLEMENTATIONS.md) maps the nine original notebooks, their execution copies, current study commands and four protocol phases.
 
 ```bash
 git clone https://github.com/shanmukhdatta/QSV2G.git
 cd QSV2G
-python -m pip install -e ".[dev,pqc]"
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements-repro.txt
+python -m pip install -e . --no-deps
 python -m pytest -q tests
-python scripts/run_protocol.py --pair AB --operation CHARGE --length 9
-```
-
-To run bounded experiments, then verify the identity of preserved historical archives:
-
-```bash
-python scripts/run_experiment.py --study validation
-python scripts/run_experiment.py --study security-adversarial
-python scripts/run_experiment.py --study noise
-python scripts/run_experiment.py --study performance
-python scripts/run_experiment.py --study reliability
-python scripts/check_parity.py
 python scripts/verify_archived_evidence.py
+python -m qsv2g.evaluation.evidence --out results/generated/paper-evidence
+python scripts/reproduce_all.py --out results/generated/my-smoke
+python -m qsv2g.evaluation.analysis results/generated/my-smoke
 ```
 
-Experiment runners default to **small smoke-test budgets** and write new output to `results/generated/`. `--full` requests larger workloads; it does not automatically reproduce every historical trial exactly. Tamarin and Maude require separate installation; see [`formal/README.md`](formal/README.md).
+The evidence command recalculates the paper's key results and generates vector figures **directly from archived raw records**. The nine current-code runs default to bounded smoke budgets. `--full` selects each study's documented larger budget, not every historical notebook. Every run records source hashes, packages, command, seed and output hashes; nonempty output directories are protected. Historical observations remain immutable and separate from new measurements.
+
+The tested reviewer environment is Python 3.12 on Linux with the pinned packages above. Genuine-PQC runs never silently substitute classical cryptography. Both restricted formal models have separate commands; see [formal/README.md](formal/README.md). Passing a suite is evidence within its scope, not a guarantee of conference acceptance or complete security.
+
+See [PAPER_EVIDENCE_NOTES.md](PAPER_EVIDENCE_NOTES.md) for corrections to the earlier manuscript-only evidence-availability statements.
 
 ## Research evidence
 

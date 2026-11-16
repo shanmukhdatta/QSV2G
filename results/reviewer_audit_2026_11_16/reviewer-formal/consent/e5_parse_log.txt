@@ -1,0 +1,134 @@
+theory QSV2G_Classical_Consent
+
+begin
+
+// Function signature and definition of the equational theory E
+
+functions: fst/1, mac/2, pair/2, pk/1, sign/2, snd/1, true/0, verify/3
+equations:
+    fst(<x.1, x.2>) = x.1,
+    snd(<x.1, x.2>) = x.2,
+    verify(sign(x.1, x.2), x.1, pk(x.2)) = true
+
+builtin  signing
+
+function: mac (Any, Any) : Any 
+
+rule (modulo E) Setup:
+   [ Fr( ~kEV ), Fr( ~skA ), Fr( ~skB ), Fr( ~sid ) ]
+  --[ SetupDone( ~sid ) ]->
+   [
+   !EvKey( ~kEV ), !SignAKey( ~skA ), !SignBKey( ~skB ), !PubA( pk(~skA) ),
+   !PubB( pk(~skB) ), EvBegin( ~sid ), Out( pk(~skA) ), Out( pk(~skB) )
+   ]
+
+rule (modulo E) EV_Consent:
+   [ EvBegin( sid ), Fr( ~ac ), !EvKey( k ) ]
+  --[ EVConsented( sid, ~ac ) ]->
+   [ EVIntent( sid, ~ac ), Out( <sid, ~ac, mac(<sid, ~ac>, k)> ) ]
+
+rule (modulo E) CS_Check_Consent:
+   [ In( <sid, ac, mac(<sid, ac>, k)> ), !EvKey( k ) ]
+  --[ CSConsentChecked( sid, ac ) ]->
+   [ !CSApproved( sid, ac ) ]
+
+rule (modulo E) UC_A_Approves:
+   [ !CSApproved( sid, ac ) ]
+  --[ ApprovedA( sid, ac ) ]->
+   [ !ApprovalA( sid, ac ) ]
+
+rule (modulo E) UC_B_Approves:
+   [ !CSApproved( sid, ac ) ]
+  --[ ApprovedB( sid, ac ) ]->
+   [ !ApprovalB( sid, ac ) ]
+
+rule (modulo E) Assumed_Ideal_QSS_Gate:
+   [ !ApprovalA( sid, ac ), !ApprovalB( sid, ac ), Fr( ~nu ) ]
+  --[ IdealRecoveryAssumption( sid, ac, ~nu ) ]->
+   [ !Ready( sid, ac, ~nu ), ReadyForEV( sid, ac, ~nu ) ]
+
+rule (modulo E) UC_A_Signs:
+   [ !Ready( sid, ac, nu ), !SignAKey( sk ) ]
+  --[ SignedA( sid, ac, nu ) ]->
+   [ Out( sign(<sid, ac, nu, 'A'>, sk) ) ]
+
+rule (modulo E) UC_B_Signs:
+   [ !Ready( sid, ac, nu ), !SignBKey( sk ) ]
+  --[ SignedB( sid, ac, nu ) ]->
+   [ Out( sign(<sid, ac, nu, 'B'>, sk) ) ]
+
+rule (modulo E) EV_Verifies_And_Executes:
+   [
+   EVIntent( sid, ac ), ReadyForEV( sid, ac, nu ), !PubA( pka ),
+   !PubB( pkb ), In( sigA ), In( sigB )
+   ]
+  --[
+  Eq( verify(sigA, <sid, ac, nu, 'A'>, pka), true ),
+  Eq( verify(sigB, <sid, ac, nu, 'B'>, pkb), true ),
+  Executed( sid, ac, nu )
+  ]->
+   [ ]
+
+restriction Equality:
+  "∀ x y #i. (Eq( x, y ) @ #i) ⇒ (x = y)"
+  // safety formula
+
+lemma honest_execution_reachable:
+  exists-trace "∃ sid ac nu #i. Executed( sid, ac, nu ) @ #i"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ sid ac nu #i. (Executed( sid, ac, nu ) @ #i)"
+*/
+by sorry
+
+lemma execution_requires_same_EV_consent:
+  all-traces
+  "∀ sid ac nu #i.
+    (Executed( sid, ac, nu ) @ #i) ⇒
+    (∃ #j. (EVConsented( sid, ac ) @ #j) ∧ (#j < #i))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ sid ac nu #i.
+  (Executed( sid, ac, nu ) @ #i)
+ ∧
+  ∀ #j. (EVConsented( sid, ac ) @ #j) ⇒ ¬(#j < #i)"
+*/
+by sorry
+
+lemma execution_requires_both_approval_actions:
+  all-traces
+  "∀ sid ac nu #i.
+    (Executed( sid, ac, nu ) @ #i) ⇒
+    (∃ #j #k.
+      (((ApprovedA( sid, ac ) @ #j) ∧ (ApprovedB( sid, ac ) @ #k)) ∧
+       (#j < #i)) ∧
+      (#k < #i))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ sid ac nu #i.
+  (Executed( sid, ac, nu ) @ #i)
+ ∧
+  ∀ #j #k.
+   (ApprovedA( sid, ac ) @ #j) ∧ (ApprovedB( sid, ac ) @ #k)
+  ⇒
+   ((¬(#j < #i)) ∨ (¬(#k < #i)))"
+*/
+by sorry
+
+lemma executed_once_per_session:
+  all-traces
+  "∀ sid ac1 ac2 nu1 nu2 #i #j.
+    ((Executed( sid, ac1, nu1 ) @ #i) ∧ (Executed( sid, ac2, nu2 ) @ #j)) ⇒
+    (#i = #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ sid ac1 ac2 nu1 nu2 #i #j.
+  (Executed( sid, ac1, nu1 ) @ #i) ∧ (Executed( sid, ac2, nu2 ) @ #j)
+ ∧
+  ¬(#i = #j)"
+*/
+by sorry
+
+end
+
+[Theory QSV2G_Classical_Consent] Theory loaded

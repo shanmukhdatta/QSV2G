@@ -1,0 +1,43 @@
+{
+  "ideal_trials": 720,
+  "correct": 720,
+  "workflows": 6,
+  "completed": 6,
+  "crypto_backend": "pqcrypto native ML-KEM-768 + ML-DSA-65",
+  "quantum_state_checks": [
+    {
+      "s": 0,
+      "norm": 1.0000000000000002,
+      "x_stabilizer_error": 0.0,
+      "z_stabilizer_error": 8.100577428481035e-16,
+      "one_share_distances": [
+        1.9229626863835638e-16,
+        1.9229626863835638e-16,
+        1.9229626863835638e-16
+      ]
+    },
+    {
+      "s": 1,
+      "norm": 1.0000000000000002,
+      "x_stabilizer_error": 0.0,
+      "z_stabilizer_error": 6.600966666949706e-16,
+      "one_share_distances": [
+        1.9229626863835638e-16,
+        1.9229626863835638e-16,
+        1.9229626863835638e-16
+      ]
+    },
+    {
+      "s": 2,
+      "norm": 1.0000000000000002,
+      "x_stabilizer_error": 0.0,
+      "z_stabilizer_error": 6.553555421299595e-16,
+      "one_share_distances": [
+        1.9229626863835638e-16,
+        1.9229626863835638e-16,
+        1.9229626863835638e-16
+      ]
+    }
+  ],
+  "scope": "ideal simulated quantum states, genuine PQC, no physical V2G hardware"
+}
